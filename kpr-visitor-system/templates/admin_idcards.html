@@ -1,0 +1,1280 @@
+{% extends "base.html" %}
+
+{% block title %}ID Card Management · KPR College{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center flex-wrap gap-2">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-id-card-alt fs-2 me-2" style="color: #1a237e;"></i>
+        <span class="fw-bold" style="font-size: 1.6rem;">ID Card Control</span>
+    </div>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="badge bg-white text-primary px-3 py-1 rounded-pill border border-primary">
+            <i class="fas fa-circle text-primary me-1" style="font-size: 0.5rem;"></i> 
+            {{ available_count }} Available
+        </span>
+        <span class="badge bg-white text-dark px-3 py-1 rounded-pill border border-secondary">
+            <i class="fas fa-clock me-1"></i> {{ now.strftime('%H:%M') }}
+        </span>
+    </div>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">ID Card Control</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== ID CARD MANAGEMENT - CLEAN & PROFESSIONAL ===== */
+    :root {
+        --primary: #1a237e;
+        --primary-dark: #0d1458;
+        --primary-light: #e8eaf6;
+        --primary-soft: #c5cae9;
+        --danger: #d32f2f;
+        --danger-light: #ffebee;
+        --success: #2e7d32;
+        --success-light: #e8f5e9;
+        --warning: #ed6c02;
+        --warning-light: #fff3e0;
+        --info: #0288d1;
+        --info-light: #e1f5fe;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.05);
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --transition: all 0.2s ease;
+        
+        /* Card status colors */
+        --card-available: #10b981;
+        --card-available-light: #d1fae5;
+        --card-issued: #3b82f6;
+        --card-issued-light: #dbeafe;
+        --card-lost: #ef4444;
+        --card-lost-light: #fee2e2;
+        --card-damaged: #f59e0b;
+        --card-damaged-light: #fed7aa;
+    }
+
+    body {
+        background: #f1f5f9;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .container-fluid {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 12px 16px !important;
+    }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--gray-50);
+        padding: 4px 8px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+        flex: 1 1 160px;
+    }
+
+    .filter-group i {
+        color: var(--primary);
+        font-size: 0.9rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .filter-select, .filter-input {
+        border: none;
+        background: transparent;
+        padding: 6px 4px;
+        font-size: 0.9rem;
+        width: 100%;
+        outline: none;
+        color: var(--gray-700);
+    }
+
+    .search-group {
+        flex: 2 1 240px;
+        position: relative;
+    }
+
+    .search-group input {
+        width: 100%;
+        padding: 6px 6px 6px 32px;
+        border: 1px solid var(--gray-200);
+        border-radius: 20px;
+        font-size: 0.9rem;
+        background: white;
+    }
+
+    .search-group i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-size: 0.9rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 6px;
+        margin-left: auto;
+    }
+
+    .btn-sm {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+
+    .btn-primary-sm {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary-sm:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-outline-sm {
+        background: white;
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+    }
+
+    .btn-outline-sm:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-success-sm {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-success-sm:hover {
+        background: #1b5e20;
+    }
+
+    /* ===== STATS ROW ===== */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--radius-md);
+        padding: 16px;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-icon.available { 
+        background: var(--card-available-light); 
+        color: var(--card-available);
+    }
+    .stat-icon.issued { 
+        background: var(--card-issued-light); 
+        color: var(--card-issued);
+    }
+    .stat-icon.lost { 
+        background: var(--card-lost-light); 
+        color: var(--card-lost);
+    }
+    .stat-icon.damaged { 
+        background: var(--card-damaged-light); 
+        color: var(--card-damaged);
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .stat-percent {
+        font-size: 0.7rem;
+        color: var(--gray-400);
+        margin-top: 2px;
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .progress-header h5 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .progress-header h5 i {
+        color: var(--primary);
+    }
+
+    .progress-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .progress-stat {
+        text-align: right;
+    }
+
+    .progress-stat .label {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+    }
+
+    .progress-stat .value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .progress-bars {
+        display: flex;
+        gap: 2px;
+        height: 40px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: var(--gray-100);
+    }
+
+    .progress-bar-segment {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        transition: width 0.3s ease;
+    }
+
+    .progress-bar-segment.available { background: var(--card-available); }
+    .progress-bar-segment.issued { background: var(--card-issued); }
+    .progress-bar-segment.lost { background: var(--card-lost); }
+    .progress-bar-segment.damaged { background: var(--card-damaged); }
+
+    .progress-legend {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: var(--gray-600);
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+    }
+
+    .legend-color.available { background: var(--card-available); }
+    .legend-color.issued { background: var(--card-issued); }
+    .legend-color.lost { background: var(--card-lost); }
+    .legend-color.damaged { background: var(--card-damaged); }
+
+    /* ===== TABLE ===== */
+    .table-wrapper {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .table-header h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-count {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+        font-size: 0.85rem;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px 16px;
+        background: white;
+        color: var(--gray-600);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-700);
+        vertical-align: middle;
+    }
+
+    tr:hover td {
+        background: var(--gray-50);
+    }
+
+    /* Card number badge */
+    .card-number {
+        font-family: 'SF Mono', 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .card-number i {
+        font-size: 0.7rem;
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-available {
+        background: var(--card-available-light);
+        color: var(--card-available);
+    }
+
+    .status-issued {
+        background: var(--card-issued-light);
+        color: var(--card-issued);
+    }
+
+    .status-lost {
+        background: var(--card-lost-light);
+        color: var(--card-lost);
+    }
+
+    .status-damaged {
+        background: var(--card-damaged-light);
+        color: var(--card-damaged);
+    }
+
+    /* Visitor info */
+    .visitor-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .visitor-name {
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 0.85rem;
+    }
+
+    .visitor-id {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        font-family: monospace;
+    }
+
+    .visitor-contact {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .visitor-contact i {
+        font-size: 0.6rem;
+        color: var(--primary);
+    }
+
+    /* Date display */
+    .date-display {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .date-main {
+        font-weight: 500;
+        color: var(--gray-800);
+        font-size: 0.8rem;
+    }
+
+    .date-sub {
+        font-size: 0.65rem;
+        color: var(--gray-500);
+    }
+
+    /* Usage count */
+    .usage-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: var(--gray-100);
+        border-radius: 20px;
+        font-size: 0.7rem;
+        color: var(--gray-600);
+    }
+
+    .usage-count i {
+        color: var(--primary);
+        font-size: 0.6rem;
+    }
+
+    /* Action buttons */
+    .action-group {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        text-decoration: none;
+        transition: var(--transition);
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    .btn-icon:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .btn-icon.success:hover { background: var(--success); }
+    .btn-icon.warning:hover { background: var(--warning); }
+    .btn-icon.danger:hover { background: var(--danger); }
+    .btn-icon.info:hover { background: var(--info); }
+
+    .btn-text {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .btn-text:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 16px;
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        font-size: 0.8rem;
+        text-decoration: none;
+    }
+
+    .page-link:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--gray-400);
+        margin-bottom: 12px;
+    }
+
+    /* Toast */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 8px;
+        padding: 12px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 1100;
+        border-left: 4px solid;
+    }
+
+    .toast.show {
+        transform: translateX(0);
+    }
+
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.info { border-left-color: var(--info); }
+
+    .toast i { font-size: 1.2rem; }
+    .toast.success i { color: var(--success); }
+    .toast.error i { color: var(--danger); }
+    .toast.info i { color: var(--info); }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .modal-header i {
+        font-size: 2rem;
+    }
+
+    .modal-header.warning i { color: var(--warning); }
+    .modal-header.danger i { color: var(--danger); }
+    .modal-header.success i { color: var(--success); }
+
+    .modal-header h3 {
+        margin: 0;
+        color: var(--gray-800);
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        margin-bottom: 24px;
+        color: var(--gray-600);
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-group, .search-group, .btn-group {
+            width: 100%;
+        }
+        
+        .btn-group {
+            margin-left: 0;
+        }
+
+        .progress-stats {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .progress-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .progress-stats {
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-row">
+            <div class="filter-group">
+                <i class="fas fa-filter"></i>
+                <select class="filter-select" id="statusFilter">
+                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Cards</option>
+                    <option value="available" {% if status_filter == 'available' %}selected{% endif %}>Available</option>
+                    <option value="issued" {% if status_filter == 'issued' %}selected{% endif %}>Issued</option>
+                    <option value="lost" {% if status_filter == 'lost' %}selected{% endif %}>Lost</option>
+                    <option value="damaged" {% if status_filter == 'damaged' %}selected{% endif %}>Damaged</option>
+                </select>
+            </div>
+
+            <div class="search-group">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search card number..." value="{{ search_query }}">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-sm btn-primary-sm" onclick="applyFilters()">Apply</button>
+                <a href="{{ url_for('admin_idcards') }}" class="btn-sm btn-outline-sm">Reset</a>
+                <button class="btn-sm btn-success-sm" onclick="exportCardReport()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon available">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ available_count }}</div>
+                <div class="stat-label">Available Cards</div>
+                <div class="stat-percent">{{ ((available_count/100)*100)|round|int }}% of total</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon issued">
+                <i class="fas fa-hand-holding"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ issued_count }}</div>
+                <div class="stat-label">Issued Cards</div>
+                <div class="stat-percent">{{ ((issued_count/100)*100)|round|int }}% utilization</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon lost">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ lost_count }}</div>
+                <div class="stat-label">Lost Cards</div>
+                <div class="stat-percent">Requires attention</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon damaged">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ damaged_count }}</div>
+                <div class="stat-label">Damaged Cards</div>
+                <div class="stat-percent">Needs repair</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+        <div class="progress-header">
+            <h5>
+                <i class="fas fa-chart-pie"></i>
+                Card Inventory Overview
+            </h5>
+            <div class="progress-stats">
+                <div class="progress-stat">
+                    <div class="label">Total Cards</div>
+                    <div class="value">{{ total_count }}/100</div>
+                </div>
+                <div class="progress-stat">
+                    <div class="label">In Circulation</div>
+                    <div class="value">{{ issued_count }}</div>
+                </div>
+                <div class="progress-stat">
+                    <div class="label">Available</div>
+                    <div class="value">{{ available_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-bars">
+            <div class="progress-bar-segment available" style="width: {{ ((available_count/100)*100)|round|int }}%">
+                {% if ((available_count/100)*100) > 10 %}{{ available_count }}{% endif %}
+            </div>
+            <div class="progress-bar-segment issued" style="width: {{ ((issued_count/100)*100)|round|int }}%">
+                {% if ((issued_count/100)*100) > 10 %}{{ issued_count }}{% endif %}
+            </div>
+            <div class="progress-bar-segment lost" style="width: {{ ((lost_count/100)*100)|round|int }}%">
+                {% if ((lost_count/100)*100) > 5 %}{{ lost_count }}{% endif %}
+            </div>
+            <div class="progress-bar-segment damaged" style="width: {{ ((damaged_count/100)*100)|round|int }}%">
+                {% if ((damaged_count/100)*100) > 5 %}{{ damaged_count }}{% endif %}
+            </div>
+        </div>
+
+        <div class="progress-legend">
+            <span class="legend-item">
+                <span class="legend-color available"></span>
+                Available
+            </span>
+            <span class="legend-item">
+                <span class="legend-color issued"></span>
+                Issued
+            </span>
+            <span class="legend-item">
+                <span class="legend-color lost"></span>
+                Lost
+            </span>
+            <span class="legend-item">
+                <span class="legend-color damaged"></span>
+                Damaged
+            </span>
+        </div>
+    </div>
+
+    <!-- Table -->
+    {% if cards %}
+    <div class="table-wrapper">
+        <div class="table-header">
+            <h4>
+                <i class="fas fa-id-card me-1" style="color: var(--primary);"></i>
+                ID Card Inventory
+                <span class="badge-count ms-2">{{ cards|length }} of {{ total_count }}</span>
+            </h4>
+            <div class="d-flex gap-2">
+                <button class="btn-sm btn-outline-sm" onclick="printSummary()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn-sm btn-outline-sm" onclick="bulkActions()">
+                    <i class="fas fa-tasks"></i> Bulk
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Card Number</th>
+                        <th>Status</th>
+                        <th>Current Holder</th>
+                        <th>Issued Date</th>
+                        <th>Returned Date</th>
+                        <th>Usage</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cards %}
+                    <tr>
+                        <td>
+                            <span class="card-number">
+                                <i class="fas fa-credit-card"></i>
+                                {{ item.card.card_number }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if item.card.status == 'available' %}
+                                <span class="status-badge status-available">
+                                    <i class="fas fa-check-circle"></i>
+                                    Available
+                                </span>
+                            {% elif item.card.status == 'issued' %}
+                                <span class="status-badge status-issued">
+                                    <i class="fas fa-hand-holding"></i>
+                                    Issued
+                                </span>
+                            {% elif item.card.status == 'lost' %}
+                                <span class="status-badge status-lost">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Lost
+                                </span>
+                            {% elif item.card.status == 'damaged' %}
+                                <span class="status-badge status-damaged">
+                                    <i class="fas fa-tools"></i>
+                                    Damaged
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.current_visitor %}
+                                <div class="visitor-info">
+                                    <span class="visitor-name">{{ item.current_visitor.full_name }}</span>
+                                    <span class="visitor-id">{{ item.current_visitor.visitor_id }}</span>
+                                    <span class="visitor-contact">
+                                        <i class="fas fa-phone"></i>
+                                        {{ item.current_visitor.phone }}
+                                    </span>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.card.issued_date %}
+                                <div class="date-display">
+                                    <span class="date-main">{{ item.card.issued_date.strftime('%d %b %Y') }}</span>
+                                    <span class="date-sub">{{ item.card.issued_date.strftime('%I:%M %p') }}</span>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.card.returned_date %}
+                                <div class="date-display">
+                                    <span class="date-main">{{ item.card.returned_date.strftime('%d %b %Y') }}</span>
+                                    <span class="date-sub">{{ item.card.returned_date.strftime('%I:%M %p') }}</span>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="usage-count">
+                                <i class="fas fa-history"></i>
+                                {{ item.card.visitors.count() if item.card.visitors else 0 }} uses
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                <a href="{{ url_for('id_card_details', card_number=item.card.card_number) }}" 
+                                   class="btn-icon" title="View History">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                                
+                                {% if item.card.status == 'issued' %}
+                                    <button class="btn-icon warning" title="Mark as Lost" 
+                                            onclick="updateCardStatus({{ item.card.id }}, 'lost', '{{ item.card.card_number }}')">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </button>
+                                    <button class="btn-icon danger" title="Mark as Damaged" 
+                                            onclick="updateCardStatus({{ item.card.id }}, 'damaged', '{{ item.card.card_number }}')">
+                                        <i class="fas fa-tools"></i>
+                                    </button>
+                                {% elif item.card.status in ['lost', 'damaged'] %}
+                                    <button class="btn-icon success" title="Restore Card" 
+                                            onclick="updateCardStatus({{ item.card.id }}, 'available', '{{ item.card.card_number }}')">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <ul class="pagination">
+        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('admin_idcards', page=page-1, status=status_filter, search=search_query) }}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        {% for p in range(1, total_pages + 1) %}
+            {% if p >= page - 2 and p <= page + 2 %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('admin_idcards', page=p, status=status_filter, search=search_query) }}">{{ p }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('admin_idcards', page=page+1, status=status_filter, search=search_query) }}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+    </ul>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-id-card"></i>
+        <h5 class="fw-semibold">No Cards Found</h5>
+        <p class="text-muted small">Try adjusting your filters</p>
+        <a href="{{ url_for('admin_idcards') }}" class="btn-sm btn-primary-sm mt-2">
+            <i class="fas fa-redo"></i> Clear Filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal" id="statusModal">
+    <div class="modal-content">
+        <div class="modal-header" id="statusModalHeader">
+            <i class="fas" id="statusModalIcon"></i>
+            <h3 id="statusModalTitle">Update Card Status</h3>
+        </div>
+        <div class="modal-body" id="statusModalBody">
+            Are you sure you want to mark card <strong id="cardNumberDisplay"></strong> as <span id="newStatusDisplay"></span>?
+        </div>
+        <div class="modal-footer">
+            <button class="btn-sm btn-outline-sm" onclick="closeStatusModal()">Cancel</button>
+            <button class="btn-sm" id="statusConfirmBtn" onclick="confirmStatusUpdate()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast">
+    <i class="fas" id="toastIcon"></i>
+    <span id="toastMessage"></span>
+</div>
+
+<script>
+    // State
+    let currentCardId = null;
+    let newStatus = null;
+    let currentCardNumber = null;
+
+    // Toast
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const messageEl = document.getElementById('toastMessage');
+        
+        toast.className = 'toast ' + type;
+        icon.className = 'fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+        messageEl.textContent = message;
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Filters
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        
+        let url = "{{ url_for('admin_idcards') }}?";
+        let params = [];
+        
+        if (status && status !== 'all') params.push(`status=${status}`);
+        if (search) params.push(`search=${encodeURIComponent(search)}`);
+        
+        window.location.href = url + params.join('&');
+    }
+
+    document.getElementById('searchInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
+    // Status Update
+    function updateCardStatus(cardId, status, cardNumber) {
+        currentCardId = cardId;
+        newStatus = status;
+        currentCardNumber = cardNumber;
+
+        const modal = document.getElementById('statusModal');
+        const header = document.getElementById('statusModalHeader');
+        const icon = document.getElementById('statusModalIcon');
+        const title = document.getElementById('statusModalTitle');
+        const body = document.getElementById('statusModalBody');
+        const confirmBtn = document.getElementById('statusConfirmBtn');
+        const statusDisplay = document.getElementById('newStatusDisplay');
+
+        // Update modal based on status
+        statusDisplay.textContent = status;
+        document.getElementById('cardNumberDisplay').textContent = cardNumber;
+
+        if (status === 'lost') {
+            header.className = 'modal-header warning';
+            icon.className = 'fas fa-exclamation-triangle';
+            title.textContent = 'Mark Card as Lost';
+            confirmBtn.className = 'btn-sm btn-warning';
+            confirmBtn.textContent = 'Mark Lost';
+        } else if (status === 'damaged') {
+            header.className = 'modal-header danger';
+            icon.className = 'fas fa-tools';
+            title.textContent = 'Mark Card as Damaged';
+            confirmBtn.className = 'btn-sm btn-danger';
+            confirmBtn.textContent = 'Mark Damaged';
+        } else if (status === 'available') {
+            header.className = 'modal-header success';
+            icon.className = 'fas fa-check-circle';
+            title.textContent = 'Restore Card';
+            confirmBtn.className = 'btn-sm btn-success';
+            confirmBtn.textContent = 'Restore';
+        }
+
+        modal.classList.add('show');
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').classList.remove('show');
+        currentCardId = null;
+        newStatus = null;
+        currentCardNumber = null;
+    }
+
+    function confirmStatusUpdate() {
+        if (!currentCardId || !newStatus) return;
+
+        showToast(`Updating card status...`, 'info');
+        closeStatusModal();
+
+        fetch(`/api/card/${currentCardId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast(data.message || 'Error updating card', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error updating card', 'error');
+        });
+    }
+
+    // Export
+    function exportCardReport() {
+        const params = new URLSearchParams(window.location.search);
+        window.location.href = '/export/csv?type=cards&' + params.toString();
+    }
+
+    // Print
+    function printSummary() {
+        window.print();
+    }
+
+    // Bulk Actions
+    function bulkActions() {
+        // Simple bulk actions for now
+        const status = prompt('Enter status to set for all visible cards (available/lost/damaged):');
+        if (status && ['available', 'lost', 'damaged'].includes(status)) {
+            if (confirm(`Set all visible cards to ${status}?`)) {
+                showToast(`Bulk update to ${status}...`, 'info');
+                // Implement bulk update via API
+            }
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        };
+    });
+</script>
+{% endblock %}

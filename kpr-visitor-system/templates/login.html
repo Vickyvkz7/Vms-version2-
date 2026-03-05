@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPR College · Visitor Management Login</title>
+    
+    <!-- Bootstrap 5 (grid & utilities only) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter + Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== MODERN CORPORATE LOGIN ===== */
+        :root {
+            --bg-light: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-light: #e9edf4;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
+            
+            --accent-admin: #2563eb;
+            --accent-admin-light: #3b82f6;
+            --accent-admin-soft: #eff6ff;
+            
+            --accent-security: #16a34a;
+            --accent-security-light: #22c55e;
+            --accent-security-soft: #f0fdf4;
+            
+            --border-radius: 1.5rem;
+            --border-radius-sm: 1rem;
+            --transition: all 0.2s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        
+        .login-wrapper {
+            width: 100%;
+            max-width: 1360px;
+            animation: fadeUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Main grid */
+        .login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        
+        /* Left panel – branding */
+        .brand-panel {
+            background: linear-gradient(145deg, #f8fafd, #ffffff);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--border-light);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--accent-admin);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.2);
+        }
+        
+        .logo-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.9rem;
+            color: var(--text-primary);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .brand-quote {
+            margin: 1.5rem 0 2.5rem;
+        }
+        
+        .brand-quote h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        .brand-quote p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-admin);
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .feature-text h4 {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .feature-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .badge-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .badge-row i {
+            color: #10b981;
+            font-size: 0.7rem;
+        }
+        
+        /* Right panel – form */
+        .form-panel {
+            padding: 3rem 2.5rem;
+            background: white;
+        }
+        
+        .form-header {
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Role cards */
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .role-card {
+            flex: 1;
+            background: #fafbfc;
+            border: 2px solid var(--border-light);
+            border-radius: 1rem;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .role-card.selected {
+            border-color: var(--accent-admin);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .role-card.security.selected {
+            border-color: var(--accent-security);
+        }
+        
+        .role-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .role-icon.admin {
+            background: var(--accent-admin);
+        }
+        
+        .role-icon.security {
+            background: var(--accent-security);
+        }
+        
+        .role-card h4 {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+        
+        .role-card p {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: var(--accent-admin-soft);
+            color: var(--accent-admin);
+        }
+        
+        .role-card.security.selected .role-badge {
+            background: var(--accent-security-soft);
+            color: var(--accent-security);
+        }
+        
+        /* Form fields */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-light);
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: #fafbfc;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-admin);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus + .input-icon {
+            color: var(--accent-admin);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.4rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .password-toggle:hover {
+            background: var(--border-light);
+            color: var(--accent-admin);
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .remember-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .remember-checkbox input[type="checkbox"] {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--accent-admin);
+        }
+        
+        .remember-checkbox span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .forgot-link {
+            color: var(--accent-admin);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            color: white;
+            margin-bottom: 2rem;
+            background: var(--accent-admin);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+        }
+        
+        .login-btn.security {
+            background: var(--accent-security);
+            box-shadow: 0 8px 16px rgba(22, 163, 74, 0.25);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        
+        /* System status */
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fafbfc;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-light);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            position: relative;
+        }
+        
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 1.8s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            70% { transform: scale(2.2); opacity: 0; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        
+        .status-text {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .status-text small {
+            font-weight: 400;
+            color: var(--text-secondary);
+            display: block;
+        }
+        
+        /* Demo credentials */
+        .demo-credentials {
+            background: #fafbfc;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+        }
+        
+        .demo-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .demo-title i {
+            color: var(--accent-admin);
+        }
+        
+        .credential-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+        
+        .credential-row:hover {
+            border-color: var(--accent-admin);
+        }
+        
+        .credential-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .badge-admin {
+            background: var(--accent-admin);
+        }
+        
+        .badge-security {
+            background: var(--accent-security);
+        }
+        
+        .credential-info {
+            flex: 1;
+        }
+        
+        .credential-username {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .credential-password {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .copy-btn {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent-admin);
+            background: var(--accent-admin-soft);
+            color: var(--accent-admin);
+        }
+        
+        /* Flash messages */
+        .alert {
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            border-left: 4px solid;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .alert-success {
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+        
+        .alert-warning {
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+        
+        .alert-info {
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-header h3 {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .modal-body {
+            color: var(--text-secondary);
+        }
+        
+        .modal-footer {
+            margin-top: 1.5rem;
+            text-align: right;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .login-grid {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            
+            .brand-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .role-selector {
+                flex-direction: column;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-grid">
+            <!-- Left brand panel -->
+            <div class="brand-panel">
+                <div>
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <img src="{{ url_for('static', filename='image.png') }}" alt="Logo" style="width:60px; height:60px; object-fit:contain;">
+                        </div>
+                        <div class="logo-text">
+                            <h1>KPR College</h1>
+                            <p>Visitor Management System</p>
+                        </div>
+                    </div>
+                    
+                    <div class="brand-quote">
+                        <h2>Streamlined & Secure</h2>
+                        <p>Modern visitor tracking with real‑time insights and effortless check‑in/out.</p>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-shield"></i></div>
+                            <div class="feature-text">
+                                <h4>Role‑based Access</h4>
+                                <p>Admin & security roles</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+                            <div class="feature-text">
+                                <h4>QR Passes</h4>
+                                <p>Digital, scannable passes</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-id-card"></i></div>
+                            <div class="feature-text">
+                                <h4>ID Card Tracking</h4>
+                                <p>CAS001–CAS100 inventory</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-chart-simple"></i></div>
+                            <div class="feature-text">
+                                <h4>Live Dashboard</h4>
+                                <p>Real‑time visitor stats</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="badge-row">
+                    <i class="fas fa-circle"></i>
+                    <span>System v2.1.0 · 100 ID cards active · All services operational</span>
+                </div>
+            </div>
+            
+            <!-- Right form panel -->
+            <div class="form-panel">
+                <div class="form-header">
+                    <h2>Sign In</h2>
+                    <p>Choose your role and enter your credentials</p>
+                </div>
+                
+                <!-- Flash messages (if any) -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div id="flashMessages">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category if category != 'error' else 'error' }}">
+                                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
+                <!-- Role selector -->
+                <div class="role-selector" id="roleSelector">
+                    <div class="role-card admin selected" id="adminRole" onclick="selectRole('admin')">
+                        <div class="role-icon admin"><i class="fas fa-user-tie"></i></div>
+                        <h4>Administrator</h4>
+                        <p>Full system access</p>
+                        <span class="role-badge">Admin</span>
+                    </div>
+                    <div class="role-card security" id="securityRole" onclick="selectRole('security')">
+                        <div class="role-icon security"><i class="fas fa-user-shield"></i></div>
+                        <h4>Security Staff</h4>
+                        <p>Check‑in/out, monitoring</p>
+                        <span class="role-badge">Security</span>
+                    </div>
+                </div>
+                
+                <!-- Login form -->
+                <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+                    <!-- Hidden role field -->
+                    <input type="hidden" id="selectedRole" name="login_type" value="admin">
+                    
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label class="form-label" for="username">
+                            <i class="far fa-user-circle"></i> Username
+                        </label>
+                        <div class="input-container">
+                            <i class="input-icon far fa-user"></i>
+                            <input type="text" class="form-input" id="username" name="username" 
+                                   placeholder="e.g. admin" autocomplete="username" required value="admin">
+                        </div>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-container">
+                            <i class="input-icon fas fa-lock"></i>
+                            <input type="password" class="form-input" id="password" name="password" 
+                                   placeholder="••••••••" autocomplete="current-password" required value="admin">
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Options -->
+                    <div class="form-options">
+                        <label class="remember-checkbox">
+                            <input type="checkbox" id="remember" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link" onclick="showForgotModal(event)">Forgot password?</a>
+                    </div>
+                    
+                    <!-- Login button -->
+                    <button type="submit" class="login-btn admin" id="loginButton">
+                        <i class="fas fa-arrow-right-to-bracket"></i>
+                        <span id="loginButtonText">Sign in as Admin</span>
+                    </button>
+                </form>
+                
+                <!-- System status -->
+                <div class="system-status">
+                    <div class="status-dot"></div>
+                    <div class="status-text">
+                        <span id="systemMessage">System Online</span>
+                        <small id="visitorCount">Fetching stats…</small>
+                    </div>
+                </div>
+                
+                <!-- Demo credentials -->
+                <div class="demo-credentials">
+                    <div class="demo-title">
+                        <i class="fas fa-key"></i>
+                        <span>Demo credentials</span>
+                    </div>
+                    
+                    <div class="credential-row" id="adminCredRow">
+                        <div class="credential-badge badge-admin"><i class="fas fa-user-tie"></i></div>
+                        <div class="credential-info">
+                            <div class="credential-username">admin</div>
+                            <div class="credential-password">password: admin</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCredentials('admin', 'admin', event)"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                    
+                    <div class="credential-row" id="securityCredRow">
+                        <div class="credential-badge badge-security"><i class="fas fa-user-shield"></i></div>
+                        <div class="credential-info">
+                            <div class="credential-username">security</div>
+                            <div class="credential-password">password: security123</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCredentials('security', 'security123', event)"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forgot password modal -->
+    <div class="modal" id="forgotModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle me-2"></i>Reset password</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Please contact your system administrator:</p>
+                <ul class="list-unstyled mt-3">
+                    <li><strong>Admin:</strong> admin@kprcollege.edu</li>
+                    <li><strong>Security:</strong> security@kprcollege.edu</li>
+                </ul>
+                <hr>
+                <p class="small text-muted">Or use the demo credentials above to log in.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary btn-sm" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedRole = 'admin';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle
+            const toggle = document.getElementById('passwordToggle');
+            const pwd = document.getElementById('password');
+            toggle.addEventListener('click', function() {
+                const type = pwd.type === 'password' ? 'text' : 'password';
+                pwd.type = type;
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+            
+            // Load stats (simulated)
+            loadSystemStats();
+            
+            // Initial role
+            selectRole('admin');
+            
+            // Auto‑hide flash messages
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    alert.style.transition = 'opacity 0.4s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 400);
+                });
+            }, 5000);
+            
+            // Form loading state
+            const form = document.getElementById('loginForm');
+            const btn = document.getElementById('loginButton');
+            const btnText = document.getElementById('loginButtonText');
+            form.addEventListener('submit', function() {
+                btn.disabled = true;
+                btnText.textContent = 'Signing in...';
+                btn.querySelector('i').className = 'fas fa-spinner fa-spin';
+            });
+        });
+        
+        function selectRole(role) {
+            selectedRole = role;
+            
+            document.getElementById('adminRole').classList.remove('selected');
+            document.getElementById('securityRole').classList.remove('selected');
+            document.getElementById('adminCredRow').style.borderColor = '#e9edf4';
+            document.getElementById('securityCredRow').style.borderColor = '#e9edf4';
+            
+            if (role === 'admin') {
+                document.getElementById('adminRole').classList.add('selected');
+                document.getElementById('loginButton').className = 'login-btn admin';
+                document.getElementById('loginButtonText').textContent = 'Sign in as Admin';
+                document.getElementById('adminCredRow').style.borderColor = '#2563eb';
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin';
+            } else {
+                document.getElementById('securityRole').classList.add('selected');
+                document.getElementById('loginButton').className = 'login-btn security';
+                document.getElementById('loginButtonText').textContent = 'Sign in as Security';
+                document.getElementById('securityCredRow').style.borderColor = '#16a34a';
+                document.getElementById('username').value = 'security';
+                document.getElementById('password').value = 'security123';
+            }
+            
+            document.getElementById('selectedRole').value = role;
+        }
+        
+        function loadSystemStats() {
+            setTimeout(() => {
+                const count = Math.floor(Math.random() * 35) + 15;
+                document.getElementById('visitorCount').innerHTML = `<i class="fas fa-users me-1"></i>Today: ${count} visitors`;
+            }, 600);
+            
+            const messages = [
+                'System Online · All systems go',
+                'Real‑time sync active',
+                'Database connected',
+                'Security protocols engaged'
+            ];
+            let i = 0;
+            setInterval(() => {
+                document.getElementById('systemMessage').textContent = messages[i % messages.length];
+                i++;
+            }, 5000);
+        }
+        
+        function copyCredentials(username, password, e) {
+            const text = `Username: ${username}\nPassword: ${password}`;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = e.currentTarget;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                btn.style.borderColor = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        }
+        
+        function showForgotModal(e) {
+            e.preventDefault();
+            document.getElementById('forgotModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('forgotModal').classList.remove('show');
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '1') {
+                e.preventDefault();
+                selectRole('admin');
+            } else if (e.ctrlKey && e.key === '2') {
+                e.preventDefault();
+                selectRole('security');
+            } else if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').submit();
+            } else if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Click outside modal to close
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('forgotModal');
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body>
+</html>

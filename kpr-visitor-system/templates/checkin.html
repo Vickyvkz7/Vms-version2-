@@ -1,0 +1,1179 @@
+{% extends "base.html" %}
+
+{% block title %}Security Check‑in · KPR College{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center">
+    <span class="fw-bold">Security Console</span>
+    <span class="badge bg-white text-primary ms-3 px-3 py-2 rounded-pill shadow-sm border border-primary">
+        <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem; animation: blink 1.5s infinite;"></i> GATE ACTIVE
+    </span>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('security_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+<li class="breadcrumb-item active text-primary fw-semibold">Visitor Check‑in</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== ENHANCED SECURITY CHECK-IN STYLES ===== */
+    :root {
+        --primary: #0d6efd;
+        --primary-dark: #0b5ed7;
+        --primary-light: #e7f1ff;
+        --primary-soft: #cfe2ff;
+        --success: #198754;
+        --success-light: #d1e7dd;
+        --warning: #ffc107;
+        --warning-light: #fff3cd;
+        --danger: #dc3545;
+        --danger-light: #f8d7da;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-600: #6c757d;
+        --gray-800: #343a40;
+        --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+        --shadow: 0 8px 24px rgba(0,0,0,0.1);
+        --shadow-lg: 0 16px 32px rgba(13,110,253,0.15);
+        --border-radius: 16px;
+        --border-radius-lg: 24px;
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background: #f0f5fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Blink Animation for Live Indicator */
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    /* ===== ENHANCED PURPOSE CARDS ===== */
+    .purpose-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-badge {
+        background: white;
+        color: var(--primary);
+        padding: 0.7rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        border: 2px solid rgba(13,110,253,0.15);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        backdrop-filter: blur(5px);
+    }
+
+    .section-badge i {
+        margin-right: 0.6rem;
+        font-size: 1rem;
+        color: var(--primary);
+    }
+
+    .purpose-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .purpose-card {
+        background: white;
+        border: 3px solid var(--gray-200);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 280px;
+    }
+
+    .purpose-card::before {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13,110,253,0.1), rgba(13,110,253,0.05));
+        transform: translateY(-100%);
+        transition: transform 0.4s ease;
+        opacity: 0;
+    }
+
+    .purpose-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), #4d9eff, var(--primary));
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.4s ease;
+    }
+
+    .purpose-card:hover {
+        transform: translateY(-12px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(13,110,253,0.2);
+    }
+
+    .purpose-card:hover::after {
+        transform: scaleX(1);
+    }
+
+    .purpose-card.selected {
+        border-color: var(--primary);
+        background: linear-gradient(145deg, #ffffff, var(--primary-light));
+        box-shadow: 0 20px 40px rgba(13,110,253,0.25);
+        border-width: 3px;
+        transform: translateY(-8px);
+    }
+
+    .purpose-card.selected::after {
+        transform: scaleX(1);
+    }
+
+    .purpose-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(145deg, var(--gray-100), white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.8rem;
+        color: var(--primary);
+        transition: var(--transition);
+        border: 4px solid white;
+        box-shadow: 0 12px 24px -8px rgba(13,110,253,0.2);
+    }
+
+    .purpose-card:hover .purpose-icon {
+        background: white;
+        border-color: var(--primary);
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 20px 30px -8px rgba(13,110,253,0.3);
+    }
+
+    .purpose-card.selected .purpose-icon {
+        background: white;
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+
+    .purpose-card h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: var(--gray-800);
+        letter-spacing: -0.3px;
+    }
+
+    .purpose-card p {
+        color: var(--gray-600);
+        font-size: 0.95rem;
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    .selected-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--success), #146c43);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        opacity: 0;
+        transform: scale(0.5) rotate(-180deg);
+        transition: var(--transition);
+        box-shadow: 0 6px 12px rgba(25,135,84,0.3);
+    }
+
+    .purpose-card.selected .selected-badge {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+
+    /* ===== ENHANCED FORM PANEL ===== */
+    .form-panel {
+        background: white;
+        border-radius: 28px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(0,0,0,0.05);
+        animation: fadeSlideUp 0.5s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    @keyframes fadeSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== ENHANCED SECTION HEADERS ===== */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--gray-200);
+        position: relative;
+    }
+
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+    }
+
+    .section-number {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.2rem;
+        box-shadow: 0 8px 16px rgba(13,110,253,0.2);
+    }
+
+    .section-header h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--gray-800);
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .section-header p {
+        color: var(--gray-600);
+        margin: 0.2rem 0 0;
+        font-size: 0.9rem;
+    }
+
+    /* ===== ENHANCED FORM ELEMENTS ===== */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        width: 20px;
+        font-size: 1rem;
+    }
+
+    .required::after {
+        content: "*";
+        color: var(--danger);
+        margin-left: 4px;
+        font-weight: 800;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--gray-200);
+        border-radius: 14px;
+        padding: 0.8rem 1.2rem;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: white;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(13,110,253,0.15);
+        outline: none;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--primary);
+    }
+
+    /* ===== ENHANCED ID TOGGLE ===== */
+    .id-toggle {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        background: var(--gray-100);
+        padding: 1.2rem 2rem;
+        border-radius: 60px;
+        cursor: pointer;
+        border: 2px solid var(--gray-200);
+        transition: var(--transition);
+        margin: 2rem 0;
+        width: fit-content;
+    }
+
+    .id-toggle:hover {
+        background: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .toggle-switch {
+        width: 56px;
+        height: 30px;
+        background: var(--gray-300);
+        border-radius: 34px;
+        position: relative;
+        transition: var(--transition);
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        width: 26px;
+        height: 26px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: var(--transition);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.active {
+        background: linear-gradient(135deg, var(--success), #146c43);
+    }
+
+    .toggle-switch.active::after {
+        left: 28px;
+    }
+
+    .id-toggle span {
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 1rem;
+    }
+
+    .id-fields {
+        display: none;
+        animation: fadeSlideDown 0.3s ease;
+    }
+
+    .id-fields.show {
+        display: block;
+    }
+
+    @keyframes fadeSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== ENHANCED ACTION BUTTONS ===== */
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1.2rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 3px solid var(--gray-200);
+    }
+
+    .btn-clear {
+        padding: 0.9rem 2.5rem;
+        border: 2px solid var(--gray-200);
+        background: white;
+        border-radius: 50px;
+        font-weight: 600;
+        color: var(--gray-600);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .btn-clear:hover {
+        border-color: var(--danger);
+        background: var(--danger-light);
+        color: var(--danger);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(220,53,69,0.15);
+    }
+
+    .btn-clear:active {
+        transform: translateY(0);
+    }
+
+    .btn-submit {
+        padding: 0.9rem 3rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        box-shadow: 0 8px 20px rgba(13,110,253,0.3);
+        transition: var(--transition);
+        cursor: pointer;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(13,110,253,0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ===== LOADING SPINNER ===== */
+    .loading-spinner {
+        display: inline-block;
+        width: 1.2rem;
+        height: 1.2rem;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ===== DISTRICT DROPDOWN STYLES ===== */
+    .district-select {
+        background: white;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 992px) {
+        .purpose-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .purpose-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-panel {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-clear, .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .id-toggle {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="container-fluid px-4 py-4">
+    <!-- Step 1: Purpose Selection Cards - ENHANCED -->
+    <div class="purpose-section">
+        <div class="section-badge">
+            <i class="fas fa-hand-pointer fa-beat"></i> STEP 1: SELECT VISIT PURPOSE
+        </div>
+        
+        <div class="purpose-grid">
+            <!-- Admission Card -->
+            <div class="purpose-card" onclick="selectType('admission')" id="cardAdmission">
+                <div class="selected-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="purpose-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Admission</h3>
+                <p>Prospective students & parents seeking admission information</p>
+            </div>
+            
+            <!-- Parent Meeting Card -->
+            <div class="purpose-card" onclick="selectType('parent')" id="cardParent">
+                <div class="selected-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="purpose-icon">
+                    <i class="fas fa-users-between-lines"></i>
+                </div>
+                <h3>Parents Meeting</h3>
+                <p>PTA meetings, academic discussions, fee inquiries</p>
+            </div>
+            
+            <!-- Official Visit Card -->
+            <div class="purpose-card" onclick="selectType('official')" id="cardOfficial">
+                <div class="selected-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="purpose-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3>Official Visit</h3>
+                <p>Vendors, deliveries, guests, maintenance staff</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Form Panel (hidden initially) - ENHANCED -->
+    <div class="form-panel" id="mainForm" style="display: none;">
+        <!-- IMPORTANT FIX: Removed onsubmit and added id to form -->
+        <form method="POST" action="{{ url_for('checkin') }}" id="checkinForm">
+            <input type="hidden" name="visit_type" id="visitTypeInput">
+            <input type="hidden" name="checkin_time" value="{{ now.strftime('%Y-%m-%d %H:%M:%S') }}">
+
+            <!-- Personal Details Section -->
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <div>
+                    <h3>Personal Details</h3>
+                    <p>Visitor's basic information</p>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="fas fa-user"></i>Full Name
+                    </label>
+                    <input type="text" class="form-control" name="full_name" id="fullName" required 
+                           placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="fas fa-phone-alt"></i>Mobile Number
+                    </label>
+                    <input type="tel" class="form-control" name="phone" id="phone" required 
+                           pattern="[0-9]{10}" placeholder="10 digits" maxlength="10"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt"></i>Address
+                    </label>
+                    <input type="text" class="form-control" name="address" id="address" 
+                           placeholder="Street, locality">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-city"></i>District
+                    </label>
+                    <select class="form-select district-select" name="district" id="district">
+                        <option value="">Select District</option>
+                        <option value="Ariyalur">Ariyalur</option>
+                        <option value="Chengalpattu">Chengalpattu</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Coimbatore">Coimbatore</option>
+                        <option value="Cuddalore">Cuddalore</option>
+                        <option value="Dharmapuri">Dharmapuri</option>
+                        <option value="Dindigul">Dindigul</option>
+                        <option value="Erode">Erode</option>
+                        <option value="Kallakurichi">Kallakurichi</option>
+                        <option value="Kanchipuram">Kanchipuram</option>
+                        <option value="Kanyakumari">Kanyakumari</option>
+                        <option value="Karur">Karur</option>
+                        <option value="Krishnagiri">Krishnagiri</option>
+                        <option value="Madurai">Madurai</option>
+                        <option value="Nagapattinam">Nagapattinam</option>
+                        <option value="Namakkal">Namakkal</option>
+                        <option value="Perambalur">Perambalur</option>
+                        <option value="Pudukkottai">Pudukkottai</option>
+                        <option value="Ramanathapuram">Ramanathapuram</option>
+                        <option value="Ranipet">Ranipet</option>
+                        <option value="Salem">Salem</option>
+                        <option value="Sivaganga">Sivaganga</option>
+                        <option value="Tenkasi">Tenkasi</option>
+                        <option value="Thanjavur">Thanjavur</option>
+                        <option value="Theni">Theni</option>
+                        <option value="Thoothukkudi">Thoothukkudi</option>
+                        <option value="Tiruchirappalli">Tiruchirappalli</option>
+                        <option value="Tirunelveli">Tirunelveli</option>
+                        <option value="Tirupathur">Tirupathur</option>
+                        <option value="Tiruppur">Tiruppur</option>
+                        <option value="Tiruvallur">Tiruvallur</option>
+                        <option value="Tiruvannamalai">Tiruvannamalai</option>
+                        <option value="Tiruvarur">Tiruvarur</option>
+                        <option value="Vellore">Vellore</option>
+                        <option value="Viluppuram">Viluppuram</option>
+                        <option value="Virudhunagar">Virudhunagar</option>
+                    </select>
+                </div>
+                
+                <!-- Expected Duration - Small like other fields -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-hourglass-half"></i>Expected Duration
+                    </label>
+                    <select class="form-select" name="expected_duration" id="expectedDuration">
+                        <option value="">Select duration</option>
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="120">2 hours</option>
+                        <option value="180">3 hours</option>
+                        <option value="240">4 hours</option>
+                        <option value="480">Half day (8 hrs)</option>
+                        <option value="960">Full day (16 hrs)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dynamic Fields Section (based on purpose) -->
+            <div id="typeSpecificSection">
+                <!-- Admission Fields -->
+                <div id="admissionFields" style="display: none;">
+                    <div class="section-header mt-5">
+                        <div class="section-number">3</div>
+                        <div>
+                            <h3>Admission Details</h3>
+                            <p>Student & parent information</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-user-graduate"></i>Student Name
+                            </label>
+                            <input type="text" class="form-control" name="student_name" id="studentName" 
+                                   placeholder="Full name of student">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-friends"></i>Parent/Guardian Name
+                            </label>
+                            <input type="text" class="form-control" name="parent_name" id="parentName" 
+                                   placeholder="Enter parent/guardian name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-users"></i>No. of Persons
+                            </label>
+                            <input type="number" class="form-control" name="accompanied_count" id="accompaniedCount" 
+                                   min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-motorcycle"></i>Vehicle Number
+                            </label>
+                            <input type="text" class="form-control" name="vehicle_number" id="vehicleNumber" 
+                                   placeholder="TN 39 AB 1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-car"></i>Vehicle Type
+                            </label>
+                            <select class="form-select" name="vehicle_type" id="vehicleType">
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Two-wheeler">Two‑wheeler</option>
+                                <option value="Four-wheeler">Four‑wheeler</option>
+                                <option value="Auto">Auto</option>
+                                <option value="Van">Van</option>
+                                <option value="Truck">Truck</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Purpose
+                            </label>
+                            <select class="form-select" name="purpose" id="admissionPurpose">
+                                <option value="Admission">Admission</option>
+                                <option value="Campus Tour">Campus Tour</option>
+                                <option value="Fee Inquiry">Fee Inquiry</option>
+                                <option value="Course Details">Course Details</option>
+                                <option value="Scholarship Inquiry">Scholarship Inquiry</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Meeting Fields -->
+                <div id="parentFields" style="display: none;">
+                    <div class="section-header mt-5">
+                        <div class="section-number">3</div>
+                        <div>
+                            <h3>Meeting Details</h3>
+                            <p>Parent-teacher meeting info</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-user-friends"></i>Parent Name
+                            </label>
+                            <input type="text" class="form-control" name="parent_name" id="parentMeetingName" 
+                                   placeholder="Parent/Guardian name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-graduate"></i>Student Name
+                            </label>
+                            <input type="text" class="form-control" name="student_name" id="studentMeetingName" 
+                                   placeholder="Student name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hashtag"></i>Student Roll No.
+                            </label>
+                            <input type="text" class="form-control" name="student_roll" id="studentRoll" 
+                                   placeholder="Optional">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-handshake"></i>Purpose
+                            </label>
+                            <select class="form-select" name="purpose" id="parentPurpose" required>
+                                <option value="">Select Purpose</option>
+                                <option value="Academic Progress">Academic Progress</option>
+                                <option value="Fee Payment">Fee Payment</option>
+                                <option value="Disciplinary">Disciplinary</option>
+                                <option value="Leave Application">Leave Application</option>
+                                <option value="General Meeting">General Meeting</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-user-tie"></i>Person to Meet
+                            </label>
+                            <input type="text" class="form-control" name="person_to_meet" id="personToMeet" 
+                                   placeholder="Faculty/Staff name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-building"></i>Department
+                            </label>
+                            <select class="form-select" name="department" id="parentDepartment" required>
+                                <option value="">Select Department</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept }}">{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-motorcycle"></i>Vehicle Number
+                            </label>
+                            <input type="text" class="form-control" name="vehicle_number" id="parentVehicle" 
+                                   placeholder="TN 39 AB 1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-car"></i>Vehicle Type
+                            </label>
+                            <select class="form-select" name="vehicle_type" id="parentVehicleType">
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Two-wheeler">Two‑wheeler</option>
+                                <option value="Four-wheeler">Four‑wheeler</option>
+                                <option value="Auto">Auto</option>
+                                <option value="Van">Van</option>
+                                <option value="Truck">Truck</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Official Visit Fields -->
+                <div id="officialFields" style="display: none;">
+                    <div class="section-header mt-5">
+                        <div class="section-number">3</div>
+                        <div>
+                            <h3>Official Visit Details</h3>
+                            <p>Organization & meeting info</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-building"></i>Organization
+                            </label>
+                            <input type="text" class="form-control" name="company" id="company" 
+                                   placeholder="Company/Organization name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Purpose
+                            </label>
+                            <select class="form-select" name="purpose" id="officialPurpose">
+                                <option value="">Select Purpose</option>
+                                <option value="Delivery">Delivery</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Vendor Meeting">Vendor Meeting</option>
+                                <option value="Guest Lecture">Guest Lecture</option>
+                                <option value="Interview">Interview</option>
+                                <option value="Official Meeting">Official Meeting</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-user-tie"></i>Contact Person
+                            </label>
+                            <input type="text" class="form-control" name="person_to_meet" id="officialContact" 
+                                   placeholder="Person to meet">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-building"></i>Department
+                            </label>
+                            <select class="form-select" name="department" id="officialDepartment" required>
+                                <option value="">Select Department</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept }}">{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-motorcycle"></i>Vehicle Number
+                            </label>
+                            <input type="text" class="form-control" name="vehicle_number" id="officialVehicle" 
+                                   placeholder="TN 39 AB 1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-car"></i>Vehicle Type
+                            </label>
+                            <select class="form-select" name="vehicle_type" id="officialVehicleType">
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Two-wheeler">Two‑wheeler</option>
+                                <option value="Four-wheeler">Four‑wheeler</option>
+                                <option value="Truck">Truck/Lorry</option>
+                                <option value="Van">Van</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optional ID Proof -->
+            <div class="section-header mt-5">
+                <div class="section-number">4</div>
+                <div>
+                    <h3>ID Verification</h3>
+                    <p>Optional – speeds up future visits</p>
+                </div>
+            </div>
+            
+            <div class="id-toggle" onclick="toggleIdProof()">
+                <div class="toggle-switch" id="idToggle"></div>
+                <span id="idToggleText">I have ID proof to provide</span>
+            </div>
+            
+            <div class="id-fields" id="idFields">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-id-card"></i>ID Type
+                        </label>
+                        <select class="form-select" name="id_type" id="idType">
+                            <option value="">Select ID Type</option>
+                            {% for id_type in id_types %}
+                            <option value="{{ id_type }}">{{ id_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-hashtag"></i>ID Number
+                        </label>
+                        <input type="text" class="form-control" name="id_number" id="idNumber" 
+                               placeholder="ID card number">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" class="btn-clear" onclick="resetForm()">
+                    <i class="fas fa-undo-alt"></i> Clear All
+                </button>
+                <!-- FIX: Added onclick to validate before submit -->
+                <button type="submit" class="btn-submit" id="submitBtn" onclick="return validateAndSubmit(event)">
+                    <i class="fas fa-check-circle"></i> Complete Check‑in
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentType = '';
+
+    function selectType(type) {
+        // Remove selected class from all cards
+        document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected'));
+        
+        // Add selected class to clicked card
+        document.getElementById(`card${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('selected');
+        
+        currentType = type;
+        document.getElementById('visitTypeInput').value = type;
+        document.getElementById('mainForm').style.display = 'block';
+
+        // Hide all dynamic sections
+        document.getElementById('admissionFields').style.display = 'none';
+        document.getElementById('parentFields').style.display = 'none';
+        document.getElementById('officialFields').style.display = 'none';
+
+        // Show appropriate section
+        if (type === 'admission') {
+            document.getElementById('admissionFields').style.display = 'block';
+        } else if (type === 'parent') {
+            document.getElementById('parentFields').style.display = 'block';
+        } else if (type === 'official') {
+            document.getElementById('officialFields').style.display = 'block';
+        }
+
+        // ensure only active purpose select is enabled (others disabled)
+        ['admissionPurpose','parentPurpose','officialPurpose'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = (id !== `${type}Purpose`);
+            }
+        });
+
+        // Scroll to form smoothly
+        document.getElementById('mainForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function toggleIdProof() {
+        const toggle = document.getElementById('idToggle');
+        const fields = document.getElementById('idFields');
+        const text = document.getElementById('idToggleText');
+        
+        toggle.classList.toggle('active');
+        
+        if (toggle.classList.contains('active')) {
+            fields.classList.add('show');
+            text.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i> ID proof will be recorded';
+        } else {
+            fields.classList.remove('show');
+            text.innerHTML = 'I have ID proof to provide';
+            document.querySelector('[name="id_type"]').value = '';
+            document.querySelector('[name="id_number"]').value = '';
+        }
+    }
+
+    // FIX: New validation function that handles the event
+    function validateAndSubmit(event) {
+        // Prevent default form submission first
+        event.preventDefault();
+        
+        // Check if purpose is selected
+        if (!currentType) {
+            alert('Please select a visit purpose first');
+            return false;
+        }
+
+        // Check required fields
+        const fullName = document.getElementById('fullName').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        if (!fullName) {
+            alert('Please enter full name');
+            document.getElementById('fullName').focus();
+            return false;
+        }
+
+        if (!phone) {
+            alert('Please enter mobile number');
+            document.getElementById('phone').focus();
+            return false;
+        }
+
+        if (phone.length !== 10) {
+            alert('Please enter a valid 10-digit mobile number');
+            document.getElementById('phone').focus();
+            return false;
+        }
+
+        // Type-specific validation
+        if (currentType === 'admission') {
+            const studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                alert('Please enter student name');
+                document.getElementById('studentName').focus();
+                return false;
+            }
+        }
+        else if (currentType === 'parent') {
+            const parentName = document.getElementById('parentMeetingName').value.trim();
+            const purpose = document.getElementById('parentPurpose').value;
+            const personToMeet = document.getElementById('personToMeet').value.trim();
+            const department = document.getElementById('parentDepartment').value;
+
+            if (!parentName) {
+                alert('Please enter parent name');
+                document.getElementById('parentMeetingName').focus();
+                return false;
+            }
+            if (!purpose) {
+                alert('Please select purpose of meeting');
+                document.getElementById('parentPurpose').focus();
+                return false;
+            }
+            if (!personToMeet) {
+                alert('Please enter person to meet');
+                document.getElementById('personToMeet').focus();
+                return false;
+            }
+            if (!department) {
+                alert('Please select department');
+                document.getElementById('parentDepartment').focus();
+                return false;
+            }
+        }
+        else if (currentType === 'official') {
+            const company = document.getElementById('company').value.trim();
+            const contact = document.getElementById('officialContact').value.trim();
+            const department = document.getElementById('officialDepartment').value;
+            const purpose = document.getElementById('officialPurpose').value;
+
+            if (!company) {
+                alert('Please enter organization name');
+                document.getElementById('company').focus();
+                return false;
+            }
+            if (!purpose) {
+                alert('Please select purpose of visit');
+                document.getElementById('officialPurpose').focus();
+                return false;
+            }
+            if (!contact) {
+                alert('Please enter contact person name');
+                document.getElementById('officialContact').focus();
+                return false;
+            }
+            if (!department) {
+                alert('Please select department');
+                document.getElementById('officialDepartment').focus();
+                return false;
+            }
+        }
+
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerHTML = '<span class="loading-spinner me-2"></span> Processing...';
+        submitBtn.disabled = true;
+
+        // FIX: Manually submit the form after validation
+        document.getElementById('checkinForm').submit();
+        
+        return true;
+    }
+
+    function resetForm() {
+        if (confirm('Are you sure you want to clear all entered details?')) {
+            document.getElementById('checkinForm').reset();
+            document.getElementById('idToggle').classList.remove('active');
+            document.getElementById('idFields').classList.remove('show');
+            document.getElementById('idToggleText').innerHTML = 'I have ID proof to provide';
+            
+            // Reset purpose selection
+            document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected'));
+            // re-enable all purpose selects
+            ['admissionPurpose','parentPurpose','officialPurpose'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = false;
+            });
+            document.getElementById('mainForm').style.display = 'none';
+            currentType = '';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    // Phone number validation
+    document.getElementById('phone')?.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Security Check-in System Ready');
+        
+        // disable all purpose selects until a type is chosen
+        ['admissionPurpose','parentPurpose','officialPurpose'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = true;
+        });
+
+        // Add smooth scrolling for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script> 
+{% endblock %}

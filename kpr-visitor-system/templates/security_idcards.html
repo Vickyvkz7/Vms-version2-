@@ -1,0 +1,1155 @@
+{% extends "base.html" %}
+
+{% block title %}ID Card Management - KPR College{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center">
+    <span class="fw-bold">Security ID Console</span>
+    <span class="badge bg-white text-primary ms-3 px-3 py-2 rounded-pill shadow-sm border border-primary">
+        <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem; animation: blink 1.5s infinite;"></i> ACTIVE MONITORING
+    </span>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('security_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+<li class="breadcrumb-item active text-primary fw-semibold">ID Card Management</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== ENHANCED SECURITY ID CARD MANAGEMENT ===== */
+    :root {
+        --primary: #1a3a6b;
+        --primary-dark: #0f2a4f;
+        --primary-light: #eef2f7;
+        --primary-soft: #d9e4f0;
+        --accent: #c49a2b;
+        --success: #2e7d32;
+        --success-light: #e8f5e9;
+        --danger: #c62828;
+        --danger-light: #ffebee;
+        --warning: #ef6c00;
+        --warning-light: #fff3e0;
+        --info: #0277bd;
+        --info-light: #e1f5fe;
+        --gray-50: #fafbfc;
+        --gray-100: #f5f7fa;
+        --gray-200: #e9ecf0;
+        --gray-300: #dde1e7;
+        --gray-400: #b0b9c5;
+        --gray-500: #8f99a8;
+        --gray-600: #6b788b;
+        --gray-700: #4a5568;
+        --gray-800: #2d3748;
+        --gray-900: #1a202c;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.02);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.04);
+        --shadow-lg: 0 8px 20px rgba(0,0,0,0.06);
+        --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.02);
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f4f7fc;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    .idcard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 8px;
+    }
+
+    /* ===== STATUS BADGES ===== */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .status-available {
+        background: var(--success-light);
+        color: var(--success);
+        border: 1px solid var(--success);
+    }
+
+    .status-issued {
+        background: var(--info-light);
+        color: var(--info);
+        border: 1px solid var(--info);
+    }
+
+    .status-lost {
+        background: var(--danger-light);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+    }
+
+    .status-damaged {
+        background: var(--warning-light);
+        color: var(--warning);
+        border: 1px solid var(--warning);
+    }
+
+    /* ===== HEADER CARD ===== */
+    .header-card {
+        background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+        border-radius: var(--radius-xl);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        color: white;
+        box-shadow: 0 12px 24px rgba(26,58,107,0.25);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 20s infinite linear;
+    }
+
+    .header-card::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 15s infinite reverse;
+    }
+
+    @keyframes float {
+        from { transform: rotate(0deg) translate(0, 0); }
+        to { transform: rotate(360deg) translate(50px, 50px); }
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-title h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-title h1 i {
+        color: var(--accent);
+    }
+
+    .header-title p {
+        opacity: 0.9;
+        margin: 0;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .stat-pill {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(255,255,255,0.15);
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .stat-pill i {
+        color: var(--accent);
+    }
+
+    .stat-pill strong {
+        font-size: 1.2rem;
+        margin-right: 4px;
+        color: white;
+    }
+
+    /* ===== METRICS GRID ===== */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 18px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .metric-icon.available { background: var(--success-light); color: var(--success); }
+    .metric-icon.issued { background: var(--info-light); color: var(--info); }
+    .metric-icon.lost { background: var(--danger-light); color: var(--danger); }
+    .metric-icon.damaged { background: var(--warning-light); color: var(--warning); }
+
+    .metric-content {
+        flex: 1;
+    }
+
+    .metric-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--gray-800);
+        line-height: 1.2;
+    }
+
+    .metric-label {
+        color: var(--gray-600);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* ===== SEARCH SECTION ===== */
+    .search-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        font-size: 0.95rem;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 12px 10px 38px;
+        border: 1px solid var(--gray-200);
+        border-radius: 40px;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: var(--gray-50);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(26,58,107,0.1);
+    }
+
+    .search-box .clear-search {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        cursor: pointer;
+        display: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+
+    .search-box .clear-search:hover {
+        background: var(--gray-200);
+        color: var(--danger);
+    }
+
+    .search-box input:not(:placeholder-shown) ~ .clear-search {
+        display: flex;
+    }
+
+    .filter-pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .filter-pill {
+        padding: 8px 18px;
+        border-radius: 40px;
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-700);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-pill:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .filter-pill.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .filter-pill i {
+        font-size: 0.8rem;
+    }
+
+    /* ===== TABLE DESIGN ===== */
+    .table-container {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: linear-gradient(145deg, var(--gray-50), white);
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .table-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .table-header h3 i {
+        color: var(--primary);
+    }
+
+    .table-header span {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 14px 20px;
+        background: var(--gray-50);
+        color: var(--gray-700);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-800);
+        font-size: 0.95rem;
+        transition: background 0.15s;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr {
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    tr:hover td {
+        background: var(--gray-50);
+    }
+
+    .card-number {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        display: inline-block;
+        border: 1px solid rgba(26,58,107,0.1);
+    }
+
+    .visitor-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .visitor-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(145deg, var(--primary-light), white);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .visitor-details {
+        line-height: 1.3;
+    }
+
+    .visitor-name {
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .visitor-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gray-500);
+        font-size: 0.75rem;
+    }
+
+    .visitor-meta i {
+        color: var(--primary);
+        width: 12px;
+    }
+
+    .no-visitor {
+        color: var(--gray-400);
+        font-style: italic;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .date-badge {
+        background: var(--gray-100);
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .view-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        background: var(--primary-light);
+        transition: var(--transition);
+    }
+
+    .view-link:hover {
+        background: var(--primary);
+        color: white;
+        gap: 10px;
+    }
+
+    .view-link i {
+        font-size: 0.75rem;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-state i {
+        font-size: 3.5rem;
+        color: var(--gray-400);
+        margin-bottom: 16px;
+    }
+
+    .empty-state h4 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .btn-clear {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 6px 14px rgba(26,58,107,0.2);
+    }
+
+    .btn-clear:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(26,58,107,0.3);
+    }
+
+    /* ===== PAGINATION ===== */
+    .pagination-section {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-700);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .page-link:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 10px rgba(26,58,107,0.2);
+    }
+
+    .page-item.disabled .page-link {
+        opacity: 0.5;
+        pointer-events: none;
+        background: var(--gray-100);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .header-stats {
+            width: 100%;
+        }
+        
+        .stat-pill {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .search-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-box {
+            width: 100%;
+        }
+        
+        .filter-pills {
+            justify-content: center;
+        }
+        
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+        
+        thead {
+            display: none;
+        }
+        
+        tr {
+            margin-bottom: 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            background: white;
+        }
+        
+        td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--gray-200);
+            border-bottom: none;
+            border-bottom: 1px dashed var(--gray-200);
+        }
+        
+        td:last-child {
+            border-bottom: none;
+        }
+        
+        td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--gray-600);
+            width: 40%;
+            font-size: 0.8rem;
+        }
+        
+        .visitor-info-cell {
+            width: 100%;
+        }
+        
+        .view-link {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .header-title h1 {
+            font-size: 1.6rem;
+        }
+        
+        .stat-pill {
+            width: 100%;
+        }
+        
+        .filter-pills {
+            flex-direction: column;
+        }
+        
+        .filter-pill {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="idcard-container">
+    <!-- Header Card -->
+    <div class="header-card">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <i class="fas fa-id-card"></i>
+                    ID Card Management
+                </h1>
+                <p>
+                    <i class="fas fa-shield-alt"></i>
+                    CAS001 - CAS100 • {{ total_count }} Total Cards
+                </p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-pill">
+                    <i class="fas fa-check-circle"></i>
+                    <span><strong>{{ available_count }}</strong> Available</span>
+                </div>
+                <div class="stat-pill">
+                    <i class="fas fa-hand-holding"></i>
+                    <span><strong>{{ issued_count }}</strong> Issued</span>
+                </div>
+                <div class="stat-pill">
+                    <i class="fas fa-chart-line"></i>
+                    <span><strong>{{ ((available_count / total_count) * 100)|round|int }}%</strong> Utilization</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon available">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">{{ available_count }}</div>
+                <div class="metric-label">Available Cards</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon issued">
+                <i class="fas fa-hand-holding"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">{{ issued_count }}</div>
+                <div class="metric-label">Issued Cards</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon lost">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">{{ lost_count }}</div>
+                <div class="metric-label">Lost Cards</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon damaged">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">{{ damaged_count }}</div>
+                <div class="metric-label">Damaged Cards</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by card number (e.g., CAS042) or visitor name..." value="{{ search_query or '' }}">
+            <i class="fas fa-times clear-search" id="clearSearch" onclick="clearSearch()"></i>
+        </div>
+        <div class="filter-pills">
+            <a href="{{ url_for('security_idcards') }}" class="filter-pill {% if not status_filter %}active{% endif %}">
+                <i class="fas fa-id-card"></i> All
+            </a>
+            <a href="{{ url_for('security_idcards') }}?status=available" class="filter-pill {% if status_filter == 'available' %}active{% endif %}">
+                <i class="fas fa-check-circle"></i> Available
+            </a>
+            <a href="{{ url_for('security_idcards') }}?status=issued" class="filter-pill {% if status_filter == 'issued' %}active{% endif %}">
+                <i class="fas fa-hand-holding"></i> Issued
+            </a>
+            <a href="{{ url_for('security_idcards') }}?status=lost" class="filter-pill {% if status_filter == 'lost' %}active{% endif %}">
+                <i class="fas fa-exclamation-triangle"></i> Lost
+            </a>
+            <a href="{{ url_for('security_idcards') }}?status=damaged" class="filter-pill {% if status_filter == 'damaged' %}active{% endif %}">
+                <i class="fas fa-tools"></i> Damaged
+            </a>
+        </div>
+    </div>
+
+    <!-- Table -->
+    {% if cards and cards|length > 0 %}
+    <div class="table-container">
+        <div class="table-header">
+            <h3><i class="fas fa-id-card"></i> ID Cards Inventory</h3>
+            <span>{{ cards|length }} Cards Displayed</span>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Card Number</th>
+                    <th>Status</th>
+                    <th>Current Visitor</th>
+                    <th>Last Activity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card_item in cards %}
+                <tr onclick="window.location.href='{{ url_for('id_card_details', card_number=card_item.card.card_number) }}'">
+                    <td data-label="Card Number">
+                        <span class="card-number">{{ card_item.card.card_number }}</span>
+                    </td>
+                    <td data-label="Status">
+                        <span class="status-badge 
+                            {% if card_item.card.status == 'available' %}status-available
+                            {% elif card_item.card.status == 'issued' %}status-issued
+                            {% elif card_item.card.status == 'lost' %}status-lost
+                            {% elif card_item.card.status == 'damaged' %}status-damaged
+                            {% endif %}">
+                            <i class="fas 
+                                {% if card_item.card.status == 'available' %}fa-check-circle
+                                {% elif card_item.card.status == 'issued' %}fa-hand-holding
+                                {% elif card_item.card.status == 'lost' %}fa-exclamation-triangle
+                                {% elif card_item.card.status == 'damaged' %}fa-tools
+                                {% endif %}">
+                            </i>
+                            {{ card_item.card.status|title }}
+                        </span>
+                    </td>
+                    <td data-label="Current Visitor">
+                        {% if card_item.current_visitor %}
+                        <div class="visitor-info-cell">
+                            <div class="visitor-avatar">
+                                {{ card_item.current_visitor.full_name[:1] }}
+                            </div>
+                            <div class="visitor-details">
+                                <div class="visitor-name">{{ card_item.current_visitor.full_name }}</div>
+                                <div class="visitor-meta">
+                                    <span><i class="fas fa-id-card"></i> {{ card_item.current_visitor.visitor_id }}</span>
+                                    <span><i class="fas fa-clock"></i> {{ card_item.current_visitor.checkin_time.strftime('%I:%M %p') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="no-visitor">
+                            <i class="fas fa-user-slash"></i> Not assigned
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td data-label="Last Activity">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            {% if card_item.card.issued_date %}
+                            <span class="date-badge">
+                                <i class="fas fa-calendar-alt"></i> Issued: {{ card_item.card.issued_date.strftime('%d/%m/%Y') }}
+                            </span>
+                            {% endif %}
+                            {% if card_item.card.returned_date %}
+                            <span class="date-badge">
+                                <i class="fas fa-undo-alt"></i> Returned: {{ card_item.card.returned_date.strftime('%d/%m/%Y') }}
+                            </span>
+                            {% endif %}
+                            {% if not card_item.card.issued_date and not card_item.card.returned_date %}
+                            <span class="date-badge">
+                                <i class="fas fa-minus"></i> No activity
+                            </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td data-label="Actions">
+                        <span class="view-link" onclick="event.stopPropagation(); window.location.href='{{ url_for('id_card_details', card_number=card_item.card.card_number) }}'">
+                            View Details <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination-section">
+        <ul class="pagination">
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('security_idcards', page=page-1, status=status_filter, search=search_query) }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% for p in range(1, total_pages + 1) %}
+                {% if p >= page - 2 and p <= page + 2 %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('security_idcards', page=p, status=status_filter, search=search_query) }}">{{ p }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('security_idcards', page=page+1, status=status_filter, search=search_query) }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <i class="fas fa-id-card"></i>
+        <h4>No ID Cards Found</h4>
+        <p>No cards match your current filters. Try adjusting your search criteria.</p>
+        <a href="{{ url_for('security_idcards') }}" class="btn-clear">
+            <i class="fas fa-redo-alt me-2"></i> Clear Filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // ===== ENHANCED JAVASCRIPT =====
+    
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    
+    // Search functionality
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            // Show/hide clear button
+            if (clearBtn) {
+                clearBtn.style.display = query.length > 0 ? 'flex' : 'none';
+            }
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                const currentUrl = new URL(window.location.href);
+                const params = new URLSearchParams(currentUrl.search);
+                
+                if (query.length > 0) {
+                    params.set('search', query);
+                } else {
+                    params.delete('search');
+                }
+                
+                // Preserve status filter
+                if (params.get('status')) {
+                    // Keep it
+                }
+                
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            }, 500);
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                const currentUrl = new URL(window.location.href);
+                const params = new URLSearchParams(currentUrl.search);
+                
+                if (query.length > 0) {
+                    params.set('search', query);
+                } else {
+                    params.delete('search');
+                }
+                
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            }
+        });
+        
+        // Initial clear button state
+        if (searchInput.value.trim().length > 0 && clearBtn) {
+            clearBtn.style.display = 'flex';
+        }
+    }
+    
+    function clearSearch() {
+        if (searchInput) {
+            searchInput.value = '';
+            if (clearBtn) {
+                clearBtn.style.display = 'none';
+            }
+            
+            const currentUrl = new URL(window.location.href);
+            const params = new URLSearchParams(currentUrl.search);
+            params.delete('search');
+            
+            window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+        }
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+F to focus search
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            searchInput?.focus();
+            searchInput?.select();
+        }
+        
+        // Escape to clear search
+        if (e.key === 'Escape' && document.activeElement === searchInput) {
+            clearSearch();
+        }
+        
+        // Number shortcuts for filters (only if not typing)
+        if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.target.matches('input, textarea, select')) {
+            const currentUrl = new URL(window.location.href);
+            const params = new URLSearchParams(currentUrl.search);
+            
+            if (e.key === '1') {
+                params.delete('status');
+                params.delete('search');
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            } else if (e.key === '2') {
+                params.set('status', 'available');
+                params.delete('search');
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            } else if (e.key === '3') {
+                params.set('status', 'issued');
+                params.delete('search');
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            } else if (e.key === '4') {
+                params.set('status', 'lost');
+                params.delete('search');
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            } else if (e.key === '5') {
+                params.set('status', 'damaged');
+                params.delete('search');
+                window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+            }
+        }
+    });
+    
+    // Prevent row click when clicking on action buttons
+    document.querySelectorAll('.view-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    // Show current filters in UI
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const search = urlParams.get('search');
+        
+        if (search && searchInput) {
+            searchInput.value = search;
+            if (clearBtn) {
+                clearBtn.style.display = 'flex';
+            }
+        }
+    });
+</script>
+{% endblock %}

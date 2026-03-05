@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+python-dotenv
+WTForms
+email-validator
+qrcode
+Pillow
+reportlab
+pytz
+gunicorn

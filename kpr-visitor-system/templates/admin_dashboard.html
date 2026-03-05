@@ -1,0 +1,1213 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - KPR College{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center">
+    <i class="fas fa-user-shield fs-2 me-2" style="color: #1a237e;"></i>
+    <span class="fw-bold" style="font-size: 1.6rem;">Admin Control Center</span>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">Admin Control Center</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --admin-primary: #1a237e;
+        --admin-dark: #0d1642;
+        --admin-light: #c5cae9;
+        --admin-soft: #e8eaf6;
+        --admin-gradient: linear-gradient(145deg, #1a237e, #283593);
+        --admin-accent: #ff6f00;
+        --admin-danger: #c62828;
+        --admin-success: #2e7d32;
+        --admin-warning: #f57c00;
+        --admin-info: #0288d1;
+    }
+    
+    body {
+        background: #f4f7fc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .dashboard-container {
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    
+    /* Welcome Header - Enhanced */
+    .welcome-header {
+        background: var(--admin-gradient);
+        padding: 30px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .welcome-title h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0 0 5px;
+        letter-spacing: -0.02em;
+    }
+    
+    .welcome-title p {
+        opacity: 0.9;
+        margin: 0;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .badge-container {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .role-badge {
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        padding: 12px 25px;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.2);
+        font-size: 1rem;
+    }
+    
+    .role-badge i {
+        font-size: 1.2rem;
+    }
+    
+    .date-badge {
+        background: rgba(255,255,255,0.1);
+        padding: 12px 25px;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    /* Stats Grid - Enhanced */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--admin-primary);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .stat-card:hover::after {
+        opacity: 1;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(26,35,126,0.1);
+        border-color: var(--admin-primary);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--admin-soft);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--admin-primary);
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover .stat-icon {
+        background: var(--admin-primary);
+        color: white;
+    }
+    
+    .stat-content h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #333;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .stat-content p {
+        color: #666;
+        margin: 5px 0 0;
+        font-weight: 500;
+    }
+    
+    .stat-trend {
+        font-size: 0.8rem;
+        margin-top: 5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .trend-up { color: var(--admin-success); }
+    .trend-down { color: var(--admin-danger); }
+    
+    /* Main Grid - Enhanced */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    /* Card Styles - Enhanced */
+    .card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e0e0e0;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--admin-primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .card-header h3 i {
+        font-size: 1.2rem;
+    }
+    
+    .card-header .badge {
+        background: var(--admin-primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    /* ID Card Stats - Enhanced */
+    .card-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .card-stat-item {
+        background: var(--admin-soft);
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .card-stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(26,35,126,0.1);
+    }
+    
+    .card-stat-item .value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--admin-primary);
+        line-height: 1.2;
+    }
+    
+    .card-stat-item .label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+    
+    /* Table Styles - Enhanced */
+    .visitor-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .visitor-table thead {
+        background: var(--admin-soft);
+    }
+    
+    .visitor-table th {
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 700;
+        color: var(--admin-primary);
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 0.9rem;
+    }
+    
+    .visitor-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+    
+    .visitor-table tbody tr {
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .visitor-table tbody tr:hover {
+        background: var(--admin-soft);
+    }
+    
+    .visitor-name {
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .visitor-avatar {
+        width: 32px;
+        height: 32px;
+        background: var(--admin-primary);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .visitor-id {
+        font-family: monospace;
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+    
+    /* Status Badges - Enhanced */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .status-checked-in {
+        background: #e8f5e9;
+        color: var(--admin-success);
+    }
+    
+    .status-checked-out {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    .status-overdue {
+        background: #ffebee;
+        color: var(--admin-danger);
+        animation: pulse 2s infinite;
+    }
+    
+    .status-pending {
+        background: #fff3e0;
+        color: var(--admin-warning);
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+    
+    /* Department Stats - Enhanced */
+    .dept-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .dept-item:last-child {
+        border-bottom: none;
+    }
+    
+    .dept-name {
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .dept-name i {
+        color: var(--admin-primary);
+        font-size: 0.9rem;
+    }
+    
+    .dept-count {
+        background: var(--admin-soft);
+        color: var(--admin-primary);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: var(--admin-gradient);
+        transition: width 0.3s ease;
+    }
+    
+    /* Quick Links - Enhanced Admin Controls */
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    
+    .quick-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 15px;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-weight: 600;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .quick-link i {
+        font-size: 1.8rem;
+        color: var(--admin-primary);
+        transition: all 0.2s;
+    }
+    
+    .quick-link span {
+        font-size: 0.9rem;
+    }
+    
+    .quick-link small {
+        font-size: 0.75rem;
+        color: #999;
+        font-weight: normal;
+    }
+    
+    .quick-link:hover {
+        background: var(--admin-gradient);
+        color: white;
+        border-color: var(--admin-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(26,35,126,0.2);
+    }
+    
+    .quick-link:hover i {
+        color: white;
+    }
+    
+    .quick-link:hover small {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    /* Admin Specific Controls */
+    .admin-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .admin-control-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .admin-control-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--admin-soft);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--admin-primary);
+        font-size: 1.5rem;
+    }
+    
+    .admin-control-content {
+        flex: 1;
+    }
+    
+    .admin-control-content h4 {
+        margin: 0 0 5px;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+    
+    .admin-control-content p {
+        margin: 0;
+        color: #666;
+        font-size: 0.85rem;
+    }
+    
+    .admin-control-link {
+        color: var(--admin-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        background: var(--admin-soft);
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    
+    .admin-control-link:hover {
+        background: var(--admin-primary);
+        color: white;
+    }
+    
+    /* View All Link */
+    .view-all-link {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: var(--admin-primary);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 10px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+    
+    .view-all-link:hover {
+        background: var(--admin-soft);
+        border-color: var(--admin-primary);
+    }
+    
+    .view-all-link i {
+        margin-left: 5px;
+        transition: transform 0.2s;
+    }
+    
+    .view-all-link:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Overdue Alert - Enhanced */
+    .overdue-alert {
+        background: #ffebee;
+        border-left: 4px solid var(--admin-danger);
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 10px rgba(198,40,40,0.1);
+    }
+    
+    .overdue-alert i {
+        color: var(--admin-danger);
+        font-size: 1.8rem;
+    }
+    
+    .overdue-content {
+        flex: 1;
+    }
+    
+    .overdue-content strong {
+        color: var(--admin-danger);
+        font-size: 1.1rem;
+    }
+    
+    .overdue-content p {
+        margin: 5px 0 0;
+        color: #666;
+    }
+    
+    .overdue-link {
+        color: var(--admin-danger);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        background: rgba(198,40,40,0.1);
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    
+    .overdue-link:hover {
+        background: var(--admin-danger);
+        color: white;
+    }
+    
+    /* System Health */
+    .system-health {
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .health-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+    }
+    
+    .health-label {
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .health-value {
+        font-weight: 600;
+        color: var(--admin-primary);
+    }
+    
+    .health-value.good { color: var(--admin-success); }
+    .health-value.warning { color: var(--admin-warning); }
+    .health-value.bad { color: var(--admin-danger); }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #ddd;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .quick-links {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .admin-controls {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .welcome-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .badge-container {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .quick-links {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .visitor-table {
+            font-size: 0.85rem;
+        }
+        
+        .overdue-alert {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Welcome Header - Enhanced -->
+    <div class="welcome-header">
+        <div class="welcome-title">
+            <h1>Admin Control Center</h1>
+            <p>
+                <i class="fas fa-user-shield"></i>
+                <strong>{{ current_user.full_name or current_user.username }}</strong> • Administrator
+                <span style="margin-left: 15px;">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ now.strftime('%A, %d %B %Y') }}
+                </span>
+            </p>
+        </div>
+        <div class="badge-container">
+            <div class="role-badge">
+                <i class="fas fa-crown"></i>
+                <span>Full System Access</span>
+            </div>
+            <div class="date-badge">
+                <i class="fas fa-clock"></i>
+                <span>{{ now.strftime('%I:%M %p') }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin-Specific Controls -->
+    <div class="admin-controls">
+        <div class="admin-control-card">
+            <div class="admin-control-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="admin-control-content">
+                <h4>User Management</h4>
+                <p>Manage staff accounts & permissions</p>
+            </div>
+            <a href="{{ url_for('admin_settings') }}#users" class="admin-control-link">
+                Manage <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="admin-control-card">
+            <div class="admin-control-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="admin-control-content">
+                <h4>System Backup</h4>
+                <p>Export data & system configuration</p>
+            </div>
+            <a href="{{ url_for('admin_settings') }}#backup" class="admin-control-link">
+                Backup <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Key Statistics - Enhanced -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_visitors }}</h3>
+                <p>Total Visitors</p>
+                <span class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i> Lifetime
+                </span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ visitors_checked_in }}</h3>
+                <p>Currently On Campus</p>
+                {% if overdue_count > 0 %}
+                <span class="stat-trend trend-down">
+                    <i class="fas fa-exclamation-circle"></i> {{ overdue_count }} overdue
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_visitors_today }}</h3>
+                <p>Today's Visitors</p>
+                <span class="stat-trend">
+                    <i class="fas fa-clock"></i> {{ now.strftime('%d/%m') }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ available_cards }}</h3>
+                <p>Available ID Cards</p>
+                <span class="stat-trend">
+                    <i class="fas fa-percent"></i> {{ card_usage.utilization }}% utilized
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+        <!-- Recent Visitors with Enhanced Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    Recent Visitor Activity
+                </h3>
+                <span class="badge">{{ recent_visitors|length }} latest</span>
+            </div>
+            <div class="card-body">
+                {% if recent_visitors %}
+                <table class="visitor-table">
+                    <thead>
+                        <tr>
+                            <th>Visitor</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Check-in</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in recent_visitors %}
+                        <tr>
+                            <td>
+                                <div class="visitor-name">
+                                    <span class="visitor-avatar">{{ visitor.full_name[:1] }}</span>
+                                    <div>
+                                        <div>{{ visitor.full_name }}</div>
+                                        <div class="visitor-id">{{ visitor.visitor_id }}</div>
+                                    </div>
+                                </div>
+                                {% if visitor.card_info %}
+                                <small style="color: var(--admin-primary);">
+                                    <i class="fas fa-id-card"></i> {{ visitor.card_info.card_number }}
+                                </small>
+                                {% endif %}
+                            </td>
+                            <td>{{ visitor.department }}</td>
+                            <td>
+                                {% if visitor.status == 'checked_in' %}
+                                    {% if is_overdue(visitor.checkin_time, visitor.expected_duration) %}
+                                    <span class="status-badge status-overdue">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Overdue
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge status-checked-in">
+                                        <i class="fas fa-check-circle"></i>
+                                        In Campus
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="status-badge status-checked-out">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Checked Out
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ visitor.checkin_time.strftime('%I:%M %p') }}<br>
+                                <small class="text-muted">{{ visitor.checkin_time.strftime('%d/%m') }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group" style="gap: 5px;">
+                                    <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_edit_visitor', visitor_id=visitor.visitor_id) }}" 
+                                       class="btn btn-sm btn-outline-info" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if visitor.status == 'checked_in' %}
+                                    <a href="{{ url_for('checkout_page') }}?visitor_id={{ visitor.visitor_id }}" 
+                                       class="btn btn-sm btn-outline-success" title="Checkout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <a href="{{ url_for('admin_visitors') }}" class="view-all-link" style="flex: 1;">
+                        <i class="fas fa-list"></i> View All Visitors
+                    </a>
+                    <a href="{{ url_for('checkin') }}" class="view-all-link" style="flex: 1; background: var(--admin-soft);">
+                        <i class="fas fa-plus-circle"></i> New Check-in
+                    </a>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No recent visitors</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Right Sidebar - Enhanced -->
+        <div>
+            <!-- ID Card Management - Enhanced -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-id-card"></i>
+                        ID Card Inventory
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="card-stat-item">
+                            <div class="value" style="color: var(--admin-success);">{{ available_cards }}</div>
+                            <div class="label">Available</div>
+                        </div>
+                        <div class="card-stat-item">
+                            <div class="value" style="color: var(--admin-warning);">{{ issued_cards }}</div>
+                            <div class="label">Issued</div>
+                        </div>
+                        <div class="card-stat-item">
+                            <div class="value" style="color: var(--admin-danger);">{{ lost_cards }}</div>
+                            <div class="label">Lost</div>
+                        </div>
+                        <div class="card-stat-item">
+                            <div class="value" style="color: #666;">{{ damaged_cards }}</div>
+                            <div class="label">Damaged</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #666;">Utilization Rate</span>
+                            <span style="font-weight: 700; color: var(--admin-primary);">{{ card_usage.utilization }}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ card_usage.utilization }}%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <a href="{{ url_for('admin_idcards') }}" class="view-all-link" style="flex: 1;">
+                            <i class="fas fa-edit"></i> Manage Cards
+                        </a>
+                        <button onclick="exportCardReport()" class="view-all-link" style="flex: 1;">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Department Distribution - Enhanced -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-building"></i>
+                        Department Distribution
+                    </h3>
+                    <span class="badge">Today</span>
+                </div>
+                <div class="card-body">
+                    {% if dept_stats %}
+                        {% for stat in dept_stats %}
+                        <div class="dept-item">
+                            <span class="dept-name">
+                                <i class="fas fa-building"></i>
+                                {{ stat.department }}
+                            </span>
+                            <span class="dept-count">{{ stat.count }}</span>
+                        </div>
+                        {% endfor %}
+                        
+                        <a href="{{ url_for('admin_reports') }}" class="view-all-link">
+                            View Detailed Analytics <i class="fas fa-chart-bar ms-2"></i>
+                        </a>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <p>No data available for today</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- System Health Monitor -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-heartbeat"></i>
+                        System Health
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="system-health">
+                        <div class="health-item">
+                            <span class="health-label">Database Status</span>
+                            <span class="health-value good">
+                                <i class="fas fa-check-circle"></i> Connected
+                            </span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">ID Cards Total</span>
+                            <span class="health-value">{{ card_usage.total }}/100</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">Storage Used</span>
+                            <span class="health-value good">2.3 GB / 10 GB</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">Last Backup</span>
+                            <span class="health-value">{{ now.strftime('%d/%m/%Y') }}</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">System Version</span>
+                            <span class="health-value">2.1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert for Overdue Visitors - Enhanced -->
+    {% if overdue_count > 0 %}
+    <div class="overdue-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="overdue-content">
+            <strong>{{ overdue_count }} Visitor{% if overdue_count > 1 %}s{% endif %} Currently Overdue</strong>
+            <p>These visitors have exceeded their expected duration and require attention</p>
+        </div>
+        <a href="{{ url_for('admin_visitors') }}?status=overdue" class="overdue-link">
+            <i class="fas fa-eye"></i> View Overdue
+        </a>
+        <button onclick="sendOverdueNotifications()" class="overdue-link">
+            <i class="fas fa-bell"></i> Notify
+        </button>
+    </div>
+    {% endif %}
+    
+    <!-- Admin Quick Actions - Enhanced with more controls -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-cog"></i>
+                Administrative Controls
+            </h3>
+            <span class="badge">Full Access</span>
+        </div>
+        <div class="card-body">
+            <div class="quick-links">
+                <a href="{{ url_for('admin_visitors') }}" class="quick-link">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Visitor Management</span>
+                    <small>View, edit, delete</small>
+                </a>
+                <a href="{{ url_for('admin_idcards') }}" class="quick-link">
+                    <i class="fas fa-id-card-alt"></i>
+                    <span>ID Card Management</span>
+                    <small>Issue, return, track</small>
+                </a>
+                <a href="{{ url_for('admin_reports') }}" class="quick-link">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Reports & Analytics</span>
+                    <small>Insights & trends</small>
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="quick-link">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>System Settings</span>
+                    <small>Configure system</small>
+                </a>
+                <a href="{{ url_for('checkin') }}" class="quick-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Quick Check-in</span>
+                    <small>New visitor</small>
+                </a>
+                <a href="{{ url_for('checkout_page') }}" class="quick-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Quick Check-out</span>
+                    <small>Exit visitor</small>
+                </a>
+                <a href="{{ url_for('export_csv') }}" class="quick-link">
+                    <i class="fas fa-file-csv"></i>
+                    <span>Export Data</span>
+                    <small>CSV / PDF</small>
+                </a>
+                <a href="{{ url_for('admin_settings') }}#users" class="quick-link">
+                    <i class="fas fa-user-lock"></i>
+                    <span>User Management</span>
+                    <small>Add/remove staff</small>
+                </a>
+                <a href="{{ url_for('admin_settings') }}#backup" class="quick-link">
+                    <i class="fas fa-database"></i>
+                    <span>Backup System</span>
+                    <small>Data backup</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to check overdue status
+    function isOverdue(checkinTime, expectedDuration) {
+        if (!expectedDuration) return false;
+        const checkin = new Date(checkinTime);
+        const expectedCheckout = new Date(checkin.getTime() + expectedDuration * 60000);
+        return new Date() > expectedCheckout;
+    }
+    
+    // Export card report
+    function exportCardReport() {
+        fetch('/export/csv?type=cards')
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `id_cards_report_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+            })
+            .catch(error => console.error('Error exporting report:', error));
+    }
+    
+    // Send notifications for overdue visitors
+    function sendOverdueNotifications() {
+        fetch('/api/notifications/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ type: 'overdue' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Notifications sent to ${data.recipients} staff members`);
+            } else {
+                alert('Error sending notifications');
+            }
+        })
+        .catch(error => console.error('Error sending notifications:', error));
+    }
+    
+    // Refresh dashboard data every 30 seconds
+    setInterval(function() {
+        fetch('/api/dashboard/stats')
+            .then(response => response.json())
+            .then(data => {
+                // Update stats dynamically if needed
+                console.log('Dashboard stats refreshed');
+            })
+            .catch(error => console.error('Error refreshing stats:', error));
+    }, 30000);
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any initialization code here
+    });
+</script>
+{% endblock %}
