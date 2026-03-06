@@ -10,3 +10,4 @@ Pillow
 reportlab
 pytz
 gunicorn
+psycopg2
