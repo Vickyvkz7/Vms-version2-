@@ -1,5 +1,5 @@
 # app.py - Complete Flask Application for KPR College Visitor Management System
-# MYSQL VERSION - With all vehicle, student, and parent fields
+# POSTGRESQL VERSION - With all vehicle, student, and parent fields
 
 import os
 from datetime import datetime, timedelta
@@ -49,27 +49,27 @@ app = Flask(__name__,
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'kpr-college-secret-key-2024'
     
-    # MySQL Configuration from environment variables
-    DB_USERNAME = os.environ.get('DB_USERNAME', 'root')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'vickyapjlove')
+    # PostgreSQL Configuration from environment variables
+    DB_USERNAME = os.environ.get('DB_USERNAME', 'postgres')
+    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'postgres')
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
-    DB_PORT = os.environ.get('DB_PORT', '3306')
+    DB_PORT = os.environ.get('DB_PORT', '5432')
     DB_NAME = os.environ.get('DB_NAME', 'kpr_visitor')
     
-    # MySQL Connection String
+    # PostgreSQL Connection String
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4'
+        f'postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Connection pool settings for MySQL
+    # Connection pool settings for PostgreSQL
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_size': 10,
         'pool_recycle': 3600,
         'pool_pre_ping': True,
     }
     
-    # Default credentials (can be overridden via environment for privacy)
+    # Default credentials
     DEFAULT_ADMIN_USERNAME = os.environ.get('DEFAULT_ADMIN_USERNAME', 'admin')
     DEFAULT_ADMIN_PASSWORD = os.environ.get('DEFAULT_ADMIN_PASSWORD', 'admin')
     DEFAULT_SECURITY_USERNAME = os.environ.get('DEFAULT_SECURITY_USERNAME', 'security')
@@ -185,7 +185,6 @@ class User(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    # storing plaintext passwords (not hashed) as requested
     password_hash = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     full_name = db.Column(db.String(100))
@@ -539,24 +538,24 @@ def get_current_visitor_for_card(card_id):
         status='checked_in'
     ).first()
 
-# MySQL-specific function to check and add columns if needed
-def upgrade_database_mysql():
-    """Add new columns if they don't exist - MySQL version"""
+# PostgreSQL-specific function to check and add columns if needed
+def upgrade_database_postgresql():
+    """Add new columns if they don't exist - PostgreSQL version"""
     with app.app_context():
         try:
             # Get existing columns
             inspector = inspect(db.engine)
             columns = [col['name'] for col in inspector.get_columns('visitor')]
             
-            # Columns to add with their MySQL ALTER statements
+            # Columns to add with their PostgreSQL ALTER statements
             columns_to_add = {
-                'vehicle_number': "ALTER TABLE visitor ADD COLUMN vehicle_number VARCHAR(50)",
-                'vehicle_type': "ALTER TABLE visitor ADD COLUMN vehicle_type VARCHAR(50)",
-                'accompanied_count': "ALTER TABLE visitor ADD COLUMN accompanied_count INT DEFAULT 0",
-                'student_name': "ALTER TABLE visitor ADD COLUMN student_name VARCHAR(100)",
-                'parent_name': "ALTER TABLE visitor ADD COLUMN parent_name VARCHAR(100)",
-                'student_roll': "ALTER TABLE visitor ADD COLUMN student_roll VARCHAR(50)",
-                'visit_type': "ALTER TABLE visitor ADD COLUMN visit_type VARCHAR(50) DEFAULT 'general'"
+                'vehicle_number': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS vehicle_number VARCHAR(50)",
+                'vehicle_type': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50)",
+                'accompanied_count': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS accompanied_count INTEGER DEFAULT 0",
+                'student_name': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS student_name VARCHAR(100)",
+                'parent_name': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS parent_name VARCHAR(100)",
+                'student_roll': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS student_roll VARCHAR(50)",
+                'visit_type': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS visit_type VARCHAR(50) DEFAULT 'general'"
             }
             
             for col_name, alter_stmt in columns_to_add.items():
@@ -572,8 +571,8 @@ def upgrade_database_mysql():
             # Remove email column if exists (no longer collected)
             if 'email' in columns:
                 try:
-                    # MySQL syntax for dropping column
-                    db.session.execute(text('ALTER TABLE visitor DROP COLUMN email'))
+                    # PostgreSQL syntax for dropping column
+                    db.session.execute(text('ALTER TABLE visitor DROP COLUMN IF EXISTS email'))
                     db.session.commit()
                     print('[OK] Dropped email column (no longer collected)')
                 except Exception as e:
@@ -807,13 +806,13 @@ def admin_visitors():
         search = f"%{search_query}%"
         query = query.filter(
             db.or_(
-                Visitor.visitor_id.like(search),
-                Visitor.full_name.like(search),
-                Visitor.phone.like(search),
-                Visitor.person_to_meet.like(search),
-                Visitor.vehicle_number.like(search),
-                Visitor.student_name.like(search),
-                Visitor.parent_name.like(search)
+                Visitor.visitor_id.ilike(search),
+                Visitor.full_name.ilike(search),
+                Visitor.phone.ilike(search),
+                Visitor.person_to_meet.ilike(search),
+                Visitor.vehicle_number.ilike(search),
+                Visitor.student_name.ilike(search),
+                Visitor.parent_name.ilike(search)
             )
         )
     
@@ -2022,12 +2021,12 @@ def security_visitors():
         search = f"%{search_query}%"
         query = query.filter(
             db.or_(
-                Visitor.visitor_id.like(search),
-                Visitor.full_name.like(search),
-                Visitor.phone.like(search),
-                Visitor.vehicle_number.like(search),
-                Visitor.student_name.like(search),
-                Visitor.parent_name.like(search)
+                Visitor.visitor_id.ilike(search),
+                Visitor.full_name.ilike(search),
+                Visitor.phone.ilike(search),
+                Visitor.vehicle_number.ilike(search),
+                Visitor.student_name.ilike(search),
+                Visitor.parent_name.ilike(search)
             )
         )
     
@@ -2608,10 +2607,10 @@ def api_dashboard_stats():
             IDCard.returned_date >= today_start
         ).count()
         
-        # Calculate average visit time
+        # Calculate average visit time using PostgreSQL interval handling
         avg_visit_query = db.session.query(
             db.func.avg(
-                (Visitor.actual_checkout - Visitor.checkin_time)
+                db.func.extract('epoch', Visitor.actual_checkout - Visitor.checkin_time) / 60
             )
         ).filter(
             Visitor.actual_checkout.isnot(None),
@@ -2619,10 +2618,10 @@ def api_dashboard_stats():
         ).scalar()
         
         if avg_visit_query:
-            total_seconds = avg_visit_query.total_seconds()
-            hours = int(total_seconds // 3600)
-            minutes = int((total_seconds % 3600) // 60)
-            avg_visit = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+            minutes = int(avg_visit_query)
+            hours = minutes // 60
+            mins = minutes % 60
+            avg_visit = f"{hours}h {mins}m" if hours > 0 else f"{mins}m"
         else:
             avg_visit = "0m"
         
@@ -2938,13 +2937,13 @@ def api_reports():
             purpose_stats[visitor.purpose] = 0
         purpose_stats[visitor.purpose] += 1
     
-    # Calculate average duration
+    # Calculate average duration using PostgreSQL interval handling
     total_duration = 0
     duration_count = 0
     for visitor in visitors:
         if visitor.actual_checkout:
-            delta = visitor.actual_checkout - visitor.checkin_time
-            total_duration += delta.total_seconds()
+            delta = (visitor.actual_checkout - visitor.checkin_time).total_seconds()
+            total_duration += delta
             duration_count += 1
     
     avg_duration = int(total_duration / duration_count / 60) if duration_count > 0 else 0
@@ -3036,7 +3035,7 @@ def api_health():
             'timestamp': get_indian_time_display().isoformat(),
             'database': 'connected',
             'id_cards': cards_count,
-            'version': '2.1.0-mysql'
+            'version': '2.1.0-postgresql'
         })
     except Exception as e:
         return jsonify({
@@ -3361,10 +3360,10 @@ def debug_reset_id_cards():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@app.route('/debug/test-mysql')
+@app.route('/debug/test-postgresql')
 @login_required
-def debug_test_mysql():
-    """Test MySQL connection and show database info"""
+def debug_test_postgresql():
+    """Test PostgreSQL connection and show database info"""
     if not current_user.is_admin:
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
     
@@ -3372,11 +3371,11 @@ def debug_test_mysql():
         # Test connection
         result = db.session.execute(text("SELECT 1")).scalar()
         
-        # Get MySQL version
-        version = db.session.execute(text("SELECT VERSION()")).scalar()
+        # Get PostgreSQL version
+        version = db.session.execute(text("SELECT version()")).scalar()
         
-        # Get database name
-        db_name = db.session.execute(text("SELECT DATABASE()")).scalar()
+        # Get current database
+        db_name = db.session.execute(text("SELECT current_database()")).scalar()
         
         # Get table counts
         user_count = User.query.count()
@@ -3386,13 +3385,13 @@ def debug_test_mysql():
         audit_log_count = AuditLog.query.count()
         
         # Get table list
-        tables = db.session.execute(text("SHOW TABLES")).fetchall()
+        tables = db.session.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public'")).fetchall()
         table_list = [t[0] for t in tables]
         
         return jsonify({
             'success': True,
             'connection': 'successful',
-            'mysql_version': version,
+            'postgresql_version': version,
             'database': db_name,
             'tables': table_list,
             'counts': {
@@ -3518,16 +3517,16 @@ def init_database():
     """Initialize database with required data"""
     with app.app_context():
         try:
-            # Test MySQL connection
+            # Test PostgreSQL connection
             db.session.execute(text('SELECT 1'))
-            print("[OK] MySQL connection successful")
+            print("[OK] PostgreSQL connection successful")
             
             # Create all tables (if they don't exist)
             db.create_all()
             print("[OK] Database tables verified/created")
             
-            # Check and upgrade database schema for MySQL
-            upgrade_database_mysql()
+            # Check and upgrade database schema for PostgreSQL
+            upgrade_database_postgresql()
             
             # Initialize ID cards if needed
             initialize_id_cards()
@@ -3554,19 +3553,19 @@ def print_startup_info():
         lost_cards = IDCard.query.filter_by(status='lost').count()
         damaged_cards = IDCard.query.filter_by(status='damaged').count()
         
-        # Get MySQL info
+        # Get PostgreSQL info
         try:
-            db_name = db.session.execute(text("SELECT DATABASE()")).scalar()
-            db_version = db.session.execute(text("SELECT VERSION()")).scalar()
+            db_name = db.session.execute(text("SELECT current_database()")).scalar()
+            db_version = db.session.execute(text("SELECT version()")).scalar()
         except:
             db_name = "Unknown"
             db_version = "Unknown"
         
         print("\n" + "="*60)
-        print("KPR COLLEGE VISITOR MANAGEMENT SYSTEM - MYSQL EDITION")
+        print("KPR COLLEGE VISITOR MANAGEMENT SYSTEM - POSTGRESQL EDITION")
         print("="*60)
-        print(f"MySQL Database: {db_name}")
-        print(f"MySQL Version:  {db_version}")
+        print(f"PostgreSQL Database: {db_name}")
+        print(f"PostgreSQL Version:  {db_version}")
         print(f"Server URL:     http://localhost:5000")
         print(f"Admin Login:    admin / admin")
         print(f"Security Login: security / security123")
@@ -3577,7 +3576,7 @@ def print_startup_info():
 # ===================== APPLICATION ENTRY POINT =====================
 if __name__ == '__main__':
     # Install required packages if not already installed
-    required_packages = ['pymysql', 'python-dotenv', 'qrcode', 'reportlab', 'pytz']
+    required_packages = ['psycopg2-binary', 'python-dotenv', 'qrcode', 'reportlab', 'pytz']
     
     # Initialize database
     init_database()
