@@ -1,5 +1,5 @@
 # app.py - Complete Flask Application for KPR College Visitor Management System
-# POSTGRESQL VERSION - Fixed template paths
+# POSTGRESQL VERSION - Fixed database initialization and table creation
 
 import os
 from datetime import datetime, timedelta
@@ -13,6 +13,7 @@ from io import BytesIO
 import base64
 import json
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import ProgrammingError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -42,8 +43,8 @@ def indian_time_default():
 
 # Initialize Flask App - Fix template paths
 app = Flask(__name__, 
-            template_folder='templates',  # Look for templates in 'templates' folder
-            static_folder='static')       # Look for static files in 'static' folder
+            template_folder='templates',
+            static_folder='static')
 
 # Configuration
 class Config:
@@ -543,8 +544,13 @@ def upgrade_database_postgresql():
     """Add new columns if they don't exist - PostgreSQL version"""
     with app.app_context():
         try:
-            # Get existing columns
+            # Check if visitor table exists first
             inspector = inspect(db.engine)
+            if 'visitor' not in inspector.get_table_names():
+                print("[OK] Visitor table doesn't exist yet, skipping upgrade")
+                return
+            
+            # Get existing columns
             columns = [col['name'] for col in inspector.get_columns('visitor')]
             
             # Columns to add with their PostgreSQL ALTER statements
@@ -3408,6 +3414,45 @@ def debug_test_postgresql():
             'error': str(e)
         }), 500
 
+# ===================== DEBUG ROUTE TO CREATE TABLES =====================
+@app.route('/debug/create-tables')
+def debug_create_tables():
+    """Force create all database tables"""
+    try:
+        # Import all models first
+        from sqlalchemy import inspect
+        
+        # Create all tables
+        db.create_all()
+        print("[OK] Tables created via db.create_all()")
+        
+        # Check if tables were created
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        # Create default users if they don't exist
+        if not User.query.first():
+            create_default_admin()
+            create_default_security()
+            print("[OK] Default users created")
+        
+        # Initialize ID cards
+        initialize_id_cards()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Tables created successfully',
+            'tables': tables
+        })
+    except Exception as e:
+        print(f"[ERROR] {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 # ===================== ERROR HANDLERS =====================
 @app.errorhandler(404)
 def page_not_found(e):
@@ -3514,16 +3559,30 @@ def create_default_security():
             print("[OK] Security user already exists")
 
 def init_database():
-    """Initialize database with required data"""
+    """Initialize database with required data - ENHANCED VERSION"""
     with app.app_context():
         try:
             # Test PostgreSQL connection
             db.session.execute(text('SELECT 1'))
             print("[OK] PostgreSQL connection successful")
             
-            # Create all tables (if they don't exist)
-            db.create_all()
-            print("[OK] Database tables verified/created")
+            # Check if tables exist
+            inspector = inspect(db.engine)
+            existing_tables = inspector.get_table_names()
+            print(f"[OK] Existing tables: {existing_tables}")
+            
+            if 'user' not in existing_tables:
+                print("[WARNING] User table missing, creating all tables...")
+                # Create all tables
+                db.create_all()
+                print("[OK] All tables created via db.create_all()")
+            else:
+                print("[OK] Tables already exist")
+            
+            # Verify tables were created
+            inspector = inspect(db.engine)
+            tables = inspector.get_table_names()
+            print(f"[OK] Tables in database: {tables}")
             
             # Check and upgrade database schema for PostgreSQL
             upgrade_database_postgresql()
@@ -3543,6 +3602,9 @@ def init_database():
             
         except Exception as e:
             print(f"[ERROR] Database initialization failed: {e}")
+            # Print more details for debugging
+            import traceback
+            traceback.print_exc()
             raise
 
 def print_startup_info():
