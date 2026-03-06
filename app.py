@@ -1,5 +1,5 @@
 # app.py - Complete Flask Application for KPR College Visitor Management System
-# POSTGRESQL VERSION - Fixed database initialization and table creation
+# POSTGRESQL VERSION - With automatic table creation on startup
 
 import os
 from datetime import datetime, timedelta
@@ -3559,7 +3559,7 @@ def create_default_security():
             print("[OK] Security user already exists")
 
 def init_database():
-    """Initialize database with required data - ENHANCED VERSION"""
+    """Initialize database with required data - ENHANCED VERSION with automatic table creation"""
     with app.app_context():
         try:
             # Test PostgreSQL connection
@@ -3571,6 +3571,7 @@ def init_database():
             existing_tables = inspector.get_table_names()
             print(f"[OK] Existing tables: {existing_tables}")
             
+            # Always try to create tables if they don't exist
             if 'user' not in existing_tables:
                 print("[WARNING] User table missing, creating all tables...")
                 # Create all tables
