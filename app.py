@@ -1,5 +1,5 @@
 # app.py - Complete Flask Application for KPR College Visitor Management System
-# POSTGRESQL VERSION - With all vehicle, student, and parent fields
+# POSTGRESQL VERSION - Fixed template paths
 
 import os
 from datetime import datetime, timedelta
@@ -40,10 +40,10 @@ def indian_time_default():
     """Default function for SQLAlchemy datetime columns"""
     return get_indian_time()
 
-# Initialize Flask App
+# Initialize Flask App - Fix template paths
 app = Flask(__name__, 
-            template_folder='kpr-visitor-system/templates',
-            static_folder='kpr-visitor-system/static')
+            template_folder='templates',  # Look for templates in 'templates' folder
+            static_folder='static')       # Look for static files in 'static' folder
 
 # Configuration
 class Config:
