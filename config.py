@@ -1,6 +1,6 @@
 """
 Configuration file for KPR College Visitor Management System
-Handles different environments: development, testing, and production
+PostgreSQL Version - Handles different environments: development, testing, and production
 """
 
 import os
@@ -13,10 +13,27 @@ class Config:
     # Application Security
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'kpr-college-secret-key-2024-dev'
     
-    # Database Configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///kpr_visitor.db'
+    # PostgreSQL Database Configuration
+    # Format: postgresql://username:password@host:port/database
+    DB_USERNAME = os.environ.get('DB_USERNAME', 'postgres')
+    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'postgres')
+    DB_HOST = os.environ.get('DB_HOST', 'localhost')
+    DB_PORT = os.environ.get('DB_PORT', '5432')
+    DB_NAME = os.environ.get('DB_NAME', 'kpr_visitor')
+    
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        f'postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
+    
+    # Connection pool settings for PostgreSQL
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 10,
+        'pool_recycle': 3600,
+        'pool_pre_ping': True,
+        'max_overflow': 20
+    }
     
     # Session Configuration
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
@@ -40,6 +57,12 @@ class Config:
     
     # Pagination
     ITEMS_PER_PAGE = 20
+    
+    # Default credentials (can be overridden via environment for privacy)
+    DEFAULT_ADMIN_USERNAME = os.environ.get('DEFAULT_ADMIN_USERNAME', 'admin')
+    DEFAULT_ADMIN_PASSWORD = os.environ.get('DEFAULT_ADMIN_PASSWORD', 'admin')
+    DEFAULT_SECURITY_USERNAME = os.environ.get('DEFAULT_SECURITY_USERNAME', 'security')
+    DEFAULT_SECURITY_PASSWORD = os.environ.get('DEFAULT_SECURITY_PASSWORD', 'security123')
     
     # College Departments
     DEPARTMENTS = [
@@ -97,6 +120,17 @@ class Config:
         'Other'
     ]
     
+    # Vehicle Types
+    VEHICLE_TYPES = [
+        'Two Wheeler',
+        'Four Wheeler',
+        'Auto Rickshaw',
+        'Van',
+        'Bus',
+        'Truck',
+        'Other'
+    ]
+    
     # Email Configuration
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
@@ -130,7 +164,7 @@ class TestingConfig(Config):
     """Testing environment configuration"""
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost:5432/kpr_visitor_test'
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'test-secret-key-do-not-use-in-production'
 
