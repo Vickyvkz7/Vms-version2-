@@ -1,5 +1,5 @@
 # app.py - Complete Flask Application for KPR College Visitor Management System
-# POSTGRESQL VERSION - With automatic table creation on startup
+# POSTGRESQL VERSION - With all vehicle, student, and parent fields
 
 import os
 from datetime import datetime, timedelta
@@ -13,7 +13,6 @@ from io import BytesIO
 import base64
 import json
 from sqlalchemy import inspect, text
-from sqlalchemy.exc import ProgrammingError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -41,10 +40,10 @@ def indian_time_default():
     """Default function for SQLAlchemy datetime columns"""
     return get_indian_time()
 
-# Initialize Flask App - Fix template paths
+# Initialize Flask App
 app = Flask(__name__, 
-            template_folder='templates',
-            static_folder='static')
+            template_folder='kpr-visitor-system/templates',
+            static_folder='kpr-visitor-system/static')
 
 # Configuration
 class Config:
@@ -70,7 +69,7 @@ class Config:
         'pool_pre_ping': True,
     }
     
-    # Default credentials
+    # Default credentials (can be overridden via environment for privacy)
     DEFAULT_ADMIN_USERNAME = os.environ.get('DEFAULT_ADMIN_USERNAME', 'admin')
     DEFAULT_ADMIN_PASSWORD = os.environ.get('DEFAULT_ADMIN_PASSWORD', 'admin')
     DEFAULT_SECURITY_USERNAME = os.environ.get('DEFAULT_SECURITY_USERNAME', 'security')
@@ -186,6 +185,7 @@ class User(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    # storing plaintext passwords (not hashed) as requested
     password_hash = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     full_name = db.Column(db.String(100))
@@ -544,24 +544,19 @@ def upgrade_database_postgresql():
     """Add new columns if they don't exist - PostgreSQL version"""
     with app.app_context():
         try:
-            # Check if visitor table exists first
-            inspector = inspect(db.engine)
-            if 'visitor' not in inspector.get_table_names():
-                print("[OK] Visitor table doesn't exist yet, skipping upgrade")
-                return
-            
             # Get existing columns
+            inspector = inspect(db.engine)
             columns = [col['name'] for col in inspector.get_columns('visitor')]
             
             # Columns to add with their PostgreSQL ALTER statements
             columns_to_add = {
-                'vehicle_number': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS vehicle_number VARCHAR(50)",
-                'vehicle_type': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50)",
-                'accompanied_count': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS accompanied_count INTEGER DEFAULT 0",
-                'student_name': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS student_name VARCHAR(100)",
-                'parent_name': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS parent_name VARCHAR(100)",
-                'student_roll': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS student_roll VARCHAR(50)",
-                'visit_type': "ALTER TABLE visitor ADD COLUMN IF NOT EXISTS visit_type VARCHAR(50) DEFAULT 'general'"
+                'vehicle_number': "ALTER TABLE visitor ADD COLUMN vehicle_number VARCHAR(50)",
+                'vehicle_type': "ALTER TABLE visitor ADD COLUMN vehicle_type VARCHAR(50)",
+                'accompanied_count': "ALTER TABLE visitor ADD COLUMN accompanied_count INTEGER DEFAULT 0",
+                'student_name': "ALTER TABLE visitor ADD COLUMN student_name VARCHAR(100)",
+                'parent_name': "ALTER TABLE visitor ADD COLUMN parent_name VARCHAR(100)",
+                'student_roll': "ALTER TABLE visitor ADD COLUMN student_roll VARCHAR(50)",
+                'visit_type': "ALTER TABLE visitor ADD COLUMN visit_type VARCHAR(50) DEFAULT 'general'"
             }
             
             for col_name, alter_stmt in columns_to_add.items():
@@ -578,7 +573,7 @@ def upgrade_database_postgresql():
             if 'email' in columns:
                 try:
                     # PostgreSQL syntax for dropping column
-                    db.session.execute(text('ALTER TABLE visitor DROP COLUMN IF EXISTS email'))
+                    db.session.execute(text('ALTER TABLE visitor DROP COLUMN email'))
                     db.session.commit()
                     print('[OK] Dropped email column (no longer collected)')
                 except Exception as e:
@@ -587,6 +582,33 @@ def upgrade_database_postgresql():
                     
         except Exception as e:
             print(f"[WARNING] Database upgrade check failed: {e}")
+
+# PostgreSQL function for date filtering
+def date_filter(query, field, date_value):
+    """Apply date filter for PostgreSQL"""
+    if date_value:
+        try:
+            filter_date = datetime.strptime(date_value, '%Y-%m-%d').date()
+            return query.filter(db.cast(field, db.Date) == filter_date)
+        except ValueError:
+            pass
+    return query
+
+def date_range_filter(query, field, start_date, end_date):
+    """Apply date range filter for PostgreSQL"""
+    if start_date:
+        try:
+            start = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(field >= start)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(field < end)
+        except ValueError:
+            pass
+    return query
 
 # ===================== ROUTES =====================
 @app.route('/')
@@ -688,11 +710,8 @@ def admin_dashboard():
     now = get_indian_time()
     today_start = datetime(now.year, now.month, now.day)
     
-    # Statistics
-    total_visitors_today = Visitor.query.filter(
-        Visitor.checkin_time >= today_start
-    ).count()
-    
+    # Statistics - PostgreSQL compatible
+    total_visitors_today = Visitor.query.filter(Visitor.checkin_time >= today_start).count()
     active_visitors = Visitor.query.filter_by(status='checked_in').count()
     total_visitors = Visitor.query.count()
     
@@ -710,7 +729,7 @@ def admin_dashboard():
         if visitor.card_id:
             visitor.card_info = IDCard.query.get(visitor.card_id)
     
-    # Department-wise distribution
+    # Department-wise distribution - PostgreSQL compatible
     dept_stats = db.session.query(
         Visitor.department,
         db.func.count(Visitor.id).label('count')
@@ -781,24 +800,14 @@ def admin_visitors():
     elif has_card_filter == 'no':
         query = query.filter(Visitor.card_id.is_(None))
     
+    # Date range filter - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
+    
+    # Date filter - PostgreSQL compatible
     if date_filter:
         try:
             filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            query = query.filter(db.func.date(Visitor.checkin_time) == filter_date)
-        except ValueError:
-            pass
-    
-    # Date range filter
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
+            query = query.filter(db.cast(Visitor.checkin_time, db.Date) == filter_date)
         except ValueError:
             pass
     
@@ -1089,19 +1098,8 @@ def admin_reports():
     
     query = Visitor.query
     
-    # Apply date filters
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
-        except ValueError:
-            pass
+    # Apply date filters - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
     
     # Apply other filters
     if department:
@@ -1151,7 +1149,7 @@ def admin_reports():
     if not start_date and not end_date:
         if report_type == 'daily':
             today = get_indian_time().date()
-            query = query.filter(db.func.date(Visitor.checkin_time) == today)
+            query = query.filter(db.cast(Visitor.checkin_time, db.Date) == today)
             title = f"Daily Report - {today.strftime('%d/%m/%Y')}"
         elif report_type == 'weekly':
             week_ago = get_indian_time() - timedelta(days=7)
@@ -2002,24 +2000,14 @@ def security_visitors():
     elif status_filter == 'overdue':
         query = query.filter_by(status='checked_in')
     
-    # Date range filter
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
-        except ValueError:
-            pass
+    # Date range filter - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
     
+    # Date filter - PostgreSQL compatible
     if date_filter:
         try:
             filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            query = query.filter(db.func.date(Visitor.checkin_time) == filter_date)
+            query = query.filter(db.cast(Visitor.checkin_time, db.Date) == filter_date)
         except ValueError:
             pass
     
@@ -2613,10 +2601,11 @@ def api_dashboard_stats():
             IDCard.returned_date >= today_start
         ).count()
         
-        # Calculate average visit time using PostgreSQL interval handling
+        # Calculate average visit time - PostgreSQL compatible
+        from sqlalchemy import func
         avg_visit_query = db.session.query(
-            db.func.avg(
-                db.func.extract('epoch', Visitor.actual_checkout - Visitor.checkin_time) / 60
+            func.avg(
+                func.extract('epoch', Visitor.actual_checkout - Visitor.checkin_time) / 60
             )
         ).filter(
             Visitor.actual_checkout.isnot(None),
@@ -2896,24 +2885,13 @@ def api_reports():
     
     query = Visitor.query
     
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
-        except ValueError:
-            pass
+    # Apply date filters - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
     
     if not start_date and not end_date:
         if report_type == 'daily':
             today = get_indian_time().date()
-            query = query.filter(db.func.date(Visitor.checkin_time) == today)
+            query = query.filter(db.cast(Visitor.checkin_time, db.Date) == today)
         elif report_type == 'weekly':
             week_ago = get_indian_time() - timedelta(days=7)
             query = query.filter(Visitor.checkin_time >= week_ago)
@@ -2943,16 +2921,17 @@ def api_reports():
             purpose_stats[visitor.purpose] = 0
         purpose_stats[visitor.purpose] += 1
     
-    # Calculate average duration using PostgreSQL interval handling
-    total_duration = 0
-    duration_count = 0
-    for visitor in visitors:
-        if visitor.actual_checkout:
-            delta = (visitor.actual_checkout - visitor.checkin_time).total_seconds()
-            total_duration += delta
-            duration_count += 1
+    # Calculate average duration - PostgreSQL compatible
+    from sqlalchemy import func
+    avg_duration_result = db.session.query(
+        func.avg(
+            func.extract('epoch', Visitor.actual_checkout - Visitor.checkin_time) / 60
+        )
+    ).filter(
+        Visitor.actual_checkout.isnot(None)
+    ).scalar()
     
-    avg_duration = int(total_duration / duration_count / 60) if duration_count > 0 else 0
+    avg_duration = int(avg_duration_result) if avg_duration_result else 0
     
     # Card usage statistics
     card_stats = {
@@ -3063,19 +3042,8 @@ def export_csv():
     
     query = Visitor.query
     
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
-        except ValueError:
-            pass
+    # Apply date filters - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
     
     visitors = query.order_by(Visitor.checkin_time.desc()).all()
     
@@ -3168,19 +3136,8 @@ def export_pdf():
     
     query = Visitor.query
     
-    if start_date:
-        try:
-            start = datetime.strptime(start_date, '%Y-%m-%d')
-            query = query.filter(Visitor.checkin_time >= start)
-        except ValueError:
-            pass
-    
-    if end_date:
-        try:
-            end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Visitor.checkin_time < end)
-        except ValueError:
-            pass
+    # Apply date filters - PostgreSQL compatible
+    query = date_range_filter(query, Visitor.checkin_time, start_date, end_date)
     
     visitors = query.order_by(Visitor.checkin_time.desc()).limit(100).all()
     
@@ -3380,7 +3337,7 @@ def debug_test_postgresql():
         # Get PostgreSQL version
         version = db.session.execute(text("SELECT version()")).scalar()
         
-        # Get current database
+        # Get database name
         db_name = db.session.execute(text("SELECT current_database()")).scalar()
         
         # Get table counts
@@ -3409,45 +3366,6 @@ def debug_test_postgresql():
             }
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-# ===================== DEBUG ROUTE TO CREATE TABLES =====================
-@app.route('/debug/create-tables')
-def debug_create_tables():
-    """Force create all database tables"""
-    try:
-        # Import all models first
-        from sqlalchemy import inspect
-        
-        # Create all tables
-        db.create_all()
-        print("[OK] Tables created via db.create_all()")
-        
-        # Check if tables were created
-        inspector = inspect(db.engine)
-        tables = inspector.get_table_names()
-        
-        # Create default users if they don't exist
-        if not User.query.first():
-            create_default_admin()
-            create_default_security()
-            print("[OK] Default users created")
-        
-        # Initialize ID cards
-        initialize_id_cards()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Tables created successfully',
-            'tables': tables
-        })
-    except Exception as e:
-        print(f"[ERROR] {e}")
-        import traceback
-        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': str(e)
@@ -3559,31 +3477,16 @@ def create_default_security():
             print("[OK] Security user already exists")
 
 def init_database():
-    """Initialize database with required data - ENHANCED VERSION with automatic table creation"""
+    """Initialize database with required data"""
     with app.app_context():
         try:
             # Test PostgreSQL connection
             db.session.execute(text('SELECT 1'))
             print("[OK] PostgreSQL connection successful")
             
-            # Check if tables exist
-            inspector = inspect(db.engine)
-            existing_tables = inspector.get_table_names()
-            print(f"[OK] Existing tables: {existing_tables}")
-            
-            # Always try to create tables if they don't exist
-            if 'user' not in existing_tables:
-                print("[WARNING] User table missing, creating all tables...")
-                # Create all tables
-                db.create_all()
-                print("[OK] All tables created via db.create_all()")
-            else:
-                print("[OK] Tables already exist")
-            
-            # Verify tables were created
-            inspector = inspect(db.engine)
-            tables = inspector.get_table_names()
-            print(f"[OK] Tables in database: {tables}")
+            # Create all tables (if they don't exist)
+            db.create_all()
+            print("[OK] Database tables verified/created")
             
             # Check and upgrade database schema for PostgreSQL
             upgrade_database_postgresql()
@@ -3603,9 +3506,6 @@ def init_database():
             
         except Exception as e:
             print(f"[ERROR] Database initialization failed: {e}")
-            # Print more details for debugging
-            import traceback
-            traceback.print_exc()
             raise
 
 def print_startup_info():
