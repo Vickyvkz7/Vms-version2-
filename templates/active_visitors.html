@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Active Visitors · KPR College{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center">
+    <span>Visitor Management</span>
+    <span class="badge bg-white text-primary ms-3 px-3 py-2 rounded-pill shadow-sm border border-primary">
+        <i class="fas fa-users me-1"></i> ACTIVE: {{ active_visitors }}
+    </span>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('security_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+<li class="breadcrumb-item active text-primary fw-semibold">Visitors</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== VISITOR MANAGEMENT STYLES (matches check‑in) ===== */
+    :root {
+        --primary: #0d6efd;
+        --primary-dark: #0b5ed7;
+        --primary-light: #e7f1ff;
+        --primary-soft: #cfe2ff;
+        --success: #198754;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-600: #6c757d;
+        --gray-800: #343a40;
+        --border-radius: 16px;
+        --shadow: 0 8px 24px rgba(0,0,0,0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background: #f0f5fa;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .filters-bar {
+        background: white;
+        border-radius: 60px;
+        padding: 8px 16px 8px 24px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+    }
+    .filter-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+    .filter-badge {
+        background: var(--primary-soft);
+        color: var(--primary-dark);
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .filter-badge i { font-size: 0.9rem; }
+    .filter-select, .filter-input {
+        border: 2px solid var(--gray-200);
+        border-radius: 40px;
+        padding: 8px 16px;
+        font-size: 0.95rem;
+        background: white;
+        min-width: 150px;
+    }
+    .filter-select:focus, .filter-input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+    .btn-filter {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 40px;
+        padding: 8px 24px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    .btn-filter:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    /* Visitor Table */
+    .visitor-table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+    }
+    .visitor-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .visitor-table th {
+        text-align: left;
+        padding: 16px 12px;
+        color: var(--gray-600);
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+    .visitor-table td {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+    .visitor-table tr:hover td { background: var(--gray-100); }
+
+    .visitor-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-soft);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 700;
+    }
+    .visitor-info h6 {
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 2px;
+    }
+    .visitor-info small {
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-status {
+        padding: 6px 14px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .badge-active { background: #d1e7dd; color: #0f5132; }
+    .badge-overdue { background: #f8d7da; color: #842029; }
+    .badge-completed { background: var(--gray-200); color: var(--gray-600); }
+
+    .badge-card {
+        background: var(--primary);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .btn-view {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-300);
+        border-radius: 30px;
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .btn-view:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pagination {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 24px;
+    }
+    .page-item .page-link {
+        border: 2px solid var(--gray-200);
+        border-radius: 40px;
+        color: var(--gray-800);
+        padding: 8px 16px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    .page-item.active .page-link {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+    .page-item .page-link:hover {
+        background: var(--primary-soft);
+        border-color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+        .filters-bar { flex-direction: column; align-items: stretch; }
+        .filter-group { justify-content: center; }
+        .visitor-table { display: block; overflow-x: auto; }
+    }
+</style>
+
+<div class="container-fluid px-4 py-4">
+    <!-- Filters & Search Bar -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <span class="filter-badge"><i class="fas fa-filter"></i> Status</span>
+            <select class="filter-select" id="statusFilter" onchange="applyFilter()">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Visitors</option>
+                <option value="checked_in" {% if status_filter == 'checked_in' %}selected{% endif %}>Active</option>
+                <option value="checked_out" {% if status_filter == 'checked_out' %}selected{% endif %}>Checked Out</option>
+                <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+            </select>
+
+            <span class="filter-badge ms-3"><i class="fas fa-calendar-alt"></i> Date</span>
+            <input type="date" class="filter-input" id="dateFilter" value="{{ date_filter }}" onchange="applyFilter()">
+        </div>
+        <div class="filter-group">
+            <input type="text" class="filter-input" id="searchInput" placeholder="Search name / ID / phone" value="{{ search_query }}">
+            <button class="btn-filter" onclick="applySearch()"><i class="fas fa-search me-1"></i> Search</button>
+        </div>
+    </div>
+
+    <!-- Visitor List -->
+    <div class="visitor-table-container">
+        {% if visitors %}
+        <table class="visitor-table">
+            <thead>
+                <tr>
+                    <th>Visitor</th>
+                    <th>Contact</th>
+                    <th>Department / Meeting</th>
+                    <th>Check‑in</th>
+                    <th>Duration</th>
+                    <th>ID Card</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visitor in visitors %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="visitor-avatar">{{ visitor.full_name[:1] }}</div>
+                            <div class="visitor-info">
+                                <h6>{{ visitor.full_name }}</h6>
+                                <small><i class="far fa-id-card"></i> {{ visitor.visitor_id }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="visitor-info">
+                            <small><i class="fas fa-phone-alt"></i> {{ visitor.phone }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="visitor-info">
+                            <small><i class="fas fa-building"></i> {{ visitor.department or '—' }}</small>
+                            <small><i class="fas fa-user-tie"></i> {{ visitor.person_to_meet or '—' }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="visitor-info">
+                            <small>{{ visitor.checkin_time.strftime('%d/%m/%Y') }}</small>
+                            <small>{{ visitor.checkin_time.strftime('%I:%M %p') }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% if visitor.status == 'checked_in' %}
+                            {% set dur = visitor.current_duration if visitor.current_duration else calculate_duration(visitor.checkin_time) %}
+                            <span class="badge-status {% if visitor.is_overdue_flag %}badge-overdue{% else %}badge-active{% endif %}">
+                                <i class="fas fa-hourglass-half"></i> {{ dur.hours }}h {{ dur.minutes }}m
+                            </span>
+                        {% elif visitor.actual_checkout %}
+                            {% set dur = visitor.total_duration %}
+                            <span class="badge-status badge-completed">{{ dur.hours }}h {{ dur.minutes }}m</span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if visitor.card_info %}
+                        <span class="badge-card">{{ visitor.card_info.card_number }}</span>
+                        {% else %}
+                        <span class="text-muted small">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if visitor.status == 'checked_in' %}
+                            {% if visitor.is_overdue_flag %}
+                            <span class="badge-status badge-overdue"><i class="fas fa-exclamation-circle"></i> Overdue</span>
+                            {% else %}
+                            <span class="badge-status badge-active"><i class="fas fa-check-circle"></i> Active</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge-status badge-completed"><i class="fas fa-check"></i> Completed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="btn-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <nav class="pagination-container">
+            <ul class="pagination">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('security_visitors', page=page-1, status=status_filter, date=date_filter, search=search_query) }}">Previous</a>
+                </li>
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p >= page-2 and p <= page+2 %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('security_visitors', page=p, status=status_filter, date=date_filter, search=search_query) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('security_visitors', page=page+1, status=status_filter, date=date_filter, search=search_query) }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <h5>No visitors found</h5>
+            <p class="text-muted">Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function applyFilter() {
+        const status = document.getElementById('statusFilter').value;
+        const date = document.getElementById('dateFilter').value;
+        const search = document.getElementById('searchInput').value;
+        window.location.href = `{{ url_for('security_visitors') }}?status=${status}&date=${date}&search=${encodeURIComponent(search)}`;
+    }
+
+    function applySearch() {
+        const status = document.getElementById('statusFilter').value;
+        const date = document.getElementById('dateFilter').value;
+        const search = document.getElementById('searchInput').value;
+        window.location.href = `{{ url_for('security_visitors') }}?status=${status}&date=${date}&search=${encodeURIComponent(search)}`;
+    }
+
+    // Allow Enter key in search
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applySearch();
+        }
+    });
+</script>
+{% endblock %}

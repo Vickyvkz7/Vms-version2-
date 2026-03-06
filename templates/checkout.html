@@ -1,0 +1,1410 @@
+{% extends "base.html" %}
+
+{% block title %}QR Check-out System · KPR College{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center flex-wrap gap-2">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-qrcode fs-2 me-2" style="color: #2e7d32;"></i>
+        <span class="fw-bold" style="font-size: 1.6rem;">QR Check-out</span>
+    </div>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="badge bg-white text-success px-3 py-1 rounded-pill border border-success">
+            <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i> 
+            {{ active_visitors|length }} Active
+        </span>
+        <span class="badge bg-white text-dark px-3 py-1 rounded-pill border border-secondary">
+            <i class="fas fa-clock me-1"></i> {{ now.strftime('%H:%M') }}
+        </span>
+    </div>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('security_dashboard') }}">Security</a></li>
+<li class="breadcrumb-item active">QR Check-out</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== RESTRUCTURED QR CHECKOUT - CLEAN & EFFICIENT ===== */
+    :root {
+        --primary: #2e7d32;
+        --primary-dark: #1b5e20;
+        --primary-light: #e8f5e9;
+        --primary-soft: #c8e6c9;
+        --danger: #d32f2f;
+        --danger-light: #ffebee;
+        --success: #2e7d32;
+        --success-light: #e8f5e9;
+        --warning: #ed6c02;
+        --warning-light: #fff3e0;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        --radius: 12px;
+        --radius-sm: 8px;
+        --transition: all 0.2s ease;
+    }
+
+    body {
+        background: #f1f5f9;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .checkout-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+
+    /* ===== GLOBAL SCANNER BADGE ===== */
+    .scanner-badge-global {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--primary);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 2px solid white;
+        animation: pulse-subtle 2s infinite;
+    }
+
+    @keyframes pulse-subtle {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    /* ===== HEADER SECTION ===== */
+    .header-panel {
+        background: white;
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-title h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .header-title p {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin: 4px 0 0;
+    }
+
+    .stats-group {
+        display: flex;
+        gap: 16px;
+    }
+
+    .stat-item {
+        background: var(--gray-50);
+        border-radius: 40px;
+        padding: 8px 20px;
+        border: 1px solid var(--gray-200);
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+    }
+
+    .live-indicator {
+        background: var(--success-light);
+        color: var(--success);
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--success);
+    }
+
+    /* ===== SCANNER GRID ===== */
+    .scanner-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    /* Scanner Card */
+    .scanner-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--primary-light);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.5rem;
+    }
+
+    .card-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0 0 4px;
+    }
+
+    .card-header p {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    /* Input Fields */
+    .input-group {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+    }
+
+    .scanner-input,
+    .search-input {
+        width: 100%;
+        padding: 14px 14px 14px 44px;
+        border: 2px solid var(--gray-200);
+        border-radius: 40px;
+        font-size: 1rem;
+        background: var(--gray-50);
+        transition: var(--transition);
+    }
+
+    .scanner-input:focus,
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .hint-text {
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .key-hint {
+        background: white;
+        border: 1px solid var(--gray-300);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-family: monospace;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    /* Search Results */
+    .search-results {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-sm);
+        background: white;
+        margin-top: 16px;
+        display: none;
+    }
+
+    .result-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gray-200);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .result-row:last-child {
+        border-bottom: none;
+    }
+
+    .result-row:hover {
+        background: var(--gray-50);
+    }
+
+    .result-row.selected {
+        background: var(--primary-light);
+        border-left: 4px solid var(--primary);
+    }
+
+    .result-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-light);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .result-info {
+        flex: 1;
+    }
+
+    .result-info h6 {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0 0 4px;
+    }
+
+    .result-info small {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+    }
+
+    .overdue-badge {
+        background: var(--danger-light);
+        color: var(--danger);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        margin-left: 6px;
+    }
+
+    /* ===== ACTIVE VISITORS PANEL ===== */
+    .visitors-panel {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+        margin-top: 24px;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .panel-title h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-bulk {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 40px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-bulk:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-bulk:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .count-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    /* Visitors Table */
+    .visitors-table-container {
+        overflow-x: auto;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .visitors-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .visitors-table th {
+        background: var(--gray-100);
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--gray-700);
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .visitors-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+    .visitors-table tr:hover {
+        background: var(--gray-50);
+    }
+
+    .visitors-table input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary);
+    }
+
+    .visitor-name {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .visitor-id {
+        font-family: monospace;
+        background: var(--gray-100);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+    }
+
+    .time-cell {
+        color: var(--gray-600);
+        font-size: 0.85rem;
+    }
+
+    .status-badge {
+        background: var(--success-light);
+        color: var(--success);
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.overdue {
+        background: var(--danger-light);
+        color: var(--danger);
+    }
+
+    .action-checkout {
+        background: var(--primary-light);
+        color: var(--primary);
+        border: none;
+        border-radius: 30px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-checkout:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        background: var(--gray-50);
+        border-radius: var(--radius);
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--gray-400);
+        margin-bottom: 16px;
+    }
+
+    .empty-state h4 {
+        color: var(--gray-700);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+    }
+
+    /* ===== VISITOR DETAIL CARD ===== */
+    .detail-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-top: 24px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+        display: none;
+    }
+
+    .detail-card.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px dashed var(--gray-200);
+    }
+
+    .detail-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .detail-title i {
+        font-size: 2rem;
+        color: var(--success);
+    }
+
+    .detail-title h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .scan-tag {
+        background: var(--success-light);
+        color: var(--success);
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-weight: 600;
+        border: 1px solid var(--success);
+    }
+
+    .profile-section {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .avatar-large {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-light);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+    }
+
+    .info-large {
+        flex: 1;
+    }
+
+    .info-large h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0 0 8px;
+    }
+
+    .meta-list {
+        display: flex;
+        gap: 24px;
+        color: var(--gray-500);
+        flex-wrap: wrap;
+    }
+
+    .meta-list i {
+        color: var(--primary);
+        margin-right: 6px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .detail-label {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: var(--gray-800);
+        font-size: 1.1rem;
+    }
+
+    .detail-sub {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+
+    .time-panel {
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .duration-indicator {
+        background: white;
+        border: 1px solid var(--gray-300);
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .duration-indicator.overdue {
+        background: var(--danger-light);
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+
+    .action-group {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-primary {
+        padding: 12px 28px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        padding: 12px 28px;
+        background: white;
+        color: var(--gray-700);
+        border: 2px solid var(--gray-200);
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .scanner-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-panel {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .stats-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .profile-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .meta-list {
+            justify-content: center;
+        }
+        
+        .action-group {
+            flex-direction: column;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Global Scanner Input (Hidden) -->
+<input type="hidden" id="globalScannerInput">
+
+<!-- Global Scanner Badge -->
+<div class="scanner-badge-global" id="globalScannerBadge">
+    <i class="fas fa-qrcode"></i>
+    <span>Scanner Ready</span>
+    <span class="badge bg-white text-success ms-2">F8</span>
+</div>
+
+<div class="checkout-wrapper">
+    <!-- Header Section -->
+    <div class="header-panel">
+        <div class="header-title">
+            <h1><i class="fas fa-qrcode me-2" style="color: var(--primary);"></i>QR Check-out</h1>
+            <p><i class="far fa-clock me-1"></i> {{ now.strftime('%A, %d %B %Y • %I:%M %p') }}</p>
+        </div>
+        <div class="stats-group">
+            <div class="stat-item">
+                <div class="stat-number" id="activeCount">{{ active_visitors|length }}</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="overdueCount">{{ overdue_count|default(0) }}</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="cardsIssued">{{ cards_issued|default(0) }}</div>
+                <div class="stat-label">Cards</div>
+            </div>
+        </div>
+        <div class="live-indicator">
+            <i class="fas fa-circle"></i>
+            <span>GLOBAL SCANNER</span>
+        </div>
+    </div>
+
+    <!-- Scanner Grid -->
+    <div class="scanner-layout">
+        <!-- Hardware Scanner Card -->
+        <div class="scanner-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <div>
+                    <h3>Hardware Scanner</h3>
+                    <p>Works on all pages - Press F8 to focus</p>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-qrcode"></i>
+                <input type="text" 
+                       id="hardwareScannerInput" 
+                       class="scanner-input"
+                       placeholder="Scan QR code..."
+                       autocomplete="off"
+                       autofocus>
+            </div>
+
+            <div class="hint-text">
+                <i class="fas fa-info-circle"></i>
+                <span>Auto-detects QR codes - <span class="key-hint">Enter</span> works</span>
+            </div>
+
+            <div class="hint-text mt-2">
+                <i class="fas fa-keyboard"></i>
+                <span><span class="key-hint">F8</span> focus • <span class="key-hint">Esc</span> clear</span>
+            </div>
+        </div>
+
+        <!-- Manual Search Card -->
+        <div class="scanner-card">
+            <div class="card-header">
+                <div class="card-icon" style="background: #fff3e0; color: #f97316;">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div>
+                    <h3>Manual Search</h3>
+                    <p>Find by name, ID, phone or card</p>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" 
+                       id="manualSearch" 
+                       class="search-input"
+                       placeholder="Type to search..."
+                       autocomplete="off">
+            </div>
+
+            <div class="hint-text">
+                <i class="fas fa-lightbulb"></i>
+                <span><span class="key-hint">↑</span> <span class="key-hint">↓</span> navigate • <span class="key-hint">Enter</span> select</span>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Active Visitors Panel (with integrated bulk checkout) -->
+    <div class="visitors-panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <i class="fas fa-users" style="color: var(--primary); font-size: 1.5rem;"></i>
+                <h3>Active Visitors</h3>
+                <span class="count-badge" id="activeCountBadge">{{ active_visitors|length }}</span>
+            </div>
+            
+            <!-- Bulk Actions Integrated -->
+            <div class="bulk-actions">
+                <button class="btn-bulk" id="bulkCheckoutBtn" onclick="bulkCheckout()" disabled>
+                    <i class="fas fa-sign-out-alt"></i>
+                    Check-out Selected (<span id="selectedCount">0</span>)
+                </button>
+            </div>
+        </div>
+
+        {% if active_visitors %}
+        <div class="visitors-table-container">
+            <table class="visitors-table">
+                <thead>
+                    <tr>
+                        <th width="40">
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                        </th>
+                        <th>Name & ID</th>
+                        <th>Contact</th>
+                        <th>Check-in Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th width="100">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visitor in active_visitors %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" 
+                                   class="visitor-checkbox" 
+                                   value="{{ visitor.visitor_id }}" 
+                                   onchange="updateSelection()"
+                                   data-id="{{ visitor.visitor_id }}">
+                        </td>
+                        <td>
+                            <div class="visitor-name">{{ visitor.full_name }}</div>
+                            <span class="visitor-id">{{ visitor.visitor_id }}</span>
+                            {% if visitor.card_id %}
+                            <span class="badge bg-light text-dark ms-1"><i class="fas fa-id-card"></i></span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div><i class="fas fa-phone me-1" style="font-size: 0.7rem;"></i> {{ visitor.phone }}</div>
+                            {% if visitor.email %}
+                            <small class="text-muted">{{ visitor.email }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="time-cell">
+                            {{ visitor.checkin_time.strftime('%I:%M %p') }}
+                            <br>
+                            <small>{{ visitor.checkin_time.strftime('%d/%m/%Y') }}</small>
+                        </td>
+                        <td>
+                            {% set duration = (now - visitor.checkin_time) %}
+                            {% set hours = (duration.total_seconds() / 3600)|int %}
+                            {% set minutes = ((duration.total_seconds() % 3600) / 60)|int %}
+                            {{ hours }}h {{ minutes }}m
+                        </td>
+                        <td>
+                            {% if visitor.is_overdue %}
+                            <span class="status-badge overdue">Overdue</span>
+                            {% else %}
+                            <span class="status-badge">Active</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="action-checkout" onclick="processCheckout('{{ visitor.visitor_id }}')">
+                                <i class="fas fa-sign-out-alt"></i> Check-out
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-door-open"></i>
+            <h4>No Active Visitors</h4>
+            <p>All visitors have checked out</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Visitor Detail Card (shown when scanning/searching) -->
+    <div class="detail-card" id="resultCard"></div>
+</div>
+
+<!-- Hidden audio feedback -->
+<audio id="beepSound" src="data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWAIkWAAAAIAWFuAAA" style="display: none;"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<script>
+    // ===== VISITOR DATA =====
+    let activeVisitors = {{ active_visitors_json|tojson|safe }};
+    let currentVisitor = null;
+    let searchResults = [];
+    let selectedIndex = -1;
+    let scannerBuffer = '';
+    let scannerTimer = null;
+    let selectedVisitors = new Set();
+    const SCANNER_DELAY = 100;
+
+    // ===== GLOBAL SCANNER =====
+    document.addEventListener('keydown', function(e) {
+        // F8 to focus scanner
+        if (e.key === 'F8') {
+            e.preventDefault();
+            document.getElementById('hardwareScannerInput').focus();
+            showToast('Scanner focused', 'info');
+            return;
+        }
+
+        // Ignore if typing in other inputs
+        if (e.target.tagName === 'INPUT' && e.target.id !== 'hardwareScannerInput') {
+            return;
+        }
+
+        // Enter key - process buffer
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (scannerBuffer.length > 0) {
+                processScannedCode(scannerBuffer);
+                scannerBuffer = '';
+            }
+            return;
+        }
+
+        // Escape - clear buffer
+        if (e.key === 'Escape') {
+            scannerBuffer = '';
+            clearResult();
+            return;
+        }
+
+        // Build scanner buffer
+        if (e.key.length === 1 || e.key.match(/[A-Z0-9]/i)) {
+            scannerBuffer += e.key;
+            
+            if (scannerTimer) clearTimeout(scannerTimer);
+            scannerTimer = setTimeout(() => {
+                if (scannerBuffer.length >= 8) {
+                    processScannedCode(scannerBuffer);
+                    scannerBuffer = '';
+                }
+            }, SCANNER_DELAY);
+        }
+    });
+
+    // Hardware scanner input
+    const hardwareInput = document.getElementById('hardwareScannerInput');
+    
+    hardwareInput.addEventListener('input', function(e) {
+        const value = e.target.value.trim();
+        if (scannerTimer) clearTimeout(scannerTimer);
+        
+        if (value.length >= 8) {
+            scannerTimer = setTimeout(() => {
+                processScannedCode(value);
+                hardwareInput.value = '';
+            }, SCANNER_DELAY);
+        }
+    });
+
+    hardwareInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = hardwareInput.value.trim();
+            if (value) {
+                processScannedCode(value);
+                hardwareInput.value = '';
+            }
+        }
+        if (e.key === 'Escape') {
+            hardwareInput.value = '';
+            clearResult();
+        }
+    });
+
+    // ===== PROCESS SCAN - IMMEDIATE CHECKOUT =====
+    function processScannedCode(data) {
+        console.log('Scanned:', data);
+        playBeep();
+        
+        let visitorId = null;
+        
+        // Parse various formats
+        const matches = data.match(/Visitor ID: ([A-Z0-9]+)/i);
+        if (matches && matches[1]) {
+            visitorId = matches[1];
+        } else if (/^KPR\d+$/.test(data)) {
+            visitorId = data;
+        } else {
+            const kprMatch = data.match(/(KPR\d+)/i);
+            if (kprMatch) visitorId = kprMatch[1];
+        }
+        
+        if (visitorId) {
+            const visitor = activeVisitors.find(v => v.visitor_id === visitorId);
+            
+            if (visitor) {
+                // Show quick preview then checkout
+                displayVisitorDetails(visitor);
+                showToast(`Processing checkout for ${visitor.full_name}`, 'success');
+                
+                // Immediate checkout (next second)
+                setTimeout(() => {
+                    processCheckout(visitor.visitor_id, true);
+                }, 1000);
+            } else {
+                showToast('Visitor not found or already checked out', 'warning');
+            }
+        } else {
+            showToast('Invalid QR code', 'warning');
+        }
+    }
+
+    function playBeep() {
+        document.getElementById('beepSound').play().catch(() => {});
+    }
+
+    // ===== DISPLAY VISITOR DETAILS =====
+    function displayVisitorDetails(visitor) {
+        currentVisitor = visitor;
+        
+        const checkinTime = new Date(visitor.checkin_time);
+        const now = new Date();
+        const durationMs = now - checkinTime;
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const isOverdue = visitor.is_overdue || false;
+        
+        const resultCard = document.getElementById('resultCard');
+        
+        resultCard.innerHTML = `
+            <div class="detail-header">
+                <div class="detail-title">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Visitor Found</h2>
+                </div>
+                <div class="scan-tag">
+                    <i class="fas fa-qrcode me-1"></i> SCANNED
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <div class="avatar-large">${visitor.full_name[0].toUpperCase()}</div>
+                <div class="info-large">
+                    <h2>${visitor.full_name}</h2>
+                    <div class="meta-list">
+                        <span><i class="fas fa-id-card"></i> ${visitor.visitor_id}</span>
+                        <span><i class="fas fa-phone"></i> ${visitor.phone}</span>
+                        ${visitor.email ? `<span><i class="fas fa-envelope"></i> ${visitor.email}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="detail-label"><i class="fas fa-building"></i> Department</div>
+                    <div class="detail-value">${visitor.department}</div>
+                    <div class="detail-sub"><i class="fas fa-user-tie"></i> ${visitor.person_to_meet}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label"><i class="fas fa-tag"></i> Purpose</div>
+                    <div class="detail-value">${visitor.purpose || 'Not specified'}</div>
+                </div>
+                ${visitor.card_number ? `
+                <div class="detail-item">
+                    <div class="detail-label"><i class="fas fa-id-card"></i> ID Card</div>
+                    <div class="detail-value">${visitor.card_number}</div>
+                </div>
+                ` : ''}
+                <div class="detail-item">
+                    <div class="detail-label"><i class="fas fa-clock"></i> Check-in</div>
+                    <div class="detail-value">${checkinTime.toLocaleTimeString()}</div>
+                    <div class="detail-sub">${checkinTime.toLocaleDateString()}</div>
+                </div>
+            </div>
+            
+            <div class="time-panel">
+                <div class="time-stat">
+                    <div class="detail-label">Duration</div>
+                    <div class="detail-value">${hours}h ${minutes}m</div>
+                </div>
+                <div class="duration-indicator ${isOverdue ? 'overdue' : ''}">
+                    <i class="fas ${isOverdue ? 'fa-exclamation-triangle' : 'fa-hourglass-half'}"></i>
+                    ${isOverdue ? 'OVERDUE' : 'On time'}
+                </div>
+            </div>
+            
+            <div class="action-group">
+                <button class="btn-secondary" onclick="clearResult()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button class="btn-primary" onclick="processCheckout('${visitor.visitor_id}')" id="checkoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Check-out Now
+                </button>
+            </div>
+            
+            <div class="mt-3 text-center text-muted small">
+                <i class="fas fa-spinner fa-pulse me-1"></i> Auto checkout in 1 second...
+            </div>
+        `;
+        
+        resultCard.classList.add('show');
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function clearResult() {
+        document.getElementById('resultCard').classList.remove('show');
+        currentVisitor = null;
+    }
+
+    // ===== PROCESS CHECKOUT WITH REDIRECT =====
+    function processCheckout(visitorId, auto = false) {
+        const btn = document.getElementById('checkoutBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        }
+        
+        fetch(`/api/checkout/${visitorId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                checkout_notes: auto ? 'Auto checked out via hardware scanner' : 'Checked out via QR scanner',
+                rating: 5
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Checkout successful', 'success');
+                
+                // Remove from active list
+                activeVisitors = activeVisitors.filter(v => v.visitor_id !== visitorId);
+                updateActiveCount();
+                
+                // Redirect to success page
+                window.location.href = `{{ url_for('checkout_success') }}?visitor_id=${visitorId}`;
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(error => {
+            showToast(error.message, 'danger');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Check-out Now';
+            }
+        });
+    }
+
+    // ===== SEARCH FUNCTIONALITY =====
+    const manualSearch = document.getElementById('manualSearch');
+    
+    manualSearch.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().trim();
+        
+        if (term.length < 2) {
+            document.getElementById('searchResults').style.display = 'none';
+            return;
+        }
+        
+        const results = activeVisitors.filter(v => 
+            v.full_name.toLowerCase().includes(term) ||
+            v.visitor_id.toLowerCase().includes(term) ||
+            v.phone.includes(term) ||
+            (v.card_number && v.card_number.toLowerCase().includes(term))
+        );
+        
+        searchResults = results;
+        selectedIndex = -1;
+        
+        const resultsDiv = document.getElementById('searchResults');
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div class="result-row"><i class="fas fa-search me-2"></i>No visitors found</div>';
+        } else {
+            resultsDiv.innerHTML = results.map((v, i) => `
+                <div class="result-row ${i === selectedIndex ? 'selected' : ''}" onclick="selectVisitor('${v.id}')">
+                    <div class="result-avatar">${v.full_name[0].toUpperCase()}</div>
+                    <div class="result-info">
+                        <h6>${v.full_name}</h6>
+                        <small><i class="fas fa-id-card"></i> ${v.visitor_id}${v.is_overdue ? ' <span class="overdue-badge">OVERDUE</span>' : ''}</small>
+                    </div>
+                    <small class="text-muted">${new Date(v.checkin_time).toLocaleTimeString()}</small>
+                </div>
+            `).join('');
+        }
+        resultsDiv.style.display = 'block';
+    });
+
+    manualSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && searchResults.length > 0) {
+            e.preventDefault();
+            if (selectedIndex >= 0) selectVisitor(searchResults[selectedIndex].id);
+            else selectVisitor(searchResults[0].id);
+        }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, searchResults.length - 1);
+            highlightSelected();
+        }
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            highlightSelected();
+        }
+        if (e.key === 'Escape') {
+            manualSearch.value = '';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+    });
+
+    function highlightSelected() {
+        document.querySelectorAll('#searchResults .result-row').forEach((item, i) => {
+            if (i === selectedIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    function selectVisitor(id) {
+        const visitor = activeVisitors.find(v => v.id == id);
+        if (visitor) {
+            displayVisitorDetails(visitor);
+            document.getElementById('searchResults').style.display = 'none';
+            manualSearch.value = '';
+        }
+    }
+
+    // ===== BULK CHECKOUT =====
+    function updateSelection() {
+        const checkboxes = document.querySelectorAll('.visitor-checkbox:checked');
+        selectedVisitors = new Set(Array.from(checkboxes).map(cb => cb.value));
+        
+        const selectedCount = selectedVisitors.size;
+        document.getElementById('selectedCount').textContent = selectedCount;
+        
+        const bulkBtn = document.getElementById('bulkCheckoutBtn');
+        bulkBtn.disabled = selectedCount === 0;
+        
+        // Update select all checkbox
+        const totalCheckboxes = document.querySelectorAll('.visitor-checkbox').length;
+        const selectAll = document.getElementById('selectAllCheckbox');
+        if (selectAll) {
+            selectAll.checked = selectedCount === totalCheckboxes && totalCheckboxes > 0;
+            selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCheckboxes;
+        }
+    }
+
+    function toggleSelectAll(source) {
+        document.querySelectorAll('.visitor-checkbox').forEach(cb => {
+            cb.checked = source.checked;
+        });
+        updateSelection();
+    }
+
+    function bulkCheckout() {
+        const visitorIds = Array.from(selectedVisitors);
+        if (visitorIds.length === 0) return;
+        
+        if (!confirm(`Check out ${visitorIds.length} selected visitors?`)) return;
+        
+        const bulkBtn = document.getElementById('bulkCheckoutBtn');
+        bulkBtn.disabled = true;
+        bulkBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        
+        fetch('/api/visitors/bulk-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ visitor_ids: visitorIds })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showToast(`${data.checked_out} visitors checked out`, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                throw new Error(data.message || 'Bulk checkout failed');
+            }
+        })
+        .catch(error => {
+            showToast(error.message, 'danger');
+            bulkBtn.disabled = false;
+            bulkBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Check-out Selected (<span id="selectedCount">' + visitorIds.length + '</span>)';
+        });
+    }
+
+    // ===== UTILITIES =====
+    function updateActiveCount() {
+        document.getElementById('activeCount').textContent = activeVisitors.length;
+        document.getElementById('activeCountBadge').textContent = activeVisitors.length;
+    }
+
+    function showToast(message, type = 'info') {
+        if (window.VMS?.showAlert) {
+            window.VMS.showAlert(message, type);
+        } else {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        showToast('Global scanner active on all pages', 'success');
+        document.getElementById('hardwareScannerInput').focus();
+        updateSelection(); // Initialize selection counts
+    });
+
+    // Click outside to refocus scanner
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('input, button, .result-row, .visitors-table')) {
+            hardwareInput.focus();
+        }
+    });
+</script>
+{% endblock %}

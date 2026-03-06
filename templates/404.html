@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KPR College Visitor Management System - Page Not Found">
+    <meta name="author" content="KPR College">
+    <meta name="theme-color" content="#003366">
+    
+    <title>404 - Page Not Found | KPR College VMS</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f5fa 0%, #e6ecf5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Background Pattern */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(26, 35, 126, 0.03) 2%, transparent 2%),
+                radial-gradient(circle at 75% 75%, rgba(26, 35, 126, 0.03) 2%, transparent 2%);
+            background-size: 60px 60px;
+            z-index: 0;
+        }
+        
+        /* Floating Elements */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(26, 35, 126, 0.1), rgba(0, 64, 128, 0.1));
+            filter: blur(40px);
+            z-index: 0;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -100px;
+            background: linear-gradient(135deg, rgba(245, 0, 87, 0.1), rgba(255, 128, 171, 0.1));
+            animation: float 20s infinite ease-in-out reverse;
+        }
+        
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.05), rgba(185, 246, 202, 0.05));
+            animation: pulse 8s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.2; }
+        }
+        
+        /* Main Container */
+        .error-container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            width: 90%;
+            margin: 20px;
+        }
+        
+        /* Error Card */
+        .error-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(26, 35, 126, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #003366, #004080, #1e4a7a, #fbbf24);
+            background-size: 300% 100%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Logo Section */
+        .error-logo {
+            margin-bottom: 32px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #003366, #004080, #1e4a7a);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 10px 20px -5px rgba(0, 51, 102, 0.3);
+        }
+        
+        .logo-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .logo-text h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003366;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        
+        .logo-text p {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin: 2px 0 0;
+        }
+        
+        /* Error Code */
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .digit {
+            background: linear-gradient(135deg, #003366, #004080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            animation: bounce 2s infinite;
+        }
+        
+        .digit:nth-child(2) { animation-delay: 0.2s; }
+        .digit:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+        
+        .error-message {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            max-width: 400px;
+            margin: 0 auto 32px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 4px 4px 4px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:hover,
+        .search-box:focus-within {
+            border-color: #003366;
+            box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1);
+        }
+        
+        .search-box i {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 12px 12px;
+            font-size: 0.95rem;
+            background: transparent;
+            outline: none;
+            color: #1e293b;
+        }
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box button {
+            background: #003366;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .search-box button:hover {
+            background: #004080;
+            transform: translateX(-2px);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #003366, #004080);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 51, 102, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #1e293b;
+            border: 1.5px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #003366;
+            color: #003366;
+            background: #f8faff;
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            font-size: 0.9rem;
+        }
+        
+        /* Help Links */
+        .help-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .help-link {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .help-link:hover {
+            color: #003366;
+            transform: translateY(-2px);
+        }
+        
+        .help-link i {
+            font-size: 0.9rem;
+        }
+        
+        /* Quick Tips */
+        .quick-tips {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 32px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .quick-tips h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quick-tips h4 i {
+            color: #fbbf24;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .tips-list li {
+            color: #64748b;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tips-list li i {
+            color: #10b981;
+            font-size: 0.8rem;
+        }
+        
+        /* Footer */
+        .error-footer {
+            margin-top: 24px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        .error-footer a {
+            color: #64748b;
+            text-decoration: none;
+        }
+        
+        .error-footer a:hover {
+            color: #003366;
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .error-card {
+                padding: 32px 24px;
+            }
+            
+            .error-code {
+                font-size: 6rem;
+            }
+            
+            .error-title {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .quick-tips .tips-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 4rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .search-box button {
+                width: 100%;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Floating Shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <!-- Error Container -->
+    <div class="error-container">
+        <div class="error-card">
+            <!-- Logo -->
+            <div class="error-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>KPR COLLEGE</h2>
+                    <p>Visitor Management System</p>
+                </div>
+            </div>
+
+            <!-- Error Code -->
+            <div class="error-code">
+                <span class="digit">4</span>
+                <span class="digit">0</span>
+                <span class="digit">4</span>
+            </div>
+            
+            <h1 class="error-title">Page Not Found</h1>
+            
+            <p class="error-message">
+                The page you're looking for doesn't exist or has been moved. 
+                Let's get you back on track.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for pages..." onkeypress="handleSearchKey(event)">
+                    <button onclick="performSearch()">Search</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    Go to Homepage
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Go Back
+                </a>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="quick-tips">
+                <h4>
+                    <i class="fas fa-lightbulb"></i>
+                    Quick Tips
+                </h4>
+                <ul class="tips-list">
+                    <li><i class="fas fa-check-circle"></i> Check the URL for typos</li>
+                    <li><i class="fas fa-check-circle"></i> Use the navigation menu</li>
+                    <li><i class="fas fa-check-circle"></i> Try searching above</li>
+                    <li><i class="fas fa-check-circle"></i> Contact support if needed</li>
+                </ul>
+            </div>
+
+            <!-- Help Links -->
+            <div class="help-links">
+                <a href="{{ url_for('admin_dashboard') if current_user.is_authenticated and current_user.is_admin else url_for('security_dashboard') if current_user.is_authenticated else '#' }}" class="help-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="help-link" data-bs-toggle="modal" data-bs-target="#helpModal">
+                    <i class="fas fa-question-circle"></i>
+                    Help Center
+                </a>
+                <a href="#" class="help-link" data-bs-toggle="modal" data-bs-target="#contactModal">
+                    <i class="fas fa-envelope"></i>
+                    Contact Support
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="error-footer">
+                <p>&copy; 2026 KPR College of Arts Science and Research. All rights reserved.</p>
+                <p>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a> 
+                    • 
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-question-circle me-2" style="color: #003366;"></i>Help Center</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Facing issues? Here's what you can do:</strong></p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i> Check if you're logged in</li>
+                        <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i> Verify your permissions</li>
+                        <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i> Clear browser cache</li>
+                        <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i> Try a different browser</li>
+                    </ul>
+                    <hr>
+                    <p class="mb-0">Need assistance? Contact IT Support:</p>
+                    <p class="mb-0"><a href="mailto:support@kprcollege.edu">support@kprcollege.edu</a></p>
+                    <p>Ext: 1234</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-envelope me-2" style="color: #003366;"></i>Contact Support</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><i class="fas fa-map-marker-alt me-2"></i> Coimbatore, Tamil Nadu</p>
+                    <p><i class="fas fa-phone me-2"></i> +91 422 1234567</p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kprcollege.edu">info@kprcollege.edu</a></p>
+                    <p><i class="fas fa-clock me-2"></i> Mon-Fri: 9:00 AM - 6:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-shield-alt me-2" style="color: #003366;"></i>Privacy Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>KPR College is committed to protecting your privacy. All visitor data is collected and stored in accordance with applicable data protection laws.</p>
+                    <p class="mb-0">For full privacy policy details, please contact the administration office.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-gavel me-2" style="color: #003366;"></i>Terms of Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>By using this system, you agree to comply with all college policies and procedures regarding visitor management and data protection.</p>
+                    <p class="mb-0">Unauthorized access or use of this system is strictly prohibited.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Search functionality
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                // Redirect to search page or show message
+                alert('Search functionality: "' + searchTerm + '" - This would search the site.');
+            } else {
+                alert('Please enter a search term.');
+            }
+        }
+
+        function handleSearchKey(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        // Dynamic greeting based on time of day
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greeting = document.querySelector('.error-message');
+            if (greeting) {
+                let timeGreeting = '';
+                if (hour < 12) timeGreeting = 'Good morning';
+                else if (hour < 18) timeGreeting = 'Good afternoon';
+                else timeGreeting = 'Good evening';
+                
+                greeting.innerHTML = `${timeGreeting}! The page you're looking for doesn't exist or has been moved. Let's get you back on track.`;
+            }
+        }
+
+        // Random 404 messages for fun
+        const messages = [
+            "Looks like you've wandered off the map!",
+            "This page is playing hide and seek... and winning!",
+            "404: Page on a coffee break ☕",
+            "The page you're looking for is on vacation.",
+            "Oops! Even we can't find this page.",
+            "Lost? Don't worry, it happens to the best of us."
+        ];
+
+        // Set random message
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageEl = document.querySelector('.error-message');
+            if (messageEl && !messageEl.hasAttribute('data-fixed')) {
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                messageEl.innerHTML = randomMessage + ' Let\'s get you back on track.';
+                messageEl.setAttribute('data-fixed', 'true');
+            }
+            
+            updateGreeting();
+        });
+
+        // Animate digits on hover
+        document.querySelectorAll('.digit').forEach(digit => {
+            digit.addEventListener('mouseenter', function() {
+                this.style.animation = 'none';
+                this.offsetHeight;
+                this.style.animation = 'bounce 1s infinite';
+            });
+        });
+    </script>
+</body>
+</html>

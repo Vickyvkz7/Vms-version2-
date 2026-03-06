@@ -1,0 +1,155 @@
+/* KPR College Visitor Management System Styles */
+
+:root {
+    --kpr-primary: #1a237e;
+    --kpr-secondary: #283593;
+    --kpr-accent: #5c6bc0;
+    --kpr-success: #2e7d32;
+    --kpr-warning: #f57c00;
+    --kpr-danger: #c62828;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: var(--kpr-primary);
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: var(--kpr-primary);
+    border-color: var(--kpr-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--kpr-secondary);
+    border-color: var(--kpr-secondary);
+}
+
+.btn-success {
+    background-color: var(--kpr-success);
+    border-color: var(--kpr-success);
+}
+
+.visitor-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.visitor-checkedin {
+    background-color: #d4edda;
+    color: var(--kpr-success);
+}
+
+.visitor-checkedout {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.table th {
+    background-color: var(--kpr-primary);
+    color: white;
+}
+
+.stats-card {
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.footer {
+    margin-top: 50px;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 15px;
+}
+
+.modal-header {
+    background-color: var(--kpr-primary);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+/* Form styles */
+.form-control:focus {
+    border-color: var(--kpr-accent);
+    box-shadow: 0 0 0 0.2rem rgba(92, 107, 192, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}
+
+/* Animation for alerts */
+.alert {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* QR Code display */
+.qr-container {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.qr-code {
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+/* Dashboard widgets */
+.dashboard-widget {
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+}
+
+.widget-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
