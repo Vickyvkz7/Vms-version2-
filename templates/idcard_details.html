@@ -5,11 +5,11 @@
 {% block page_title %}
 <div class="d-flex align-items-center gap-3">
     <div class="d-flex align-items-center">
-        <i class="fas fa-id-card fs-2" style="color: #2e7d32;"></i>
-        <span class="fw-bold ms-2" style="font-size: 1.6rem;">ID Card Details</span>
+        <i class="fas fa-id-card fs-2" style="color: var(--primary-600);"></i>
+        <span class="fw-bold ms-2 page-title-gradient">ID Card Details</span>
     </div>
-    <span class="badge bg-white text-success px-3 py-1 rounded-pill border border-success">
-        <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i> {{ card.card_number }}
+    <span class="card-number-pill">
+        <i class="fas fa-circle me-1" style="font-size: 0.5rem; color: var(--primary-500);"></i> {{ card.card_number }}
     </span>
 </div>
 {% endblock %}
@@ -22,104 +22,201 @@
 
 {% block content %}
 <style>
-    /* ===== PROFESSIONAL ID CARD DETAILS ===== */
+    /* ===== PREMIUM COLOR PALETTE ===== */
     :root {
-        --primary: #2e7d32;
-        --primary-dark: #1b5e20;
-        --primary-light: #e8f5e9;
-        --primary-soft: #c8e6c9;
-        --danger: #d32f2f;
-        --danger-light: #ffebee;
-        --warning: #ed6c02;
-        --warning-light: #fff3e0;
-        --info: #0288d1;
-        --info-light: #e1f5fe;
-        --gray-50: #fafbfc;
-        --gray-100: #f5f7fa;
-        --gray-200: #e9ecf0;
-        --gray-300: #dde1e7;
-        --gray-600: #6b788b;
-        --gray-800: #2d3748;
-        --gray-900: #1a202c;
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.02);
-        --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-        --shadow-lg: 0 8px 24px rgba(46,125,50,0.1);
+        /* Primary - Modern Indigo */
+        --primary-50: #eef2ff;
+        --primary-100: #e0e7ff;
+        --primary-200: #c7d2fe;
+        --primary-300: #a5b4fc;
+        --primary-400: #818cf8;
+        --primary-500: #6366f1;
+        --primary-600: #4f46e5;
+        --primary-700: #4338ca;
+        --primary-800: #3730a3;
+        --primary-900: #312e81;
+        
+        /* Secondary - Teal Accent */
+        --secondary-50: #f0fdfa;
+        --secondary-100: #ccfbf1;
+        --secondary-200: #99f6e4;
+        --secondary-300: #5eead4;
+        --secondary-400: #2dd4bf;
+        --secondary-500: #14b8a6;
+        --secondary-600: #0d9488;
+        --secondary-700: #0f766e;
+        --secondary-800: #115e59;
+        --secondary-900: #134e4a;
+        
+        /* Status Colors */
+        --success-50: #f0fdf4;
+        --success-500: #22c55e;
+        --success-600: #16a34a;
+        --success-700: #15803d;
+        
+        --warning-50: #fffbeb;
+        --warning-500: #f59e0b;
+        --warning-600: #d97706;
+        --warning-700: #b45309;
+        
+        --danger-50: #fef2f2;
+        --danger-500: #ef4444;
+        --danger-600: #dc2626;
+        --danger-700: #b91c1c;
+        
+        --info-50: #eff6ff;
+        --info-500: #3b82f6;
+        --info-600: #2563eb;
+        --info-700: #1d4ed8;
+        
+        /* Gradients */
+        --gradient-primary: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+        --gradient-success: linear-gradient(135deg, var(--success-600), var(--success-500));
+        --gradient-warning: linear-gradient(135deg, var(--warning-600), var(--warning-500));
+        --gradient-danger: linear-gradient(135deg, var(--danger-600), var(--danger-500));
+        --gradient-info: linear-gradient(135deg, var(--info-600), var(--info-500));
+        
+        /* Shadows */
+        --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.03);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.03);
+        
+        /* Radius */
+        --radius-sm: 6px;
         --radius-md: 8px;
         --radius-lg: 12px;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+        --radius-xl: 16px;
+        --radius-2xl: 20px;
+        --radius-full: 9999px;
     }
 
     body {
-        background: #f0f4f8;
+        background: #fafaf9;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #1c1917;
     }
 
     .details-wrapper {
-        max-width: 1400px;
+        max-width: 1440px;
         margin: 0 auto;
         padding: 20px;
+        animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* ===== CARD COMPONENTS ===== */
-    .card {
-        background: white;
-        border-radius: var(--radius-lg);
-        padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-200);
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== PAGE TITLE ===== */
+    .page-title-gradient {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #292524;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #1c1917, #44403c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .card-number-pill {
+        background: var(--primary-50);
+        color: var(--primary-700);
+        padding: 8px 18px;
+        border-radius: var(--radius-full);
+        font-size: 0.95rem;
+        font-weight: 600;
+        border: 1px solid var(--primary-200);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: var(--shadow-xs);
+        letter-spacing: 0.02em;
         transition: all 0.2s ease;
     }
-
-    .card:hover {
+    
+    .card-number-pill:hover {
+        border-color: var(--primary-300);
+        background: white;
         box-shadow: var(--shadow-md);
     }
 
-    .card-header {
+    /* ===== CARD COMPONENTS ===== */
+    .card-premium {
+        background: white;
+        border-radius: var(--radius-2xl);
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #e7e5e4;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-premium:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-200);
+    }
+
+    .card-premium::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        opacity: 0.8;
+    }
+
+    .card-header-premium {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
 
-    .card-title {
+    .card-title-premium {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
-    .card-title i {
-        width: 36px;
-        height: 36px;
-        background: var(--primary-light);
-        border-radius: 10px;
+    .card-title-premium i {
+        width: 42px;
+        height: 42px;
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary);
-        font-size: 1.1rem;
+        color: white;
+        font-size: 1.2rem;
+        box-shadow: var(--shadow-sm);
     }
 
-    .card-title h3 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--gray-800);
+    .card-title-premium h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
         margin: 0;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
     }
 
-    .card-title span {
-        background: var(--primary-light);
-        color: var(--primary);
-        padding: 4px 10px;
-        border-radius: 20px;
+    .card-title-premium span {
+        background: #f5f5f4;
+        color: var(--gray-700);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
         font-size: 0.75rem;
         font-weight: 600;
-        margin-left: 10px;
+        margin-left: 12px;
+        border: 1px solid #e7e5e4;
     }
 
     /* ===== HEADER SECTION ===== */
@@ -128,288 +225,485 @@
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 20px;
     }
 
     .identity {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 24px;
         flex-wrap: wrap;
     }
 
-    .card-number {
-        font-family: 'Courier New', monospace;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--primary);
-        background: var(--primary-light);
-        padding: 8px 20px;
-        border-radius: 50px;
-        letter-spacing: 1px;
-        border: 2px solid var(--primary-soft);
+    .card-number-display {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-size: 2.4rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 3px;
+        padding: 8px 0;
+        transition: all 0.2s ease;
+    }
+    
+    .card-number-display:hover {
+        filter: brightness(1.1);
     }
 
-    .status-badge {
-        padding: 6px 18px;
-        border-radius: 30px;
+    .status-badge-premium {
+        padding: 8px 22px;
+        border-radius: var(--radius-full);
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid transparent;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+    }
+    
+    .status-badge-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .status-available { 
+        background: var(--primary-50); 
+        color: var(--primary-700); 
+        border-color: var(--primary-200);
+    }
+    .status-issued { 
+        background: var(--info-50); 
+        color: var(--info-700); 
+        border-color: var(--info-200);
+    }
+    .status-lost { 
+        background: var(--danger-50); 
+        color: var(--danger-700); 
+        border-color: var(--danger-200);
+    }
+    .status-damaged { 
+        background: var(--warning-50); 
+        color: var(--warning-700); 
+        border-color: var(--warning-200);
+    }
+
+    .action-buttons-premium {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-premium {
+        padding: 10px 22px;
+        border-radius: var(--radius-full);
+        font-size: 0.95rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         display: inline-flex;
         align-items: center;
         gap: 8px;
-    }
-
-    .status-available { background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary); }
-    .status-issued { background: var(--info-light); color: var(--info); border: 1px solid var(--info); }
-    .status-lost { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); }
-    .status-damaged { background: var(--warning-light); color: var(--warning); border: 1px solid var(--warning); }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 8px 18px;
-        border-radius: 30px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
         text-decoration: none;
+        box-shadow: var(--shadow-xs);
+        letter-spacing: 0.02em;
     }
 
-    .btn-primary {
-        background: var(--primary);
+    .btn-premium i {
+        font-size: 0.9rem;
+        transition: transform 0.15s ease;
+    }
+
+    .btn-premium:hover i {
+        transform: translateX(2px);
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary-premium {
+        background: var(--gradient-primary);
         color: white;
     }
 
-    .btn-primary:hover {
-        background: var(--primary-dark);
+    .btn-primary-premium:hover {
+        background: linear-gradient(135deg, #4338ca, #4f46e5);
     }
 
-    .btn-outline {
+    .btn-outline-premium {
         background: white;
-        color: var(--gray-600);
-        border: 1px solid var(--gray-200);
+        color: #0f766e;
+        border: 1.5px solid #e7e5e4;
     }
 
-    .btn-outline:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        background: var(--primary-light);
+    .btn-outline-premium:hover {
+        border-color: var(--primary-500);
+        color: var(--primary-600);
+        background: var(--primary-50);
+        box-shadow: var(--shadow-md);
     }
 
     /* ===== STATS GRID ===== */
-    .stats-grid {
+    .stats-grid-premium {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 20px;
+        margin-bottom: 24px;
     }
 
-    .stat-box {
-        background: var(--gray-50);
-        border-radius: var(--radius-md);
-        padding: 16px;
-        border: 1px solid var(--gray-200);
+    .stat-card-premium {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        border: 1px solid #e7e5e4;
+        box-shadow: var(--shadow-xs);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .stat-label {
+    .stat-card-premium:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary-200);
+        box-shadow: var(--shadow-lg);
+        background: white;
+    }
+
+    .stat-card-premium::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .stat-card-premium:hover::after {
+        opacity: 1;
+    }
+
+    .stat-label-premium {
         font-size: 0.7rem;
-        color: var(--gray-600);
+        color: #78716c;
         text-transform: uppercase;
-        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+
+    .stat-label-premium i {
+        color: var(--primary-500);
+        font-size: 0.8rem;
+        background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .stat-card-premium:hover .stat-label-premium i {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .stat-value-premium {
+        font-weight: 800;
+        color: #292524;
+        font-size: 1.4rem;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .stat-sub-premium {
+        font-size: 0.75rem;
+        color: #78716c;
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .stat-label i {
-        color: var(--primary);
-    }
-
-    .stat-value {
-        font-weight: 700;
-        color: var(--gray-800);
-        font-size: 1.2rem;
-        margin-bottom: 4px;
-    }
-
-    .stat-sub {
-        font-size: 0.7rem;
-        color: var(--gray-600);
+    .stat-sub-premium i {
+        color: var(--primary-400);
     }
 
     /* ===== VISITOR SECTION ===== */
-    .visitor-card {
-        background: linear-gradient(145deg, white, var(--gray-50));
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        border: 1px solid var(--gray-200);
-        margin-bottom: 20px;
-        border-left: 4px solid var(--primary);
+    .visitor-card-premium {
+        background: linear-gradient(145deg, white, #fafaf9);
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        border: 1px solid #e7e5e4;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .visitor-row {
+    .visitor-card-premium::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+        opacity: 0.6;
+    }
+
+    .visitor-card-premium:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-200);
+    }
+
+    .visitor-row-premium {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 24px;
         flex-wrap: wrap;
     }
 
-    .visitor-avatar {
-        width: 60px;
-        height: 60px;
-        background: var(--primary);
-        border-radius: 16px;
+    .visitor-avatar-premium {
+        width: 70px;
+        height: 70px;
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
-        font-size: 1.8rem;
-        box-shadow: 0 4px 12px rgba(46,125,50,0.2);
+        font-size: 2rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .visitor-info {
+    .visitor-card-premium:hover .visitor-avatar-premium {
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .visitor-info-premium {
         flex: 1;
     }
 
-    .visitor-name {
-        font-size: 1.3rem;
+    .visitor-name-premium {
+        font-size: 1.5rem;
         font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 6px;
+        color: #1c1917;
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+        background: linear-gradient(135deg, #1c1917, var(--primary-700));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
-    .visitor-details {
+    .visitor-details-premium {
         display: flex;
-        gap: 20px;
+        gap: 24px;
         flex-wrap: wrap;
     }
 
-    .detail-item {
+    .detail-item-premium {
         display: flex;
         align-items: center;
-        gap: 6px;
-        color: var(--gray-600);
-        font-size: 0.9rem;
+        gap: 8px;
+        color: #44403c;
+        font-size: 0.95rem;
+        background: #f5f5f4;
+        padding: 8px 14px;
+        border-radius: var(--radius-full);
+        border: 1px solid #e7e5e4;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .detail-item i {
-        color: var(--primary);
+    .detail-item-premium:hover {
+        border-color: var(--primary-300);
+        color: var(--primary-700);
+        transform: translateY(-1px);
+        background: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .detail-item-premium i {
+        color: var(--primary-500);
         width: 16px;
+        transition: all 0.15s ease;
+    }
+    
+    .detail-item-premium:hover i {
+        transform: scale(1.1);
     }
 
-    .badge-active {
-        background: var(--primary-light);
-        color: var(--primary);
-        padding: 4px 12px;
-        border-radius: 30px;
-        font-size: 0.8rem;
+    .badge-active-premium {
+        background: var(--primary-100);
+        color: var(--primary-700);
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
         font-weight: 600;
+        border: 1px solid var(--primary-300);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: var(--shadow-xs);
     }
 
-    .empty-state {
+    .empty-state-premium {
         text-align: center;
-        padding: 30px;
-        background: var(--gray-50);
-        border-radius: var(--radius-lg);
-        border: 2px dashed var(--gray-200);
+        padding: 40px;
+        background: #fafaf9;
+        border-radius: var(--radius-2xl);
+        border: 2px dashed #d6d3d1;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .empty-state i {
-        font-size: 2.5rem;
-        color: var(--gray-300);
-        margin-bottom: 10px;
+    .empty-state-premium:hover {
+        border-color: var(--primary-300);
+        background: white;
+        box-shadow: var(--shadow-md);
     }
 
-    .empty-state p {
-        color: var(--gray-600);
+    .empty-state-premium i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+    }
+
+    .empty-state-premium p {
+        color: #78716c;
+        font-size: 1rem;
     }
 
     /* ===== TABLE STYLES ===== */
-    .table-responsive {
+    .table-container-premium {
         overflow-x: auto;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--gray-200);
-        margin-top: 16px;
+        border-radius: var(--radius-xl);
+        border: 1px solid #e7e5e4;
+        margin-top: 20px;
+        background: white;
+        box-shadow: var(--shadow-xs);
     }
 
-    table {
+    .table-premium {
         width: 100%;
         border-collapse: collapse;
         min-width: 800px;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
 
-    th {
+    .table-premium th {
         text-align: left;
-        padding: 14px 16px;
-        background: var(--gray-50);
-        color: var(--gray-600);
+        padding: 16px 20px;
+        background: #f5f5f4;
+        color: #57534e;
         font-weight: 600;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        border-bottom: 1px solid var(--gray-200);
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e7e5e4;
     }
 
-    td {
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--gray-200);
-        color: var(--gray-800);
+    .table-premium td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e7e5e4;
+        color: #44403c;
+        transition: background 0.15s ease;
     }
 
-    tr:hover td {
-        background: var(--gray-50);
+    .table-premium tbody tr:hover td {
+        background: var(--primary-50);
     }
 
-    .history-status {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.7rem;
+    .table-premium tbody tr:hover {
+        box-shadow: inset 0 0 0 1px var(--primary-200);
+    }
+
+    .table-premium tr:last-child td {
+        border-bottom: none;
+    }
+
+    .history-status-premium {
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
         font-weight: 600;
         display: inline-block;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
     }
 
-    .status-in {
-        background: var(--primary-light);
-        color: var(--primary);
+    .status-in-premium {
+        background: #ecfdf5;
+        color: #047857;
+        border-color: #a7f3d0;
     }
 
-    .status-out {
-        background: var(--info-light);
-        color: var(--info);
+    .status-out-premium {
+        background: #f0fdfa;
+        color: #0f766e;
+        border-color: #99f6e4;
     }
 
-    .visitor-link {
-        color: var(--primary);
+    .visitor-link-premium {
+        color: var(--primary-600);
         text-decoration: none;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .visitor-link:hover {
-        text-decoration: underline;
+    .visitor-link-premium:hover {
+        color: var(--primary-700);
+        gap: 8px;
+    }
+
+    .visitor-link-premium i {
+        font-size: 0.8rem;
+        transition: transform 0.15s ease;
+    }
+
+    .visitor-link-premium:hover i {
+        transform: translateX(3px);
     }
 
     /* ===== FOOTER ===== */
-    .footer-actions {
+    .footer-actions-premium {
         display: flex;
-        gap: 12px;
+        gap: 16px;
         justify-content: flex-end;
-        margin-top: 20px;
+        margin-top: 24px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
     }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1200px) {
-        .stats-grid {
+        .stats-grid-premium {
             grid-template-columns: repeat(2, 1fr);
         }
     }
@@ -419,9 +713,18 @@
             padding: 12px;
         }
         
+        .card-premium {
+            padding: 20px;
+        }
+        
         .identity {
             flex-direction: column;
             align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .card-number-display {
+            font-size: 2rem;
         }
         
         .header-row {
@@ -429,50 +732,90 @@
             align-items: flex-start;
         }
         
-        .action-buttons {
+        .action-buttons-premium {
             width: 100%;
         }
         
-        .btn {
+        .btn-premium {
             flex: 1;
             justify-content: center;
         }
         
-        .stats-grid {
+        .stats-grid-premium {
             grid-template-columns: 1fr;
+            gap: 12px;
         }
         
-        .visitor-row {
+        .visitor-row-premium {
             flex-direction: column;
             text-align: center;
         }
         
-        .visitor-details {
+        .visitor-details-premium {
             justify-content: center;
         }
         
-        .footer-actions {
+        .footer-actions-premium {
             flex-direction: column;
+        }
+        
+        .table-premium th,
+        .table-premium td {
+            padding: 12px 16px;
         }
     }
 
-    /* ===== UTILITIES ===== */
-    .text-muted { color: var(--gray-600); }
-    .mb-2 { margin-bottom: 8px; }
-    .mb-3 { margin-bottom: 16px; }
-    .mt-2 { margin-top: 8px; }
-    .mt-3 { margin-top: 16px; }
-    .me-1 { margin-right: 4px; }
-    .me-2 { margin-right: 8px; }
+    @media (max-width: 480px) {
+        .card-number-display {
+            font-size: 1.6rem;
+        }
+        
+        .status-badge-premium {
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
+        
+        .visitor-name-premium {
+            font-size: 1.3rem;
+        }
+        
+        .detail-item-premium {
+            width: 100%;
+        }
+    }
+
+    /* ===== UTILITY CLASSES ===== */
+    .text-gradient-primary {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .bg-soft-primary {
+        background: var(--primary-50);
+    }
+    
+    .border-soft-primary {
+        border-color: var(--primary-200);
+    }
+    
+    .shadow-hover {
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .shadow-hover:hover {
+        box-shadow: var(--shadow-lg);
+    }
 </style>
 
 <div class="details-wrapper">
     <!-- Header Card -->
-    <div class="card">
+    <div class="card-premium">
         <div class="header-row">
             <div class="identity">
-                <span class="card-number">{{ card.card_number }}</span>
-                <span class="status-badge 
+                <span class="card-number-display">{{ card.card_number }}</span>
+                <span class="status-badge-premium 
                     {% if card.status == 'available' %}status-available
                     {% elif card.status == 'issued' %}status-issued
                     {% elif card.status == 'lost' %}status-lost
@@ -480,7 +823,7 @@
                     {% endif %}">
                     <i class="fas 
                         {% if card.status == 'available' %}fa-check-circle
-                        {% elif card.status == 'issued' %}fa-hand-holding
+                        {% elif card.status == 'issued' %}fa-hand-holding-heart
                         {% elif card.status == 'lost' %}fa-exclamation-triangle
                         {% elif card.status == 'damaged' %}fa-tools
                         {% endif %}">
@@ -488,13 +831,13 @@
                     {{ card.status|upper }}
                 </span>
             </div>
-            <div class="action-buttons">
-                <a href="{{ url_for('security_idcards') }}" class="btn btn-outline">
+            <div class="action-buttons-premium">
+                <a href="{{ url_for('security_idcards') }}" class="btn-premium btn-outline-premium">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
                 {% if current_user.is_admin %}
-                <button class="btn btn-primary" onclick="updateCardStatus()">
-                    <i class="fas fa-sync-alt"></i> Update
+                <button class="btn-premium btn-primary-premium" onclick="updateCardStatus()">
+                    <i class="fas fa-sync-alt"></i> Update Status
                 </button>
                 {% endif %}
             </div>
@@ -502,82 +845,83 @@
     </div>
 
     <!-- Statistics Grid -->
-    <div class="stats-grid">
-        <div class="stat-box">
-            <div class="stat-label"><i class="fas fa-calendar-plus"></i> Created</div>
-            <div class="stat-value">{{ card.created_at.strftime('%d %b %Y') }}</div>
-            <div class="stat-sub">{{ card.created_at.strftime('%I:%M %p') }}</div>
+    <div class="stats-grid-premium">
+        <div class="stat-card-premium">
+            <div class="stat-label-premium"><i class="fas fa-calendar-plus"></i> Created</div>
+            <div class="stat-value-premium">{{ card.created_at.strftime('%d %b %Y') }}</div>
+            <div class="stat-sub-premium"><i class="fas fa-clock"></i> {{ card.created_at.strftime('%I:%M %p') }}</div>
         </div>
         
-        <div class="stat-box">
-            <div class="stat-label"><i class="fas fa-hand-holding"></i> Last Issued</div>
+        <div class="stat-card-premium">
+            <div class="stat-label-premium"><i class="fas fa-hand-holding-heart"></i> Last Issued</div>
             {% if card.issued_date %}
-            <div class="stat-value">{{ card.issued_date.strftime('%d %b %Y') }}</div>
-            <div class="stat-sub">{{ card.issued_date.strftime('%I:%M %p') }}</div>
+            <div class="stat-value-premium">{{ card.issued_date.strftime('%d %b %Y') }}</div>
+            <div class="stat-sub-premium"><i class="fas fa-clock"></i> {{ card.issued_date.strftime('%I:%M %p') }}</div>
             {% else %}
-            <div class="stat-value">Never</div>
-            <div class="stat-sub">Not issued yet</div>
+            <div class="stat-value-premium">—</div>
+            <div class="stat-sub-premium">Not issued yet</div>
             {% endif %}
         </div>
         
-        <div class="stat-box">
-            <div class="stat-label"><i class="fas fa-undo-alt"></i> Last Returned</div>
+        <div class="stat-card-premium">
+            <div class="stat-label-premium"><i class="fas fa-undo-alt"></i> Last Returned</div>
             {% if card.returned_date %}
-            <div class="stat-value">{{ card.returned_date.strftime('%d %b %Y') }}</div>
-            <div class="stat-sub">{{ card.returned_date.strftime('%I:%M %p') }}</div>
+            <div class="stat-value-premium">{{ card.returned_date.strftime('%d %b %Y') }}</div>
+            <div class="stat-sub-premium"><i class="fas fa-clock"></i> {{ card.returned_date.strftime('%I:%M %p') }}</div>
             {% else %}
-            <div class="stat-value">Never</div>
-            <div class="stat-sub">Not returned yet</div>
+            <div class="stat-value-premium">—</div>
+            <div class="stat-sub-premium">Not returned yet</div>
             {% endif %}
         </div>
         
-        <div class="stat-box">
-            <div class="stat-label"><i class="fas fa-chart-line"></i> Total Uses</div>
-            <div class="stat-value">{{ history|length }}</div>
-            <div class="stat-sub">Times issued</div>
+        <div class="stat-card-premium">
+            <div class="stat-label-premium"><i class="fas fa-chart-line"></i> Total Uses</div>
+            <div class="stat-value-premium">{{ history|length }}</div>
+            <div class="stat-sub-premium"><i class="fas fa-id-card"></i> Times issued</div>
         </div>
     </div>
 
     <!-- Current Visitor Card -->
-    <div class="visitor-card">
-        <div class="card-header" style="margin-bottom: 16px;">
-            <div class="card-title">
-                <i class="fas fa-user"></i>
+    <div class="visitor-card-premium">
+        <div class="card-header-premium" style="margin-bottom: 20px;">
+            <div class="card-title-premium">
+                <i class="fas fa-user-check"></i>
                 <h3>Current Assignment</h3>
                 {% if current_visitor %}
-                <span>ACTIVE</span>
+                <span class="badge-active-premium">
+                    <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i> ACTIVE
+                </span>
                 {% endif %}
             </div>
         </div>
 
         {% if current_visitor %}
-        <div class="visitor-row">
-            <div class="visitor-avatar">{{ current_visitor.full_name[:1] }}</div>
-            <div class="visitor-info">
-                <div class="visitor-name">{{ current_visitor.full_name }}</div>
-                <div class="visitor-details">
-                    <span class="detail-item"><i class="fas fa-id-card"></i> {{ current_visitor.visitor_id }}</span>
-                    <span class="detail-item"><i class="fas fa-phone-alt"></i> {{ current_visitor.phone }}</span>
-                    <span class="detail-item"><i class="fas fa-building"></i> {{ current_visitor.department or '—' }}</span>
-                    <span class="badge-active"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i> Checked In</span>
+        <div class="visitor-row-premium">
+            <div class="visitor-avatar-premium">{{ current_visitor.full_name[:1] }}</div>
+            <div class="visitor-info-premium">
+                <div class="visitor-name-premium">{{ current_visitor.full_name }}</div>
+                <div class="visitor-details-premium">
+                    <span class="detail-item-premium"><i class="fas fa-id-card"></i> {{ current_visitor.visitor_id }}</span>
+                    <span class="detail-item-premium"><i class="fas fa-phone-alt"></i> {{ current_visitor.phone }}</span>
+                    <span class="detail-item-premium"><i class="fas fa-building"></i> {{ current_visitor.department or '—' }}</span>
                 </div>
             </div>
         </div>
         
-        <div class="stats-grid mt-3" style="grid-template-columns: repeat(2, 1fr);">
-            <div class="stat-box">
-                <div class="stat-label"><i class="fas fa-calendar-alt"></i> Issued On</div>
-                <div class="stat-value">{{ current_visitor.card_issued_date.strftime('%d %b %Y') }}</div>
-                <div class="stat-sub">{{ current_visitor.card_issued_date.strftime('%I:%M %p') }}</div>
+        <div class="stats-grid-premium mt-3" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="stat-card-premium">
+                <div class="stat-label-premium"><i class="fas fa-calendar-alt"></i> Issued On</div>
+                <div class="stat-value-premium">{{ current_visitor.card_issued_date.strftime('%d %b %Y') }}</div>
+                <div class="stat-sub-premium"><i class="fas fa-clock"></i> {{ current_visitor.card_issued_date.strftime('%I:%M %p') }}</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label"><i class="fas fa-hourglass-half"></i> Duration</div>
-                <div class="stat-value">{{ current_visitor.duration_display }}</div>
-                <div class="stat-sub">Current visit</div>
+            <div class="stat-card-premium">
+                <div class="stat-label-premium"><i class="fas fa-hourglass-half"></i> Duration</div>
+                <div class="stat-value-premium">{{ current_visitor.duration_display }}</div>
+                <div class="stat-sub-premium"><i class="fas fa-clock"></i> Current visit</div>
             </div>
         </div>
         {% else %}
-        <div class="empty-state">
+        <div class="empty-state-premium">
             <i class="fas fa-id-card"></i>
             <p>No visitor currently assigned to this card</p>
         </div>
@@ -585,9 +929,9 @@
     </div>
 
     <!-- History Card -->
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">
+    <div class="card-premium">
+        <div class="card-header-premium">
+            <div class="card-title-premium">
                 <i class="fas fa-history"></i>
                 <h3>Issue History</h3>
                 <span>{{ history|length }} Records</span>
@@ -595,8 +939,8 @@
         </div>
 
         {% if history %}
-        <div class="table-responsive">
-            <table>
+        <div class="table-container-premium">
+            <table class="table-premium">
                 <thead>
                     <tr>
                         <th>Visitor ID</th>
@@ -610,30 +954,34 @@
                 <tbody>
                     {% for visitor in history %}
                     <tr>
-                        <td><span style="font-family: monospace; font-weight: 600;">{{ visitor.visitor_id }}</span></td>
-                        <td><strong>{{ visitor.full_name }}</strong></td>
+                        <td><span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--primary-700);">{{ visitor.visitor_id }}</span></td>
+                        <td><strong style="color: var(--secondary-800);">{{ visitor.full_name }}</strong></td>
                         <td>
                             {% if visitor.card_issued_date %}
-                            {{ visitor.card_issued_date.strftime('%d %b %Y') }}<br>
-                            <small class="text-muted">{{ visitor.card_issued_date.strftime('%I:%M %p') }}</small>
+                            <div style="font-weight: 600;">{{ visitor.card_issued_date.strftime('%d %b %Y') }}</div>
+                            <small style="color: var(--secondary-500);">{{ visitor.card_issued_date.strftime('%I:%M %p') }}</small>
                             {% else %}—{% endif %}
                         </td>
                         <td>
                             {% if visitor.card_returned_date %}
-                            {{ visitor.card_returned_date.strftime('%d %b %Y') }}<br>
-                            <small class="text-muted">{{ visitor.card_returned_date.strftime('%I:%M %p') }}</small>
+                            <div style="font-weight: 600;">{{ visitor.card_returned_date.strftime('%d %b %Y') }}</div>
+                            <small style="color: var(--secondary-500);">{{ visitor.card_returned_date.strftime('%I:%M %p') }}</small>
                             {% else %}—{% endif %}
                         </td>
                         <td>
                             {% if visitor.status == 'checked_in' %}
-                            <span class="history-status status-in">Active</span>
+                            <span class="history-status-premium status-in-premium">
+                                <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i> Active
+                            </span>
                             {% else %}
-                            <span class="history-status status-out">Completed</span>
+                            <span class="history-status-premium status-out-premium">
+                                <i class="fas fa-check-circle me-1"></i> Completed
+                            </span>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="visitor-link">
-                                View <i class="fas fa-arrow-right ms-1"></i>
+                            <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="visitor-link-premium">
+                                View <i class="fas fa-arrow-right"></i>
                             </a>
                         </td>
                     </tr>
@@ -642,7 +990,7 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">
+        <div class="empty-state-premium">
             <i class="fas fa-history"></i>
             <p>No issue history available for this card</p>
         </div>
@@ -650,17 +998,17 @@
     </div>
 
     <!-- Footer Actions -->
-    <div class="footer-actions">
-        <a href="{{ url_for('security_idcards') }}" class="btn btn-outline">
+    <div class="footer-actions-premium">
+        <a href="{{ url_for('security_idcards') }}" class="btn-premium btn-outline-premium">
             <i class="fas fa-arrow-left"></i> Back to ID Cards
         </a>
         {% if current_visitor %}
-        <a href="{{ url_for('visitor_details', visitor_id=current_visitor.visitor_id) }}" class="btn btn-primary">
+        <a href="{{ url_for('visitor_details', visitor_id=current_visitor.visitor_id) }}" class="btn-premium btn-primary-premium">
             <i class="fas fa-eye"></i> View Visitor
         </a>
         {% endif %}
         {% if current_user.is_admin and card.status == 'issued' and not current_visitor %}
-        <button class="btn btn-primary" onclick="forceReturnCard()">
+        <button class="btn-premium btn-primary-premium" onclick="forceReturnCard()">
             <i class="fas fa-undo-alt"></i> Force Return
         </button>
         {% endif %}
@@ -668,7 +1016,7 @@
 </div>
 
 <script>
-    // ===== PROFESSIONAL JAVASCRIPT =====
+    // ===== PREMIUM JAVASCRIPT =====
     function updateCardStatus() {
         const statuses = ['available', 'lost', 'damaged'];
         let message = 'Select new status:\n';
@@ -682,7 +1030,7 @@
             const newStatus = statuses[index];
             
             if (confirm(`Are you sure you want to change status to ${newStatus.toUpperCase()}?`)) {
-                const btn = event.target;
+                const btn = event.target.closest('button');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
                 btn.disabled = true;
@@ -700,16 +1048,16 @@
                     btn.disabled = false;
                     
                     if (data.success) {
-                        alert('✅ Status updated successfully!');
-                        location.reload();
+                        showNotification('success', 'Status updated successfully!');
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert('❌ Error: ' + data.message);
+                        showNotification('error', data.message || 'Error updating status');
                     }
                 })
                 .catch(error => {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    alert('❌ Error updating status');
+                    showNotification('error', 'Error updating status');
                     console.error(error);
                 });
             }
@@ -719,14 +1067,14 @@
     function forceReturnCard() {
         if (!confirm('⚠️ Are you sure you want to force return this card? The visitor will be checked out.')) return;
         
-        const btn = event.target;
+        const btn = event.target.closest('button');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         btn.disabled = true;
         
         const visitorId = '{{ current_visitor.visitor_id if current_visitor else "" }}';
         if (!visitorId) {
-            alert('No visitor assigned to this card');
+            showNotification('error', 'No visitor assigned to this card');
             btn.innerHTML = originalText;
             btn.disabled = false;
             return;
@@ -748,18 +1096,23 @@
             btn.disabled = false;
             
             if (data.success) {
-                alert('✅ Card returned successfully!');
-                location.reload();
+                showNotification('success', 'Card returned successfully!');
+                setTimeout(() => location.reload(), 1000);
             } else {
-                alert('❌ Error: ' + data.message);
+                showNotification('error', data.message || 'Error returning card');
             }
         })
         .catch(error => {
             btn.innerHTML = originalText;
             btn.disabled = false;
-            alert('❌ Error returning card');
+            showNotification('error', 'Error returning card');
             console.error(error);
         });
+    }
+    
+    function showNotification(type, message) {
+        // Use existing flash message system
+        window.showFlashMessage(message, type, 3000);
     }
     
     // ===== KEYBOARD SHORTCUTS =====
@@ -777,6 +1130,31 @@
             updateCardStatus();
         }
         {% endif %}
+        
+        // Alt + V to view visitor (if exists)
+        {% if current_visitor %}
+        if (e.altKey && e.key === 'v') {
+            e.preventDefault();
+            window.location.href = "{{ url_for('visitor_details', visitor_id=current_visitor.visitor_id) }}";
+        }
+        {% endif %}
+    });
+    
+    // ===== ANIMATED COUNTERS =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add staggered animations to stat cards
+        const statCards = document.querySelectorAll('.stat-card-premium');
+        statCards.forEach((card, index) => {
+            card.style.animation = `fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.1}s both`;
+        });
+        
+        // Add hover effects to table rows
+        const tableRows = document.querySelectorAll('.table-premium tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.transition = 'all 0.2s ease';
+            });
+        });
     });
 </script>
 {% endblock %}
