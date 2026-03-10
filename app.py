@@ -916,6 +916,7 @@ def admin_visitors():
             flash('Access denied. Admin privileges required.', 'error')
             return redirect(url_for('security_visitors'))
         
+        # Get filter parameters
         status_filter = request.args.get('status', 'all')
         date_filter = request.args.get('date', '')
         department_filter = request.args.get('department', 'all')
@@ -927,6 +928,7 @@ def admin_visitors():
         page = request.args.get('page', 1, type=int)
         per_page = 20
         
+        # Start building query
         query = Visitor.query
         
         # Apply filters
@@ -935,7 +937,11 @@ def admin_visitors():
         elif status_filter == 'checked_out':
             query = query.filter_by(status='checked_out')
         elif status_filter == 'overdue':
-            query = query.filter_by(status='checked_in')
+            # For overdue, we'll handle separately
+            pass
+        else:
+            # 'all' - no status filter
+            pass
         
         if has_card_filter == 'yes':
             query = query.filter(Visitor.card_id.isnot(None))
@@ -973,21 +979,26 @@ def admin_visitors():
                 )
             )
         
+        # Handle overdue filter separately
+        if status_filter == 'overdue':
+            # Get all checked-in visitors and filter for overdue
+            checked_in = Visitor.query.filter_by(status='checked_in').all()
+            overdue_ids = [v.id for v in checked_in if is_overdue(v.checkin_time, v.expected_duration)]
+            if overdue_ids:
+                query = Visitor.query.filter(Visitor.id.in_(overdue_ids))
+            else:
+                query = Visitor.query.filter(False)  # No results
+        else:
+            # Apply the status filter to query
+            if status_filter != 'all' and status_filter != 'overdue':
+                query = query.filter_by(status=status_filter)
+        
         # Pagination
         pagination = query.order_by(Visitor.checkin_time.desc()).paginate(
             page=page, per_page=per_page, error_out=False
         )
         visitors = pagination.items
-        
-        # Apply overdue filter after query if needed (for filtered list only)
-        if status_filter == 'overdue':
-            # This is inefficient but necessary for overdue calculation
-            all_visitors = Visitor.query.filter_by(status='checked_in').all()
-            overdue_ids = [v.id for v in all_visitors if is_overdue(v.checkin_time, v.expected_duration)]
-            pagination = Visitor.query.filter(Visitor.id.in_(overdue_ids)).order_by(Visitor.checkin_time.desc()).paginate(
-                page=page, per_page=per_page, error_out=False
-            )
-            visitors = pagination.items
+        total_pages = pagination.pages
         
         # Calculate additional data for each visitor
         for visitor in visitors:
@@ -1008,6 +1019,9 @@ def admin_visitors():
                              visitors=visitors,
                              pagination=pagination,
                              total_visitors=pagination.total,
+                             total_pages=total_pages,
+                             current_page=page,
+                             per_page=per_page,
                              active_visitors=active_visitors,
                              checked_out_today=checked_out_today,
                              page=page,
@@ -1195,6 +1209,7 @@ def admin_idcards():
             page=page, per_page=per_page, error_out=False
         )
         cards = pagination.items
+        total_pages = pagination.pages
         
         # Prepare card data with current visitor
         card_data = []
@@ -1214,6 +1229,9 @@ def admin_idcards():
         return render_template('admin_idcards.html',
                              cards=card_data,
                              pagination=pagination,
+                             total_pages=total_pages,
+                             current_page=page,
+                             per_page=per_page,
                              available_count=available_count,
                              issued_count=issued_count,
                              lost_count=lost_count,
@@ -2198,21 +2216,26 @@ def security_visitors():
                 )
             )
         
+        # Handle overdue filter separately
+        if status_filter == 'overdue':
+            # Get all checked-in visitors and filter for overdue
+            checked_in = Visitor.query.filter_by(status='checked_in').all()
+            overdue_ids = [v.id for v in checked_in if is_overdue(v.checkin_time, v.expected_duration)]
+            if overdue_ids:
+                query = Visitor.query.filter(Visitor.id.in_(overdue_ids))
+            else:
+                query = Visitor.query.filter(False)  # No results
+        else:
+            # Apply the status filter to query
+            if status_filter != 'all' and status_filter != 'overdue':
+                query = query.filter_by(status=status_filter)
+        
         # Pagination
         pagination = query.order_by(Visitor.checkin_time.desc()).paginate(
             page=page, per_page=per_page, error_out=False
         )
         visitors = pagination.items
-        
-        # Apply overdue filter after query if needed
-        if status_filter == 'overdue':
-            # This is inefficient but necessary for overdue calculation
-            all_visitors = Visitor.query.filter_by(status='checked_in').all()
-            overdue_ids = [v.id for v in all_visitors if is_overdue(v.checkin_time, v.expected_duration)]
-            pagination = Visitor.query.filter(Visitor.id.in_(overdue_ids)).order_by(Visitor.checkin_time.desc()).paginate(
-                page=page, per_page=per_page, error_out=False
-            )
-            visitors = pagination.items
+        total_pages = pagination.pages
         
         # Calculate additional data for each visitor
         for visitor in visitors:
@@ -2233,6 +2256,9 @@ def security_visitors():
                              visitors=visitors,
                              pagination=pagination,
                              total_visitors=pagination.total,
+                             total_pages=total_pages,
+                             current_page=page,
+                             per_page=per_page,
                              active_visitors=active_visitors,
                              checked_out_today=checked_out_today,
                              page=page,
@@ -2278,6 +2304,7 @@ def security_idcards():
             page=page, per_page=per_page, error_out=False
         )
         cards = pagination.items
+        total_pages = pagination.pages
         
         # Prepare card data with current visitor
         card_data = []
@@ -2297,6 +2324,9 @@ def security_idcards():
         return render_template('security_idcards.html',
                              cards=card_data,
                              pagination=pagination,
+                             total_pages=total_pages,
+                             current_page=page,
+                             per_page=per_page,
                              available_count=available_count,
                              issued_count=issued_count,
                              lost_count=lost_count,
