@@ -3,27 +3,27 @@
 {% block title %}Visitor Details · KPR College{% endblock %}
 
 {% block page_title %}
-<div class="d-flex align-items-center flex-wrap gap-2">
-    <span class="fw-bold" style="font-size: 1.5rem;">Visitor Profile</span>
+<div class="d-flex align-items-center flex-wrap gap-3">
+    <span class="page-title">Visitor Profile</span>
     <div class="d-flex align-items-center gap-2">
         {% if visitor.status == 'checked_in' %}
             {% if is_overdue %}
-            <span class="badge bg-danger text-white px-3 py-2 rounded-pill">
-                <i class="fas fa-exclamation-triangle me-1"></i> OVERDUE
+            <span class="status-badge status-overdue">
+                <i class="fas fa-exclamation-triangle me-1"></i> Overdue
             </span>
             {% else %}
-            <span class="badge bg-success text-white px-3 py-2 rounded-pill">
-                <i class="fas fa-check-circle me-1"></i> ACTIVE
+            <span class="status-badge status-active">
+                <i class="fas fa-check-circle me-1"></i> Active
             </span>
             {% endif %}
         {% else %}
-            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">
-                <i class="fas fa-check me-1"></i> CHECKED OUT
+            <span class="status-badge status-checked-out">
+                <i class="fas fa-check me-1"></i> Checked Out
             </span>
         {% endif %}
         
         {% if card %}
-        <span class="badge bg-primary text-white px-3 py-2 rounded-pill">
+        <span class="status-badge status-card">
             <i class="fas fa-id-card me-1"></i> {{ card.card_number }}
         </span>
         {% endif %}
@@ -51,79 +51,178 @@
 
 {% block content %}
 <style>
-    /* ===== PREMIUM VISITOR DETAILS DESIGN ===== */
+    /* ===== PREMIUM COLOR PALETTE ===== */
     :root {
-        --primary: #0f3b5e;
-        --primary-dark: #0a2a42;
-        --primary-light: #e8f0fe;
-        --primary-gradient: linear-gradient(145deg, #0f3b5e, #1a4b72);
+        /* Primary - Modern Indigo */
+        --primary-50: #eef2ff;
+        --primary-100: #e0e7ff;
+        --primary-200: #c7d2fe;
+        --primary-300: #a5b4fc;
+        --primary-400: #818cf8;
+        --primary-500: #6366f1;
+        --primary-600: #4f46e5;
+        --primary-700: #4338ca;
+        --primary-800: #3730a3;
+        --primary-900: #312e81;
         
-        --accent-1: #e67e22;
-        --accent-2: #27ae60;
-        --accent-3: #e74c3c;
+        /* Secondary - Teal Accent */
+        --secondary-50: #f0fdfa;
+        --secondary-100: #ccfbf1;
+        --secondary-200: #99f6e4;
+        --secondary-300: #5eead4;
+        --secondary-400: #2dd4bf;
+        --secondary-500: #14b8a6;
+        --secondary-600: #0d9488;
+        --secondary-700: #0f766e;
+        --secondary-800: #115e59;
+        --secondary-900: #134e4a;
         
-        --success: #27ae60;
-        --success-light: #e9f7ef;
-        --danger: #e74c3c;
-        --danger-light: #fdedec;
-        --warning: #f39c12;
-        --warning-light: #fef5e7;
-        --info: #3498db;
-        --info-light: #e8f0fe;
+        /* Status Colors - Refined */
+        --success-50: #ecfdf5;
+        --success-500: #10b981;
+        --success-600: #059669;
+        --success-700: #047857;
         
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
-        --gray-700: #334155;
-        --gray-800: #1e293b;
-        --gray-900: #0f172a;
+        --warning-50: #fffbeb;
+        --warning-500: #f59e0b;
+        --warning-600: #d97706;
+        --warning-700: #b45309;
         
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
-        --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        --danger-50: #fef2f2;
+        --danger-500: #ef4444;
+        --danger-600: #dc2626;
+        --danger-700: #b91c1c;
         
+        --info-50: #eff6ff;
+        --info-500: #3b82f6;
+        --info-600: #2563eb;
+        --info-700: #1d4ed8;
+        
+        /* Neutral Palette - Warmer */
+        --gray-50: #fafaf9;
+        --gray-100: #f5f5f4;
+        --gray-200: #e7e5e4;
+        --gray-300: #d6d3d1;
+        --gray-400: #a8a29e;
+        --gray-500: #78716c;
+        --gray-600: #57534e;
+        --gray-700: #44403c;
+        --gray-800: #292524;
+        --gray-900: #1c1917;
+        
+        /* Accent Gradients */
+        --gradient-primary: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+        --gradient-secondary: linear-gradient(135deg, var(--secondary-500), var(--secondary-400));
+        --gradient-success: linear-gradient(135deg, var(--success-600), var(--success-500));
+        --gradient-warning: linear-gradient(135deg, var(--warning-600), var(--warning-500));
+        --gradient-danger: linear-gradient(135deg, var(--danger-600), var(--danger-500));
+        
+        /* Shadows - Softer */
+        --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.03);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.03);
+        --shadow-glow: 0 0 0 2px var(--primary-100);
+        
+        /* Border Radius */
         --radius-sm: 6px;
         --radius-md: 8px;
         --radius-lg: 12px;
         --radius-xl: 16px;
         --radius-2xl: 20px;
+        --radius-full: 9999px;
     }
 
     body {
-        background: #f0f7fa;
+        background: var(--gray-50);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--gray-800);
     }
 
     .details-container {
         max-width: 1440px;
         margin: 0 auto;
-        padding: 20px 24px;
-        animation: fadeIn 0.4s ease;
+        animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ===== HERO SECTION ===== */
+    /* ===== PAGE TITLE ===== */
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--gray-900), var(--gray-700));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* ===== REFINED STATUS BADGES ===== */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid transparent;
+        box-shadow: var(--shadow-xs);
+    }
+    
+    .status-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .status-active {
+        background: var(--success-50);
+        color: var(--success-700);
+        border-color: var(--success-200);
+    }
+    
+    .status-overdue {
+        background: var(--danger-50);
+        color: var(--danger-700);
+        border-color: var(--danger-200);
+    }
+    
+    .status-checked-out {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border-color: var(--gray-300);
+    }
+    
+    .status-card {
+        background: var(--primary-50);
+        color: var(--primary-700);
+        border-color: var(--primary-200);
+    }
+    
+    .status-badge i {
+        font-size: 0.8rem;
+    }
+
+    /* ===== REFINED HERO SECTION ===== */
     .hero-section {
         background: white;
-        border-radius: var(--radius-xl);
-        padding: 28px 32px;
-        margin-bottom: 28px;
-        box-shadow: var(--shadow-lg);
+        border-radius: var(--radius-2xl);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-200);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
         overflow: hidden;
     }
-
+    
     .hero-section::before {
         content: '';
         position: absolute;
@@ -131,7 +230,13 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: var(--primary-gradient);
+        background: var(--gradient-primary);
+        opacity: 0.8;
+    }
+    
+    .hero-section:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-200);
     }
 
     .hero-grid {
@@ -143,136 +248,135 @@
     }
 
     .visitor-badge {
-        background: var(--primary);
-        color: white;
-        padding: 8px 20px;
-        border-radius: 40px;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        padding: 6px 18px;
+        border-radius: var(--radius-full);
         font-weight: 600;
-        font-size: 1rem;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        font-family: 'JetBrains Mono', 'Inter', monospace;
+        letter-spacing: 0.3px;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 12px rgba(15, 59, 94, 0.3);
+        gap: 8px;
+        border: 1px solid var(--gray-300);
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-xs);
+    }
+    
+    .visitor-badge i {
+        color: var(--primary-600);
     }
 
     .visitor-name-hero {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 700;
         color: var(--gray-800);
-        margin: 8px 0 4px;
+        margin: 4px 0 8px;
         line-height: 1.2;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--gray-900), var(--primary-700));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .visitor-tagline {
         color: var(--gray-500);
-        font-size: 1rem;
+        font-size: 0.9rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         flex-wrap: wrap;
+    }
+    
+    .visitor-tagline i {
+        color: var(--primary-500);
+        width: 16px;
+    }
+    
+    .visitor-tagline .separator {
+        color: var(--gray-300);
+        font-size: 1.2rem;
+        line-height: 1;
     }
 
     .status-strip {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         flex-wrap: wrap;
     }
 
-    .status-chip {
-        padding: 8px 20px;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid transparent;
-    }
-
-    .status-chip.active {
-        background: var(--success-light);
-        color: var(--success);
-        border-color: var(--success);
-    }
-
-    .status-chip.overdue {
-        background: var(--danger-light);
-        color: var(--danger);
-        border-color: var(--danger);
-    }
-
-    .status-chip.checked-out {
-        background: var(--gray-100);
-        color: var(--gray-600);
-        border-color: var(--gray-300);
-    }
-
-    .status-chip.card {
-        background: var(--primary-light);
-        color: var(--primary);
-        border-color: var(--primary);
-    }
-
-    /* ===== QUICK STATS ROW ===== */
+    /* ===== REFINED STATS CARDS ===== */
     .stats-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 16px;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
     }
 
     .stat-card-mini {
         background: white;
-        border-radius: var(--radius-lg);
-        padding: 16px 20px;
-        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-xl);
+        padding: 16px 18px;
+        box-shadow: var(--shadow-xs);
         border: 1px solid var(--gray-200);
         display: flex;
         align-items: center;
-        gap: 16px;
-        transition: all 0.2s;
+        gap: 14px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        height: 100%;
     }
 
     .stat-card-mini:hover {
-        transform: translateY(-2px);
-        border-color: var(--primary);
+        border-color: var(--primary-300);
         box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        background: white;
     }
 
     .stat-icon {
-        width: 48px;
-        height: 48px;
-        background: var(--primary-light);
-        border-radius: var(--radius-md);
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary);
-        font-size: 1.5rem;
+        color: var(--primary-600);
+        font-size: 1.3rem;
+        transition: all 0.2s ease;
+    }
+    
+    .stat-card-mini:hover .stat-icon {
+        background: var(--gradient-primary);
+        color: white;
+        transform: scale(1.05) rotate(2deg);
     }
 
     .stat-content h4 {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         color: var(--gray-500);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
         margin: 0 0 4px;
+        font-weight: 600;
     }
 
     .stat-content p {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: var(--gray-800);
         margin: 0;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
     }
 
-    /* ===== MAIN CONTENT GRID ===== */
+    /* ===== REFINED SECTION CARDS ===== */
     .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
+        gap: 20px;
     }
 
     @media (max-width: 1024px) {
@@ -281,63 +385,72 @@
         }
     }
 
-    /* ===== SECTION CARDS ===== */
     .section-card {
         background: white;
-        border-radius: var(--radius-xl);
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-2xl);
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-xs);
         border: 1px solid var(--gray-200);
-        transition: all 0.2s;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
     }
 
     .section-card:hover {
         box-shadow: var(--shadow-lg);
-        border-color: var(--primary-light);
+        border-color: var(--primary-200);
     }
 
     .section-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--gray-200);
+        gap: 10px;
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--gray-100);
     }
 
     .section-header i {
-        font-size: 1.5rem;
-        color: var(--primary);
-        background: var(--primary-light);
-        padding: 10px;
+        font-size: 1.2rem;
+        color: var(--primary-600);
+        background: var(--primary-50);
+        padding: 8px;
         border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+    }
+    
+    .section-card:hover .section-header i {
+        background: var(--gradient-primary);
+        color: white;
+        transform: scale(1.05);
     }
 
     .section-header h3 {
-        font-size: 1.2rem;
+        font-size: 1rem;
         font-weight: 700;
-        color: var(--gray-800);
+        color: var(--gray-700);
         margin: 0;
+        letter-spacing: 0.02em;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
     .section-header span {
         margin-left: auto;
         background: var(--gray-100);
         color: var(--gray-600);
-        padding: 4px 12px;
-        border-radius: 30px;
-        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
         font-weight: 600;
+        letter-spacing: 0.3px;
+        border: 1px solid var(--gray-200);
     }
 
-    /* ===== DETAILS GRID ===== */
+    /* ===== REFINED DETAILS GRID ===== */
     .details-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
+        gap: 12px;
     }
 
     @media (max-width: 768px) {
@@ -348,16 +461,16 @@
 
     .detail-item {
         background: var(--gray-50);
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-lg);
         padding: 14px 16px;
         border: 1px solid var(--gray-200);
-        transition: all 0.2s;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .detail-item:hover {
         background: white;
-        border-color: var(--primary);
-        transform: translateY(-2px);
+        border-color: var(--primary-300);
+        transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
 
@@ -372,63 +485,82 @@
     }
 
     .detail-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         text-transform: uppercase;
         color: var(--gray-500);
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
+        letter-spacing: 0.4px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
         gap: 4px;
+        font-weight: 600;
     }
 
     .detail-label i {
-        font-size: 0.8rem;
-        color: var(--primary);
+        font-size: 0.7rem;
+        color: var(--primary-500);
+        width: 14px;
     }
 
     .detail-value {
-        font-weight: 600;
+        font-weight: 500;
         color: var(--gray-800);
-        font-size: 1rem;
+        font-size: 0.95rem;
         word-break: break-word;
-        line-height: 1.4;
+        line-height: 1.5;
     }
 
     .detail-value.highlight {
-        color: var(--primary);
-        font-size: 1.1rem;
+        color: var(--primary-700);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
-    /* ===== IDENTITY SECTION ===== */
+    /* ===== REFINED IDENTITY SECTION ===== */
     .identity-section {
         background: white;
-        border-radius: var(--radius-xl);
-        padding: 24px;
-        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-2xl);
+        padding: 22px;
+        box-shadow: var(--shadow-xs);
         border: 1px solid var(--gray-200);
-        margin-bottom: 24px;
+        margin-bottom: 20px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        background: linear-gradient(145deg, white, var(--gray-50));
+    }
+    
+    .identity-section:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-200);
     }
 
     .identity-header {
         display: flex;
         align-items: center;
         gap: 16px;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
 
     .identity-avatar {
-        width: 60px;
-        height: 60px;
-        background: var(--primary-gradient);
+        width: 54px;
+        height: 54px;
+        background: var(--gradient-primary);
         border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.8rem;
-        font-weight: 700;
-        box-shadow: 0 8px 16px rgba(15, 59, 94, 0.2);
+        font-size: 1.6rem;
+        font-weight: 600;
+        box-shadow: var(--shadow-md);
+        transition: all 0.2s ease;
+    }
+    
+    .identity-section:hover .identity-avatar {
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: var(--shadow-lg);
     }
 
     .identity-title h4 {
@@ -442,208 +574,172 @@
         color: var(--gray-500);
         font-size: 0.85rem;
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .identity-title p i {
+        color: var(--primary-500);
     }
 
     .identity-details {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
     }
 
     .identity-item {
         background: var(--gray-50);
-        border-radius: var(--radius-md);
-        padding: 12px 16px;
-        border: 1px solid var(--gray-200);
-    }
-
-    /* ===== QR CODE CARD ===== */
-    .qr-card {
-        background: white;
-        border-radius: var(--radius-xl);
-        padding: 20px;
-        border: 2px dashed var(--primary);
-        background: var(--primary-light);
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .qr-code {
-        background: white;
-        padding: 12px;
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
+        padding: 14px 16px;
         border: 1px solid var(--gray-200);
+        transition: all 0.15s ease;
     }
-
-    .qr-code img {
-        width: 100px;
-        height: 100px;
-        display: block;
-    }
-
-    .qr-info h5 {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin: 0 0 4px;
-    }
-
-    .qr-info p {
-        color: var(--gray-600);
-        font-size: 0.9rem;
-        margin: 0 0 12px;
-    }
-
-    .qr-info .badge {
+    
+    .identity-item:hover {
         background: white;
-        color: var(--primary);
-        padding: 6px 12px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        border: 1px solid var(--primary);
+        border-color: var(--primary-300);
     }
 
-    /* ===== PURPOSE SPECIFIC SECTIONS ===== */
+    /* ===== REFINED PURPOSE SECTION ===== */
     .purpose-section {
         background: white;
-        border-radius: var(--radius-xl);
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-2xl);
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-xs);
         border-left: 4px solid;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        background: linear-gradient(145deg, white, var(--gray-50));
+    }
+    
+    .purpose-section:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateX(2px);
     }
 
-    .purpose-section.admission { border-left-color: var(--accent-1); }
-    .purpose-section.parent { border-left-color: var(--accent-2); }
-    .purpose-section.official { border-left-color: var(--accent-3); }
+    .purpose-section.admission { 
+        border-left-color: var(--warning-500);
+    }
+    .purpose-section.parent { 
+        border-left-color: var(--success-500);
+    }
+    .purpose-section.official { 
+        border-left-color: var(--primary-500);
+    }
 
     .purpose-header {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
 
     .purpose-header i {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         color: white;
-        background: var(--primary);
+        background: var(--gradient-primary);
         padding: 10px;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
+        border-radius: var(--radius-md);
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .purpose-section:hover .purpose-header i {
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: var(--shadow-md);
     }
 
     .purpose-header h4 {
-        font-size: 1.2rem;
+        font-size: 1rem;
         font-weight: 700;
         color: var(--gray-800);
         margin: 0;
+        letter-spacing: -0.01em;
     }
 
-    /* ===== ACTION BAR ===== */
-    .action-bar {
-        background: white;
-        border-radius: var(--radius-xl);
-        padding: 20px 24px;
-        margin-top: 28px;
+    /* ===== REFINED QR CARD ===== */
+    .qr-card {
+        background: linear-gradient(145deg, var(--primary-50), white);
+        border-radius: var(--radius-2xl);
+        padding: 20px;
+        border: 1px solid var(--primary-200);
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 18px;
         flex-wrap: wrap;
-        gap: 16px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .qr-card:hover {
         box-shadow: var(--shadow-lg);
-        border: 1px solid var(--gray-200);
-        position: sticky;
-        bottom: 20px;
-        backdrop-filter: blur(10px);
-        background: rgba(255,255,255,0.95);
-        z-index: 100;
-    }
-
-    .action-group {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .btn-action {
-        padding: 12px 28px;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.2s;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background: var(--primary-gradient);
-        color: white;
-        box-shadow: 0 4px 12px rgba(15, 59, 94, 0.3);
-    }
-
-    .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(15, 59, 94, 0.4);
+        border-color: var(--primary-400);
     }
 
-    .btn-secondary {
+    .qr-code {
         background: white;
-        color: var(--gray-700);
-        border: 2px solid var(--gray-200);
+        padding: 10px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+        transition: all 0.2s ease;
+    }
+    
+    .qr-card:hover .qr-code {
+        transform: scale(1.02);
+        border-color: var(--primary-300);
     }
 
-    .btn-secondary:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        transform: translateY(-2px);
+    .qr-code img {
+        width: 80px;
+        height: 80px;
+        display: block;
     }
 
-    .btn-danger {
-        background: var(--danger);
-        color: white;
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    .qr-info h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-700);
+        margin: 0 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .qr-info h5 i {
+        color: var(--primary-500);
     }
 
-    .btn-danger:hover {
-        background: #c0392b;
-        transform: translateY(-2px);
+    .qr-info p {
+        color: var(--gray-600);
+        font-size: 0.85rem;
+        margin: 0 0 10px;
     }
 
-    .btn-success {
-        background: var(--success);
-        color: white;
-    }
-
-    .btn-success:hover {
-        background: #219a52;
-        transform: translateY(-2px);
-    }
-
-    .btn-icon-only {
-        width: 45px;
-        height: 45px;
-        border-radius: 45px;
-        padding: 0;
+    .qr-info .badge {
+        background: var(--primary-100);
+        color: var(--primary-700);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        border: 1px solid var(--primary-200);
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
+        gap: 4px;
     }
 
-    /* ===== TIMELINE ===== */
+    /* ===== REFINED TIMELINE ===== */
     .timeline {
-        margin-top: 16px;
+        margin-top: 8px;
     }
 
     .timeline-item {
@@ -651,6 +747,13 @@
         gap: 16px;
         padding: 12px 0;
         border-bottom: 1px solid var(--gray-200);
+        transition: all 0.15s ease;
+    }
+    
+    .timeline-item:hover {
+        background: var(--gray-50);
+        padding-left: 12px;
+        border-radius: var(--radius-md);
     }
 
     .timeline-item:last-child {
@@ -660,13 +763,20 @@
     .timeline-icon {
         width: 36px;
         height: 36px;
-        background: var(--primary-light);
-        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary);
+        color: var(--primary-600);
         font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .timeline-item:hover .timeline-icon {
+        background: var(--gradient-primary);
+        color: white;
+        transform: scale(1.05);
     }
 
     .timeline-content {
@@ -675,14 +785,142 @@
 
     .timeline-content h6 {
         font-weight: 600;
-        color: var(--gray-800);
+        color: var(--gray-700);
         margin: 0 0 4px;
+        font-size: 0.9rem;
     }
 
     .timeline-content p {
         color: var(--gray-500);
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         margin: 0;
+        line-height: 1.5;
+    }
+
+    /* ===== REFINED ACTION BAR ===== */
+    .action-bar {
+        background: white;
+        border-radius: var(--radius-2xl);
+        padding: 18px 22px;
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.95);
+        transition: all 0.2s ease;
+        position: sticky;
+        bottom: 20px;
+        z-index: 10;
+    }
+    
+    .action-bar:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-200);
+    }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 10px 22px;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+        background: transparent;
+        box-shadow: var(--shadow-xs);
+    }
+    
+    .btn-action i {
+        font-size: 0.9rem;
+        transition: transform 0.15s ease;
+    }
+    
+    .btn-action:hover i {
+        transform: translateX(2px);
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-action:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--primary-400);
+        color: var(--primary-700);
+        background: var(--primary-50);
+    }
+
+    .btn-danger {
+        background: var(--gradient-danger);
+        color: white;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, var(--danger-700), var(--danger-600));
+    }
+
+    .btn-success {
+        background: var(--gradient-success);
+        color: white;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, var(--success-700), var(--success-600));
+    }
+
+    .btn-icon-only {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+    }
+    
+    .btn-icon-only i {
+        margin: 0;
+    }
+    
+    .btn-icon-only:hover i {
+        transform: scale(1.1);
     }
 
     /* ===== PRINT STYLES ===== */
@@ -690,7 +928,7 @@
         .action-bar,
         .btn-action,
         .qr-card {
-            display: none;
+            display: none !important;
         }
 
         body {
@@ -701,15 +939,71 @@
         .section-card,
         .identity-section,
         .purpose-section {
-            box-shadow: none;
-            border: 1px solid #ddd;
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
             break-inside: avoid;
+            page-break-inside: avoid;
         }
+        
+        .visitor-name-hero {
+            font-size: 1.8rem;
+            -webkit-text-fill-color: var(--gray-900);
+            background: none;
+        }
+    }
+    
+    /* ===== RESPONSIVE TWEAKS ===== */
+    @media (max-width: 640px) {
+        .hero-section {
+            padding: 18px 20px;
+        }
+        
+        .visitor-name-hero {
+            font-size: 1.7rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .section-card {
+            padding: 18px;
+        }
+        
+        .action-bar {
+            padding: 16px;
+        }
+        
+        .btn-action {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-icon-only {
+            width: 38px;
+            height: 38px;
+        }
+    }
+    
+    /* ===== UTILITY CLASSES ===== */
+    .text-gradient {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .bg-soft-primary {
+        background: var(--primary-50);
+    }
+    
+    .border-soft-primary {
+        border-color: var(--primary-200);
     }
 </style>
 
 <div class="details-container">
-    <!-- Hero Section -->
+    <!-- REFINED Hero Section -->
     <div class="hero-section">
         <div class="hero-grid">
             <div>
@@ -719,42 +1013,42 @@
                 <h1 class="visitor-name-hero">{{ visitor.full_name }}</h1>
                 <div class="visitor-tagline">
                     <span><i class="fas fa-calendar-alt"></i> {{ visitor.checkin_time.strftime('%A, %d %B %Y') }}</span>
-                    <span class="text-muted">•</span>
+                    <span class="separator">•</span>
                     <span><i class="fas fa-clock"></i> {{ visitor.checkin_time.strftime('%I:%M %p') }}</span>
                 </div>
             </div>
             <div class="status-strip">
                 {% if visitor.status == 'checked_in' %}
                     {% if is_overdue %}
-                    <span class="status-chip overdue">
-                        <i class="fas fa-exclamation-triangle"></i> OVERDUE
+                    <span class="status-badge status-overdue">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Overdue
                     </span>
                     {% else %}
-                    <span class="status-chip active">
-                        <i class="fas fa-check-circle"></i> ACTIVE
+                    <span class="status-badge status-active">
+                        <i class="fas fa-check-circle me-1"></i> Active
                     </span>
                     {% endif %}
                 {% else %}
-                    <span class="status-chip checked-out">
-                        <i class="fas fa-check"></i> CHECKED OUT
+                    <span class="status-badge status-checked-out">
+                        <i class="fas fa-check me-1"></i> Checked Out
                     </span>
                     {% if visitor.actual_checkout %}
-                    <span class="status-chip">
-                        <i class="fas fa-clock"></i> {{ visitor.actual_checkout.strftime('%I:%M %p') }}
+                    <span class="status-badge" style="background: var(--gray-100); color: var(--gray-700); border-color: var(--gray-300);">
+                        <i class="fas fa-clock me-1"></i> {{ visitor.actual_checkout.strftime('%I:%M %p') }}
                     </span>
                     {% endif %}
                 {% endif %}
                 
                 {% if card %}
-                <span class="status-chip card">
-                    <i class="fas fa-id-card"></i> Card: {{ card.card_number }}
+                <span class="status-badge status-card">
+                    <i class="fas fa-id-card me-1"></i> {{ card.card_number }}
                 </span>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Quick Stats Row - Only show fields that exist in database -->
+    <!-- REFINED Quick Stats Row -->
     <div class="stats-row">
         {% if visitor.phone %}
         <div class="stat-card-mini">
@@ -787,7 +1081,7 @@
             </div>
             <div class="stat-content">
                 <h4>Meeting</h4>
-                <p>{{ visitor.person_to_meet }}</p>
+                <p>{{ visitor.person_to_meet|truncate(15) }}</p>
             </div>
         </div>
         {% endif %}
@@ -811,7 +1105,7 @@
             </div>
             <div class="stat-content">
                 <h4>Department</h4>
-                <p>{{ visitor.department }}</p>
+                <p>{{ visitor.department|truncate(12) }}</p>
             </div>
         </div>
         {% endif %}
@@ -821,7 +1115,7 @@
     <div class="content-grid">
         <!-- LEFT COLUMN -->
         <div class="left-column">
-            <!-- Personal Details Card - Matches database fields -->
+            <!-- REFINED Personal Details Card -->
             <div class="section-card">
                 <div class="section-header">
                     <i class="fas fa-user-circle"></i>
@@ -874,7 +1168,7 @@
                 </div>
             </div>
 
-            <!-- Visit Details Card - Matches database fields -->
+            <!-- REFINED Visit Details Card -->
             <div class="section-card">
                 <div class="section-header">
                     <i class="fas fa-clipboard-list"></i>
@@ -919,41 +1213,41 @@
                     {% if visitor.expected_duration %}
                     <div class="detail-item">
                         <div class="detail-label"><i class="fas fa-hourglass-start"></i> Expected Duration</div>
-                        <div class="detail-value">{{ visitor.expected_duration }} minutes</div>
+                        <div class="detail-value">{{ visitor.expected_duration }} min</div>
                     </div>
                     {% endif %}
                     
                     {% if visitor.expected_checkout %}
                     <div class="detail-item full-width">
                         <div class="detail-label"><i class="fas fa-clock"></i> Expected Checkout</div>
-                        <div class="detail-value">{{ visitor.expected_checkout.strftime('%d %B %Y, %I:%M %p') }}</div>
+                        <div class="detail-value">{{ visitor.expected_checkout.strftime('%d %b %Y, %I:%M %p') }}</div>
                     </div>
                     {% endif %}
                     
                     {% if visitor.checkin_time %}
                     <div class="detail-item">
-                        <div class="detail-label"><i class="fas fa-sign-in-alt"></i> Check-in Time</div>
+                        <div class="detail-label"><i class="fas fa-sign-in-alt"></i> Check-in</div>
                         <div class="detail-value">{{ visitor.checkin_time.strftime('%I:%M %p, %d %b') }}</div>
                     </div>
                     {% endif %}
                     
                     {% if visitor.actual_checkout %}
                     <div class="detail-item">
-                        <div class="detail-label"><i class="fas fa-sign-out-alt"></i> Check-out Time</div>
+                        <div class="detail-label"><i class="fas fa-sign-out-alt"></i> Check-out</div>
                         <div class="detail-value">{{ visitor.actual_checkout.strftime('%I:%M %p, %d %b') }}</div>
                     </div>
                     {% endif %}
                     
                     {% if visitor.visit_notes %}
                     <div class="detail-item full-width">
-                        <div class="detail-label"><i class="fas fa-sticky-note"></i> Visit Notes</div>
+                        <div class="detail-label"><i class="fas fa-sticky-note"></i> Notes</div>
                         <div class="detail-value">{{ visitor.visit_notes }}</div>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Vehicle Details Card - Using correct field names from database -->
+            <!-- REFINED Vehicle Details Card -->
             {% if visitor.vehicle_number or visitor.vehicle_type or visitor.accompanied_count %}
             <div class="section-card">
                 <div class="section-header">
@@ -986,7 +1280,7 @@
             </div>
             {% endif %}
 
-            <!-- Company Details Card - Using correct field names -->
+            <!-- REFINED Company Details Card -->
             {% if visitor.company %}
             <div class="section-card">
                 <div class="section-header">
@@ -997,7 +1291,7 @@
                 <div class="details-grid">
                     {% if visitor.company %}
                     <div class="detail-item full-width">
-                        <div class="detail-label"><i class="fas fa-building"></i> Company/Organization</div>
+                        <div class="detail-label"><i class="fas fa-building"></i> Company</div>
                         <div class="detail-value">{{ visitor.company }}</div>
                     </div>
                     {% endif %}
@@ -1008,7 +1302,7 @@
 
         <!-- RIGHT COLUMN -->
         <div class="right-column">
-            <!-- Identity Section - Matches database fields -->
+            <!-- REFINED Identity Section -->
             <div class="identity-section">
                 <div class="identity-header">
                     <div class="identity-avatar">
@@ -1016,7 +1310,7 @@
                     </div>
                     <div class="identity-title">
                         <h4>Identity Verification</h4>
-                        <p>{% if visitor.id_type %}ID Provided{% else %}No ID Provided{% endif %}</p>
+                        <p><i class="fas fa-shield-alt"></i> {% if visitor.id_type %}ID Provided{% else %}No ID{% endif %}</p>
                     </div>
                 </div>
                 
@@ -1040,19 +1334,18 @@
                         <div class="detail-label"><i class="fas fa-camera"></i> ID Photo</div>
                         <div class="detail-value">
                             <img src="{{ url_for('static', filename='uploads/' + visitor.id_photo) }}" 
-                                 alt="ID" style="max-width: 150px; border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+                                 alt="ID" style="max-width: 120px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
                         </div>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Student/Parent Information Section - Direct database fields -->
+            <!-- REFINED Student/Parent Section -->
             {% if visitor.student_name or visitor.parent_name or visitor.student_roll %}
             <div class="purpose-section {% if visitor.visit_type == 'admission' %}admission{% elif visitor.visit_type == 'parent' %}parent{% else %}official{% endif %}">
                 <div class="purpose-header">
-                    <i class="fas {% if visitor.visit_type == 'admission' %}fa-graduation-cap{% elif visitor.visit_type == 'parent' %}fa-users{% else %}fa-handshake{% endif %}" 
-                       style="background: {% if visitor.visit_type == 'admission' %}var(--accent-1){% elif visitor.visit_type == 'parent' %}var(--accent-2){% else %}var(--accent-3){% endif %};"></i>
+                    <i class="fas {% if visitor.visit_type == 'admission' %}fa-graduation-cap{% elif visitor.visit_type == 'parent' %}fa-users{% else %}fa-handshake{% endif %}"></i>
                     <h4>
                         {% if visitor.visit_type == 'admission' %}
                             Admission Details
@@ -1074,7 +1367,7 @@
                     
                     {% if visitor.parent_name %}
                     <div class="detail-item full-width">
-                        <div class="detail-label">Parent/Guardian Name</div>
+                        <div class="detail-label">Parent/Guardian</div>
                         <div class="detail-value">{{ visitor.parent_name }}</div>
                     </div>
                     {% endif %}
@@ -1089,11 +1382,11 @@
             </div>
             {% endif %}
 
-            <!-- Staff Details Card -->
+            <!-- REFINED Staff Timeline Card -->
             <div class="section-card">
                 <div class="section-header">
                     <i class="fas fa-user-shield"></i>
-                    <h3>Staff Information</h3>
+                    <h3>Staff Timeline</h3>
                 </div>
                 
                 <div class="timeline">
@@ -1142,7 +1435,7 @@
                         </div>
                         <div class="timeline-content">
                             <h6>Checkout Notes</h6>
-                            <p>{{ visitor.checkout_notes }}</p>
+                            <p>{{ visitor.checkout_notes|truncate(50) }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -1154,10 +1447,7 @@
                         </div>
                         <div class="timeline-content">
                             <h6>Rating</h6>
-                            <p>
-                                {% for i in range(visitor.rating) %}⭐{% endfor %}
-                                ({{ visitor.rating }}/5)
-                            </p>
+                            <p>{{ '⭐' * visitor.rating }} ({{ visitor.rating }}/5)</p>
                         </div>
                     </div>
                     {% endif %}
@@ -1188,15 +1478,15 @@
                 </div>
             </div>
 
-            <!-- QR Code Card (if active) -->
+            <!-- REFINED QR Code Card -->
             {% if visitor.status == 'checked_in' and qr_code %}
             <div class="qr-card">
                 <div class="qr-code">
                     <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
                 </div>
                 <div class="qr-info">
-                    <h5><i class="fas fa-qrcode me-2"></i> Check-out QR Code</h5>
-                    <p>Present this QR code at the exit gate for quick checkout</p>
+                    <h5><i class="fas fa-qrcode me-2"></i> Quick Checkout</h5>
+                    <p>Scan at exit gate for express checkout</p>
                     <span class="badge">
                         <i class="fas fa-clock me-1"></i> Valid for 12 hours
                     </span>
@@ -1206,7 +1496,7 @@
         </div>
     </div>
 
-    <!-- Action Bar -->
+    <!-- REFINED Action Bar -->
     <div class="action-bar">
         <div class="action-group">
             <button class="btn-action btn-secondary" onclick="window.print()">
@@ -1220,7 +1510,7 @@
                     {{ url_for('security_visitors') }}
                 {%- endif -%}
             " class="btn-action btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to List
+                <i class="fas fa-arrow-left"></i> Back
             </a>
             
             <a href="{{ url_for('checkin') }}" class="btn-action btn-secondary">
@@ -1244,7 +1534,7 @@
             {% endif %}
             
             {% if current_user.is_admin %}
-            <button class="btn-action btn-icon-only btn-secondary" onclick="copyVisitorDetails()" title="Copy Details">
+            <button class="btn-action btn-icon-only btn-secondary" onclick="copyVisitorDetails()" title="Copy to clipboard">
                 <i class="fas fa-copy"></i>
             </button>
             
@@ -1270,7 +1560,15 @@ Status: {{ visitor.status }}
     `.trim();
     
     navigator.clipboard.writeText(details).then(() => {
-        alert('Visitor details copied to clipboard!');
+        // Show temporary success feedback
+        const btn = event.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.classList.add('btn-success');
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('btn-success');
+        }, 1500);
     }).catch(() => {
         alert('Could not copy to clipboard');
     });
@@ -1289,5 +1587,21 @@ function shareVisitor() {
         copyVisitorDetails();
     }
 }
+
+// Add smooth fade-in for page sections with staggered animation
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('.section-card, .identity-section, .purpose-section, .qr-card, .stat-card-mini');
+    sections.forEach((section, index) => {
+        section.style.animation = `fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.05}s both`;
+    });
+    
+    // Add hover sound effect (optional)
+    const buttons = document.querySelectorAll('.btn-action');
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transition = 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+        });
+    });
+});
 </script>
 {% endblock %}
