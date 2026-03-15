@@ -86,20 +86,48 @@
     }
 
     .purpose-card {
-        background: white;
-        border: 3px solid var(--gray-200);
-        border-radius: var(--border-radius-lg);
-        padding: 2rem 1.5rem;
+        background: linear-gradient(180deg, #fff, #f8fbff);
+        border: 2px solid rgba(13,110,253,0.2);
+        border-radius: 18px;
+        padding: 1rem 0.9rem;
         text-align: center;
         cursor: pointer;
-        transition: var(--transition);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         position: relative;
         overflow: hidden;
-        box-shadow: var(--shadow-sm);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.12);
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 280px;
+        min-height: 140px;
+    }
+
+    .purpose-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(0,0,0,0.16);
+        border-color: rgba(13, 110, 253, 0.45);
+        background: linear-gradient(180deg, #ffffff, #eef4ff);
+    }
+
+    .purpose-card.selected {
+        border-color: #0d6efd;
+        background: linear-gradient(180deg, #eaf2ff, #e1ebff);
+        box-shadow: 0 14px 30px rgba(13, 110, 253, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .purpose-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+        color: #1f3c7a;
+        letter-spacing: -0.2px;
+    }
+
+    .purpose-card p {
+        font-size: 0.88rem;
+        line-height: 1.35;
+        color: #4b5a72;
+        padding: 0 0.2rem;
     }
 
     .purpose-card::before {
@@ -152,19 +180,24 @@
     }
 
     .purpose-icon {
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(145deg, var(--gray-100), white);
+        width: 92px;
+        height: 92px;
+        background: linear-gradient(145deg, #ffffff, #e9efff);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2.8rem;
+            margin: 0 auto 0.6rem;
+            font-size: 1.25rem;
         color: var(--primary);
         transition: var(--transition);
-        border: 4px solid white;
-        box-shadow: 0 12px 24px -8px rgba(13,110,253,0.2);
+        border: 3px solid rgba(13,110,253,0.15);
+        box-shadow: 0 10px 24px -8px rgba(13,110,253,0.25);
+    }
+
+    .purpose-card:hover .purpose-icon {
+        transform: scale(1.05);
+        border-color: rgba(13,110,253,0.35);
     }
 
     .purpose-card:hover .purpose-icon {
@@ -222,18 +255,20 @@
     /* ===== ENHANCED FORM PANEL ===== */
     .form-panel {
         background: white;
-        border-radius: 28px;
-        padding: 2.5rem;
-        box-shadow: var(--shadow);
-        border: 1px solid rgba(0,0,0,0.05);
-        animation: fadeSlideUp 0.5s ease;
-        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        padding: 1.2rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.08);
+        animation: fadeSlideUp 0.35s ease;
+        backdrop-filter: blur(4px);
+        max-width: 980px;
+        margin: 0 auto;
     }
 
     @keyframes fadeSlideUp {
         from {
             opacity: 0;
-            transform: translateY(25px);
+            transform: translateY(12px);
         }
         to {
             opacity: 1;
@@ -245,10 +280,10 @@
     .section-header {
         display: flex;
         align-items: center;
-        gap: 1.2rem;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 3px solid var(--gray-200);
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--gray-200);
         position: relative;
     }
 
@@ -293,12 +328,12 @@
     /* ===== ENHANCED FORM ELEMENTS ===== */
     .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.9rem;
     }
 
     .form-group {
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem;
     }
 
     .form-label {
@@ -325,10 +360,10 @@
     }
 
     .form-control, .form-select {
-        border: 2px solid var(--gray-200);
-        border-radius: 14px;
-        padding: 0.8rem 1.2rem;
-        font-size: 0.95rem;
+        border: 1.6px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.9rem;
         transition: var(--transition);
         background: white;
         width: 100%;
@@ -336,7 +371,7 @@
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(13,110,253,0.15);
+        box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
         outline: none;
     }
 
@@ -441,7 +476,7 @@
         font-weight: 600;
         color: var(--gray-600);
         transition: var(--transition);
-        display: inline-flex;
+            animation: fadeSlideUp 0.5s ease;
         align-items: center;
         gap: 0.8rem;
         font-size: 1rem;
@@ -716,8 +751,8 @@
                             <label class="form-label">
                                 <i class="fas fa-users"></i>No. of Persons
                             </label>
-                            <input type="number" class="form-control" name="accompanied_count" id="accompaniedCount" 
-                                   min="0" value="0">
+                            <input type="number" class="form-control" name="accompanied_count" id="accompaniedCountAdmission" 
+                                   min="1" value="1" placeholder="Including main visitor">
                         </div>
                         <div class="form-group">
                             <label class="form-label">
@@ -818,6 +853,13 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">
+                                <i class="fas fa-users"></i>No. of Persons
+                            </label>
+                            <input type="number" class="form-control" name="accompanied_count" id="accompaniedCountParent" 
+                                   min="1" value="1" placeholder="Including main visitor">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
                                 <i class="fas fa-motorcycle"></i>Vehicle Number
                             </label>
                             <input type="text" class="form-control" name="vehicle_number" id="parentVehicle" 
@@ -872,9 +914,9 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label required">
-                                <i class="fas fa-user-tie"></i>Contact Person
+                                <i class="fas fa-user-tie"></i>Person to Meet
                             </label>
-                            <input type="text" class="form-control" name="person_to_meet" id="officialContact" 
+                            <input type="text" class="form-control" name="person_to_meet" id="officialContact" required
                                    placeholder="Person to meet">
                         </div>
                         <div class="form-group">
@@ -887,6 +929,13 @@
                                 <option value="{{ dept }}">{{ dept }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-users"></i>No. of Persons
+                            </label>
+                            <input type="number" class="form-control" name="accompanied_count" id="accompaniedCountOfficial" 
+                                   min="1" value="1" placeholder="Including main visitor">
                         </div>
                         <div class="form-group">
                             <label class="form-label">
@@ -1122,6 +1171,45 @@
         submitBtn.innerHTML = '<span class="loading-spinner me-2"></span> Processing...';
         submitBtn.disabled = true;
 
+        // IMPORTANT: Explicitly capture vehicle data from the visible form section
+        // Create hidden fields to ensure vehicle data is submitted
+        let vehicleNumber = '';
+        let vehicleType = '';
+        let accompaniedCount = '1';
+        let personToMeet = '';
+        let company = '';
+        
+        if (currentType === 'admission') {
+            vehicleNumber = (document.getElementById('vehicleNumber')?.value || '').trim();
+            vehicleType = (document.getElementById('vehicleType')?.value || '').trim();
+            accompaniedCount = (document.getElementById('accompaniedCountAdmission')?.value || '1').trim();
+        } else if (currentType === 'parent') {
+            vehicleNumber = (document.getElementById('parentVehicle')?.value || '').trim();
+            vehicleType = (document.getElementById('parentVehicleType')?.value || '').trim();
+            accompaniedCount = (document.getElementById('accompaniedCountParent')?.value || '1').trim();
+            personToMeet = (document.getElementById('personToMeet')?.value || '').trim();
+        } else if (currentType === 'official') {
+            vehicleNumber = (document.getElementById('officialVehicle')?.value || '').trim();
+            vehicleType = (document.getElementById('officialVehicleType')?.value || '').trim();
+            accompaniedCount = (document.getElementById('accompaniedCountOfficial')?.value || '1').trim();
+            personToMeet = (document.getElementById('officialContact')?.value || '').trim();
+            company = (document.getElementById('company')?.value || '').trim();
+        }
+        
+        // Find and update the actual form fields to ensure submission
+        const allVehicleNumberFields = document.querySelectorAll('input[name="vehicle_number"]');
+        const allVehicleTypeFields = document.querySelectorAll('select[name="vehicle_type"]');
+        const allAccompaniedFields = document.querySelectorAll('input[name="accompanied_count"]');
+        const allPersonToMeetFields = document.querySelectorAll('input[name="person_to_meet"]');
+        const allCompanyFields = document.querySelectorAll('input[name="company"]');
+        
+        // Update all fields to the collected values (ensures at least one will be in the submission)
+        allVehicleNumberFields.forEach(field => { field.value = vehicleNumber; });
+        allVehicleTypeFields.forEach(field => { field.value = vehicleType; });
+        allAccompaniedFields.forEach(field => { field.value = accompaniedCount; });
+        allPersonToMeetFields.forEach(field => { field.value = personToMeet; });
+        allCompanyFields.forEach(field => { field.value = company; });
+        
         // FIX: Manually submit the form after validation
         document.getElementById('checkinForm').submit();
         
