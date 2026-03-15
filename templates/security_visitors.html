@@ -5,15 +5,15 @@
 {% block page_title %}
 <div class="d-flex align-items-center flex-wrap gap-2">
     <div class="d-flex align-items-center">
-        <i class="fas fa-users-cog fs-2 me-2" style="color: #2e7d32;"></i>
-        <span class="fw-bold" style="font-size: 1.6rem;">Visitor Management</span>
+        <i class="fas fa-users-cog me-2" style="font-size: 2rem; color: var(--primary);"></i>
+        <span class="fw-bold" style="font-size: 1.8rem;">Visitor Management</span>
     </div>
     <div class="d-flex align-items-center gap-2 ms-auto">
-        <span class="badge bg-white text-success px-3 py-1 rounded-pill border border-success">
+        <span class="badge bg-white text-success px-3 py-2 rounded-pill border border-success">
             <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i> 
             {{ active_visitors }} Active
         </span>
-        <span class="badge bg-white text-dark px-3 py-1 rounded-pill border border-secondary">
+        <span class="badge bg-white text-dark px-3 py-2 rounded-pill border border-secondary">
             <i class="fas fa-clock me-1"></i> {{ now.strftime('%H:%M') }}
         </span>
     </div>
@@ -27,192 +27,290 @@
 
 {% block content %}
 <style>
-    /* ===== ADMIN VISITOR MANAGEMENT - OPTIMIZED ===== */
+    /* ===== CLEAN PROFESSIONAL VISITOR MANAGEMENT ===== */
     :root {
-        --primary: #2e7d32;
-        --primary-dark: #1b5e20;
-        --primary-light: #e8f5e9;
-        --primary-soft: #c8e6c9;
-        --danger: #d32f2f;
-        --danger-light: #ffebee;
-        --success: #2e7d32;
-        --success-light: #e8f5e9;
-        --warning: #ed6c02;
-        --warning-light: #fff3e0;
-        --info: #0288d1;
-        --info-light: #e1f5fe;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
-        --gray-700: #334155;
-        --gray-800: #1e293b;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-        --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
-        --shadow-lg: 0 10px 15px rgba(0,0,0,0.05);
-        --radius-sm: 6px;
-        --radius-md: 8px;
-        --radius-lg: 12px;
-        --transition: all 0.2s ease;
+        /* Primary - Deep Blue */
+        --primary: #1e3a8a;
+        --primary-rgb: 30, 58, 138;
+        --primary-light: #e0e7ff;
+        --primary-dark: #1e2b5a;
+        
+        /* Status Colors */
+        --success: #15803d;
+        --success-rgb: 21, 128, 61;
+        --success-light: #dcfce7;
+        
+        --danger: #b91c1c;
+        --danger-rgb: 185, 28, 28;
+        --danger-light: #fee2e2;
+        
+        --warning: #b45309;
+        --warning-rgb: 180, 83, 9;
+        --warning-light: #ffedd5;
+        
+        --info: #0369a1;
+        --info-rgb: 3, 105, 161;
+        --info-light: #e0f2fe;
+        
+        /* Visit Types */
+        --admission: #7e22ce;
+        --admission-light: #f3e8ff;
+        --parent: #1e40af;
+        --parent-light: #dbeafe;
+        --official: #b45309;
+        --official-light: #ffedd5;
+        --general: #4b5563;
+        --general-light: #f3f4f6;
+        
+        /* Neutrals */
+        --gray-900: #111827;
+        --gray-800: #1f2937;
+        --gray-700: #374151;
+        --gray-600: #4b5563;
+        --gray-500: #6b7280;
+        --gray-400: #9ca3af;
+        --gray-300: #d1d5db;
+        --gray-200: #e5e7eb;
+        --gray-100: #f3f4f6;
+        --gray-50: #f9fafb;
+        
+        /* Background */
+        --bg-main: #f8fafc;
+        
+        /* Spacing */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 12px;
+        --space-lg: 16px;
+        --space-xl: 20px;
+        --space-2xl: 24px;
+        
+        /* Typography */
+        --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --text-xs: 0.75rem;    /* 12px */
+        --text-sm: 0.875rem;    /* 14px */
+        --text-base: 1rem;      /* 16px */
+        --text-lg: 1.125rem;    /* 18px */
+        --text-xl: 1.25rem;     /* 20px */
+        --text-2xl: 1.5rem;     /* 24px */
+        --text-3xl: 1.875rem;   /* 30px */
+        
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.02);
+        
+        /* Borders */
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --radius-xl: 10px;
+        --radius-2xl: 12px;
+        --radius-full: 9999px;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
     }
 
     body {
-        background: #f1f5f9;
-        font-family: 'Inter', sans-serif;
+        background: var(--bg-main);
+        font-family: var(--font-family);
+        color: var(--gray-800);
+        line-height: 1.5;
     }
 
     .container-fluid {
         max-width: 1600px;
         margin: 0 auto;
-        padding: 12px 16px !important;
+        padding: var(--space-lg) var(--space-xl) !important;
     }
 
-    /* ===== FILTER BAR - COMPACT ===== */
-    .filter-bar {
+    /* ===== HEADER BADGES ===== */
+    .header-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--space-sm) var(--space-lg);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        font-weight: 500;
         background: white;
-        border-radius: var(--radius-lg);
-        padding: 16px;
-        margin-bottom: 16px;
-        box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-200);
-    }
-
-    .filter-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--gray-50);
-        padding: 4px 8px;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--gray-200);
-        flex: 1 1 160px;
-    }
-
-    .filter-group i {
-        color: var(--primary);
-        font-size: 0.9rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .filter-select, .filter-input {
-        border: none;
-        background: transparent;
-        padding: 6px 4px;
-        font-size: 0.9rem;
-        width: 100%;
-        outline: none;
         color: var(--gray-700);
     }
 
-    .search-group {
+    .header-badge.active {
+        border-color: rgba(var(--success-rgb), 0.3);
+        color: var(--success);
+    }
+
+    .header-badge i {
+        font-size: 0.5rem;
+        color: var(--success);
+    }
+
+    /* ===== FILTER SECTION ===== */
+    .filter-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-xl);
+        border: 1px solid var(--gray-200);
+    }
+
+    .filter-grid {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+
+    .filter-item {
+        flex: 1 1 140px;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 0 var(--space-xs);
+        height: 38px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-full);
+        transition: all 0.15s;
+    }
+
+    .filter-item:focus-within {
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .filter-item i {
+        color: var(--primary);
+        font-size: 0.875rem;
+        width: 20px;
+        text-align: center;
+        opacity: 0.7;
+    }
+
+    .filter-item select,
+    .filter-item input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        padding: var(--space-xs) 0;
+        font-size: var(--text-sm);
+        color: var(--gray-700);
+        outline: none;
+    }
+
+    .search-wrapper {
         flex: 2 1 240px;
         position: relative;
     }
 
-    .search-group input {
-        width: 100%;
-        padding: 6px 6px 6px 32px;
-        border: 1px solid var(--gray-200);
-        border-radius: 20px;
-        font-size: 0.9rem;
-        background: white;
-    }
-
-    .search-group i {
+    .search-wrapper i {
         position: absolute;
-        left: 10px;
+        left: var(--space-md);
         top: 50%;
         transform: translateY(-50%);
         color: var(--gray-400);
-        font-size: 0.9rem;
+        font-size: 0.875rem;
+    }
+
+    .search-wrapper input {
+        width: 100%;
+        height: 38px;
+        padding-left: 36px;
+        padding-right: var(--space-md);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        background: var(--gray-50);
+        transition: all 0.15s;
+    }
+
+    .search-wrapper input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
     }
 
     .btn-group {
         display: flex;
-        gap: 6px;
+        gap: var(--space-xs);
         margin-left: auto;
     }
 
-    .btn-sm {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
+    .btn {
+        height: 38px;
+        padding: 0 var(--space-lg);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
         font-weight: 500;
         border: none;
         cursor: pointer;
-        transition: var(--transition);
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        white-space: nowrap;
+        gap: var(--space-xs);
+        transition: all 0.15s;
     }
 
-    .btn-primary-sm {
+    .btn-primary {
         background: var(--primary);
         color: white;
     }
 
-    .btn-primary-sm:hover {
+    .btn-primary:hover {
         background: var(--primary-dark);
     }
 
-    .btn-outline-sm {
+    .btn-secondary {
         background: white;
-        color: var(--gray-600);
+        color: var(--gray-700);
         border: 1px solid var(--gray-200);
     }
 
-    .btn-outline-sm:hover {
-        border-color: var(--primary);
-        color: var(--primary);
+    .btn-secondary:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-300);
     }
 
-    .btn-danger-sm {
-        background: var(--danger);
-        color: white;
-    }
-
-    .btn-danger-sm:hover {
-        background: #b71c1c;
-    }
-
-    /* ===== STATS ROW - COMPACT ===== */
-    .stats-row {
+    /* ===== STATS GRID ===== */
+    .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: var(--space-md);
+        margin-bottom: var(--space-xl);
     }
 
-    .stat-item {
+    .stat-card {
         background: white;
-        border-radius: var(--radius-md);
-        padding: 12px;
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
         border: 1px solid var(--gray-200);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-md);
+        transition: all 0.15s;
+    }
+
+    .stat-card:hover {
+        border-color: var(--primary);
     }
 
     .stat-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        font-size: 1.25rem;
     }
 
     .stat-icon.total { background: var(--primary-light); color: var(--primary); }
@@ -221,27 +319,29 @@
     .stat-icon.completed { background: var(--info-light); color: var(--info); }
 
     .stat-content {
-        line-height: 1.2;
+        flex: 1;
     }
 
     .stat-value {
-        font-size: 1.3rem;
+        font-size: var(--text-2xl);
         font-weight: 700;
         color: var(--gray-800);
+        line-height: 1.2;
     }
 
     .stat-label {
-        font-size: 0.7rem;
+        font-size: var(--text-xs);
         color: var(--gray-500);
+        margin-top: 2px;
     }
 
-    /* ===== BULK ACTIONS ===== */
+    /* ===== BULK BAR ===== */
     .bulk-bar {
         background: white;
         border: 2px solid var(--primary);
-        border-radius: var(--radius-md);
-        padding: 10px 16px;
-        margin-bottom: 16px;
+        border-radius: var(--radius-lg);
+        padding: var(--space-sm) var(--space-lg);
+        margin-bottom: var(--space-lg);
         display: none;
         align-items: center;
         justify-content: space-between;
@@ -251,38 +351,45 @@
         display: flex;
     }
 
-    .bulk-bar.delete-mode {
-        border-color: var(--danger);
-    }
-
     .bulk-info {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-sm);
     }
 
     .bulk-count {
         background: var(--primary);
         color: white;
-        padding: 2px 10px;
-        border-radius: 20px;
+        padding: 2px var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
         font-weight: 600;
-        font-size: 0.8rem;
     }
 
-    .bulk-count.delete-mode {
+    .btn-danger {
         background: var(--danger);
+        color: white;
+        height: 34px;
+        padding: 0 var(--space-md);
+        border-radius: var(--radius-full);
+        border: none;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
     }
 
-    .bulk-actions-group {
-        display: flex;
-        gap: 8px;
+    .btn-danger:hover {
+        background: var(--danger);
+        opacity: 0.9;
     }
 
     /* ===== TABLE ===== */
-    .table-wrapper {
+    .table-container {
         background: white;
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-xl);
         border: 1px solid var(--gray-200);
         overflow: hidden;
     }
@@ -291,27 +398,27 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 16px;
-        background: var(--gray-50);
+        padding: var(--space-md) var(--space-lg);
         border-bottom: 1px solid var(--gray-200);
+        background: white;
     }
 
     .table-header h4 {
-        font-size: 0.95rem;
+        font-size: var(--text-base);
         font-weight: 600;
         color: var(--gray-800);
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-sm);
     }
 
     .badge-count {
         background: var(--primary-light);
         color: var(--primary);
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
+        padding: 2px var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
         font-weight: 600;
     }
 
@@ -322,23 +429,24 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1200px;
-        font-size: 0.85rem;
+        min-width: 1000px;
+        font-size: var(--text-sm);
     }
 
     th {
         text-align: left;
-        padding: 10px 12px;
-        background: white;
+        padding: 8px 10px;
+        background: var(--gray-50);
         color: var(--gray-600);
         font-weight: 600;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
+        letter-spacing: 0.3px;
         border-bottom: 1px solid var(--gray-200);
     }
 
     td {
-        padding: 10px 12px;
+        padding: var(--space-md) var(--space-lg);
         border-bottom: 1px solid var(--gray-200);
         color: var(--gray-700);
         vertical-align: middle;
@@ -348,71 +456,87 @@
         background: var(--gray-50);
     }
 
-    tr.overdue {
-        background: var(--danger-light);
+    /* Remove full row color for overdue */
+    tr.overdue td {
+        background: transparent;
     }
 
-    /* Column widths */
-    th:nth-child(1) { width: 3%; }
-    th:nth-child(2) { width: 8%; }
-    th:nth-child(3) { width: 12%; }
-    th:nth-child(4) { width: 8%; }
-    th:nth-child(5) { width: 12%; }
-    th:nth-child(6) { width: 10%; }
-    th:nth-child(7) { width: 8%; }
-    th:nth-child(8) { width: 7%; }
-    th:nth-child(9) { width: 7%; }
-    th:nth-child(10) { width: 6%; }
-    th:nth-child(11) { width: 12%; }
+    tr.overdue:hover td {
+        background: var(--gray-50);
+    }
 
-    /* Cell components */
+    /* ID Badge */
     .id-badge {
         font-family: monospace;
         font-weight: 600;
         color: var(--primary);
         background: var(--primary-light);
-        padding: 2px 6px;
-        border-radius: 20px;
-        font-size: 0.7rem;
+        padding: 2px var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
     }
 
-    .name-cell {
+    /* Visitor Cell */
+    .visitor-cell {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-sm);
     }
 
-    .avatar {
-        width: 26px;
-        height: 26px;
-        background: var(--primary);
-        border-radius: 6px;
+    .visitor-avatar {
+        width: 36px;
+        height: 36px;
+        background: var(--primary-light);
+        border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: var(--primary);
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: var(--text-base);
     }
 
-    .name-full {
+    .visitor-info {
+        line-height: 1.3;
+    }
+
+    .visitor-name {
         font-weight: 600;
         color: var(--gray-800);
-        font-size: 0.85rem;
+        font-size: var(--text-sm);
     }
 
+    .visitor-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--gray-500);
+        font-size: var(--text-xs);
+        margin-top: 2px;
+    }
+
+    .visitor-meta i {
+        color: var(--primary);
+        font-size: 0.7rem;
+        width: 12px;
+    }
+
+    /* Contact */
     .contact-info {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: var(--space-xs);
         color: var(--gray-600);
+        font-size: var(--text-sm);
     }
 
     .contact-info i {
         color: var(--primary);
-        font-size: 0.7rem;
+        font-size: var(--text-xs);
+        width: 14px;
     }
 
+    /* Meeting Info */
     .meeting-info {
         display: flex;
         flex-direction: column;
@@ -420,53 +544,104 @@
     }
 
     .meeting-person {
-        font-weight: 600;
+        font-weight: 500;
         color: var(--gray-800);
-        font-size: 0.8rem;
+        font-size: var(--text-sm);
     }
 
     .meeting-meta {
-        font-size: 0.65rem;
+        font-size: var(--text-xs);
         color: var(--gray-500);
     }
 
-    .time-badge {
-        display: flex;
-        flex-direction: column;
+    /* Visit Badges */
+    .visit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 4px var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        white-space: nowrap;
     }
 
+    .visit-admission {
+        background: var(--admission-light);
+        color: var(--admission);
+    }
+
+    .visit-parent {
+        background: var(--parent-light);
+        color: var(--parent);
+    }
+
+    .visit-official {
+        background: var(--official-light);
+        color: var(--official);
+    }
+
+    .visit-general {
+        background: var(--general-light);
+        color: var(--general);
+    }
+
+    /* Time */
     .time-main {
-        font-weight: 600;
+        font-weight: 500;
         color: var(--gray-800);
-        font-size: 0.8rem;
+        font-size: var(--text-sm);
     }
 
     .time-sub {
-        font-size: 0.6rem;
+        font-size: var(--text-xs);
         color: var(--gray-500);
     }
 
+    /* Duration */
     .duration-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        background: var(--gray-100);
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        padding: 3px 12px !important;
+        border-radius: 999px !important;
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border: 1px solid #fca5a5 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10) !important;
+        white-space: nowrap !important;
+    }
+
+    .duration-badge i {
+        width: 16px !important;
+        height: 16px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 0.65rem !important;
+        border-radius: 50% !important;
+        background: #fef2f2 !important;
+        color: #dc2626 !important;
+        border: 1px solid #fca5a5 !important;
     }
 
     .duration-badge.overdue {
-        background: var(--danger-light);
-        color: var(--danger);
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border-color: #fca5a5 !important;
     }
 
+    /* Status Badges - Pill only, no full row color */
     .status-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.65rem;
-        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
     }
 
     .status-active {
@@ -484,62 +659,83 @@
         color: var(--gray-600);
     }
 
+    /* Card Badge */
     .card-badge {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        padding: 2px 6px;
+        padding: 2px var(--space-sm);
         background: var(--info-light);
         color: var(--info);
-        border-radius: 20px;
-        font-size: 0.6rem;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
         font-family: monospace;
     }
 
+    /* Action Buttons */
     .action-group {
         display: flex;
         gap: 4px;
     }
 
-    .btn-view, .btn-edit, .btn-delete {
-        padding: 4px 10px;
+    .btn-action {
+        height: 30px;
+        padding: 0 var(--space-sm);
         border: none;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 600;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 4px;
+        transition: all 0.15s;
     }
 
     .btn-view {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .btn-view:hover {
         background: var(--primary);
         color: white;
     }
 
     .btn-edit {
+        background: var(--info-light);
+        color: var(--info);
+    }
+
+    .btn-edit:hover {
         background: var(--info);
         color: white;
     }
 
     .btn-delete {
+        background: var(--danger-light);
+        color: var(--danger);
+    }
+
+    .btn-delete:hover {
         background: var(--danger);
         color: white;
     }
 
     .btn-checkout {
-        padding: 4px 8px;
+        height: 30px;
+        padding: 0 var(--space-sm);
         background: white;
         color: var(--primary);
         border: 1px solid var(--primary);
-        border-radius: 20px;
-        font-size: 0.7rem;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 4px;
+        transition: all 0.15s;
     }
 
     .btn-checkout:hover {
@@ -552,21 +748,23 @@
         display: flex;
         justify-content: center;
         gap: 4px;
-        margin-top: 16px;
+        margin-top: var(--space-lg);
+        list-style: none;
     }
 
     .page-link {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 32px;
-        height: 32px;
-        border-radius: 6px;
+        min-width: 34px;
+        height: 34px;
+        border-radius: var(--radius-md);
         background: white;
         border: 1px solid var(--gray-200);
         color: var(--gray-600);
-        font-size: 0.8rem;
+        font-size: var(--text-sm);
         text-decoration: none;
+        transition: all 0.15s;
     }
 
     .page-link:hover {
@@ -581,19 +779,32 @@
         border-color: var(--primary);
     }
 
-    /* Empty state */
+    /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 40px 20px;
+        padding: var(--space-2xl) var(--space-xl);
         background: white;
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-xl);
         border: 2px dashed var(--gray-300);
     }
 
     .empty-state i {
         font-size: 3rem;
         color: var(--gray-400);
-        margin-bottom: 12px;
+        margin-bottom: var(--space-md);
+    }
+
+    .empty-state h5 {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: var(--space-xs);
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-lg);
     }
 
     /* Modal */
@@ -604,7 +815,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.4);
         z-index: 1000;
         align-items: center;
         justify-content: center;
@@ -616,94 +827,52 @@
 
     .modal-content {
         background: white;
-        border-radius: 12px;
-        padding: 24px;
-        max-width: 400px;
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        max-width: 380px;
         width: 90%;
     }
 
-    .modal-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-
-    .modal-header i {
-        font-size: 2rem;
-        color: var(--danger);
-    }
-
-    .modal-header h3 {
-        margin: 0;
-        color: var(--gray-800);
-    }
-
-    .modal-body {
-        margin-bottom: 24px;
-        color: var(--gray-600);
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-    }
-
+    /* Toast */
     .toast {
         position: fixed;
         top: 20px;
         right: 20px;
         background: white;
-        border-radius: 8px;
-        padding: 12px 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: var(--radius-lg);
+        padding: var(--space-sm) var(--space-lg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: var(--space-sm);
         transform: translateX(400px);
-        transition: transform 0.3s ease;
+        transition: transform 0.2s;
         z-index: 1100;
+        border-left: 3px solid;
     }
 
     .toast.show {
         transform: translateX(0);
     }
 
-    .toast.success {
-        border-left: 4px solid var(--success);
-    }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--danger); }
+    .toast.info { border-color: var(--info); }
 
-    .toast.error {
-        border-left: 4px solid var(--danger);
-    }
-
-    .toast.info {
-        border-left: 4px solid var(--info);
-    }
-
-    .toast i {
-        font-size: 1.2rem;
-    }
-
-    .toast.success i { color: var(--success); }
-    .toast.error i { color: var(--danger); }
-    .toast.info i { color: var(--info); }
-
-    /* ===== RESPONSIVE ===== */
+    /* Responsive */
     @media (max-width: 1200px) {
-        .stats-row {
+        .stats-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
 
     @media (max-width: 992px) {
-        .filter-row {
+        .filter-grid {
             flex-direction: column;
             align-items: stretch;
         }
         
-        .filter-group, .search-group, .btn-group {
+        .filter-item, .search-wrapper, .btn-group {
             width: 100%;
         }
         
@@ -712,55 +881,75 @@
         }
     }
 
+    @media (max-width: 992px) {
+        .container-fluid {
+            padding: var(--space-md) var(--space-sm) !important;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table th, .table td {
+            padding: 8px;
+            font-size: 0.72rem;
+        }
+
+        .filter-item, .search-wrapper, .btn-group {
+            width: 100%;
+        }
+    }
+
     @media (max-width: 768px) {
-        .stats-row {
+        .stats-grid {
             grid-template-columns: 1fr;
         }
         
         .bulk-bar {
             flex-direction: column;
-            gap: 8px;
-        }
-        
-        .bulk-actions-group {
-            width: 100%;
-            flex-wrap: wrap;
-        }
-        
-        .btn-sm {
-            flex: 1;
-            justify-content: center;
+            gap: var(--space-sm);
         }
     }
 </style>
 
 <div class="container-fluid">
-    <!-- Compact Filter Bar -->
-    <div class="filter-bar">
-        <div class="filter-row">
-            <div class="filter-group">
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <div class="filter-grid">
+            <div class="filter-item">
                 <i class="fas fa-filter"></i>
                 <select class="filter-select" name="status" onchange="applyFilters()">
-                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All</option>
+                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Status</option>
                     <option value="checked_in" {% if status_filter == 'checked_in' %}selected{% endif %}>Active</option>
                     <option value="checked_out" {% if status_filter == 'checked_out' %}selected{% endif %}>Completed</option>
                     <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
                 </select>
             </div>
 
-            <div class="filter-group">
+            <div class="filter-item">
+                <i class="fas fa-tag"></i>
+                <select class="filter-select" id="visitType" onchange="applyFilters()">
+                    <option value="all">All Types</option>
+                    <option value="admission" {% if visit_type_filter == 'admission' %}selected{% endif %}>Admission</option>
+                    <option value="parent" {% if visit_type_filter == 'parent' %}selected{% endif %}>Parent</option>
+                    <option value="official" {% if visit_type_filter == 'official' %}selected{% endif %}>Official</option>
+                    <option value="general" {% if visit_type_filter == 'general' %}selected{% endif %}>General</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
                 <i class="fas fa-calendar"></i>
                 <input type="date" class="filter-input" id="startDate" value="{{ start_date }}" placeholder="From">
             </div>
 
-            <div class="filter-group">
+            <div class="filter-item">
                 <i class="fas fa-calendar"></i>
                 <input type="date" class="filter-input" id="endDate" value="{{ end_date }}" placeholder="To">
             </div>
 
-            <div class="filter-group">
+            <div class="filter-item">
                 <i class="fas fa-building"></i>
-                <select class="filter-select" id="department">
+                <select class="filter-select" id="department" onchange="applyFilters()">
                     <option value="all">All Depts</option>
                     {% for dept in departments %}
                     <option value="{{ dept }}" {% if department_filter == dept %}selected{% endif %}>{{ dept }}</option>
@@ -768,86 +957,74 @@
                 </select>
             </div>
 
-            <div class="filter-group">
+            <div class="filter-item">
                 <i class="fas fa-id-card"></i>
-                <select class="filter-select" id="hasCard">
+                <select class="filter-select" id="hasCard" onchange="applyFilters()">
                     <option value="all">Card: All</option>
                     <option value="yes" {% if has_card_filter == 'yes' %}selected{% endif %}>With Card</option>
                     <option value="no" {% if has_card_filter == 'no' %}selected{% endif %}>No Card</option>
                 </select>
             </div>
 
-            <div class="search-group">
+            <div class="search-wrapper">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by ID, name, phone..." value="{{ search_query }}">
+                <input type="text" id="searchInput" placeholder="Search by name, ID, phone..." value="{{ search_query }}">
             </div>
 
             <div class="btn-group">
-                <button class="btn-sm btn-primary-sm" onclick="applyFilters()">Apply</button>
-                <a href="{{ url_for('admin_visitors') }}" class="btn-sm btn-outline-sm">Reset</a>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-check"></i> Apply
+                </button>
+                <a href="{{ url_for('security_visitors') }}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-        <div class="stat-item">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
             <div class="stat-icon total"><i class="fas fa-users"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ total_visitors }}</div>
-                <div class="stat-label">Total</div>
+                <div class="stat-label">Total Visitors</div>
             </div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
             <div class="stat-icon active"><i class="fas fa-user-check"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ active_visitors }}</div>
-                <div class="stat-label">Active</div>
+                <div class="stat-label">Active Now</div>
             </div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
             <div class="stat-icon overdue"><i class="fas fa-exclamation-triangle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ overdue_count }}</div>
                 <div class="stat-label">Overdue</div>
             </div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
             <div class="stat-icon completed"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ checked_out_today|default(0) }}</div>
-                <div class="stat-label">Today</div>
+                <div class="stat-label">Checked Out Today</div>
             </div>
-        </div>
-    </div>
-
-    <!-- Bulk Actions -->
-    <div class="bulk-bar" id="bulkBar">
-        <div class="bulk-info">
-            <span class="bulk-count" id="selectedCount">0</span>
-            <span>visitors selected</span>
-        </div>
-        <div class="bulk-actions-group">
-            <button class="btn-sm btn-danger-sm" onclick="showBulkDeleteModal()">
-                <i class="fas fa-trash"></i> Delete Selected
-            </button>
-            <button class="btn-sm btn-outline-sm" onclick="clearSelection()">
-                <i class="fas fa-times"></i> Cancel
-            </button>
         </div>
     </div>
 
     <!-- Table -->
     {% if visitors %}
-    <div class="table-wrapper">
+    <div class="table-container">
         <div class="table-header">
-            <h4><i class="fas fa-id-card me-1" style="color: var(--primary);"></i> Visitor Records <span class="badge-count ms-2">{{ start_index }} - {{ end_index }} of {{ total_visitors }}</span></h4>
+            <h4><i class="fas fa-id-card"></i> Visitor Records <span class="badge-count ms-2">{{ start_index }} - {{ end_index }} of {{ total_visitors }}</span></h4>
             <div class="d-flex gap-2">
-                <a href="{{ url_for('export_csv') }}?{{ request.query_string.decode() }}" class="btn-sm btn-outline-sm">
-                    <i class="fas fa-file-csv"></i> Export CSV
+                <a href="{{ url_for('export_csv') }}?{{ request.query_string.decode() }}" class="btn btn-secondary">
+                    <i class="fas fa-file-csv"></i> CSV
                 </a>
-                <a href="{{ url_for('export_pdf') }}?{{ request.query_string.decode() }}" class="btn-sm btn-outline-sm">
-                    <i class="fas fa-file-pdf"></i> Export PDF
+                <a href="{{ url_for('export_pdf') }}?{{ request.query_string.decode() }}" class="btn btn-secondary">
+                    <i class="fas fa-file-pdf"></i> PDF
                 </a>
             </div>
         </div>
@@ -856,10 +1033,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll" onclick="toggleAll()"></th>
                         <th>ID</th>
                         <th>Visitor</th>
                         <th>Phone</th>
+                        <th>Type</th>
                         <th>Meeting</th>
                         <th>Dept</th>
                         <th>Check-in</th>
@@ -872,12 +1049,16 @@
                 <tbody>
                     {% for visitor in visitors %}
                     <tr class="{% if visitor.is_overdue_flag %}overdue{% endif %}">
-                        <td onclick="event.stopPropagation()"><input type="checkbox" class="visitor-checkbox" value="{{ visitor.visitor_id }}" onchange="updateSelection()"></td>
                         <td><span class="id-badge">{{ visitor.visitor_id[-6:] }}</span></td>
                         <td>
-                            <div class="name-cell">
-                                <div class="avatar">{{ visitor.full_name[:1] }}</div>
-                                <span class="name-full">{{ visitor.full_name|truncate(15) }}</span>
+                            <div class="visitor-cell">
+                                <div class="visitor-avatar">{{ visitor.full_name[:1] }}</div>
+                                <div class="visitor-info">
+                                    <div class="visitor-name">{{ visitor.full_name|truncate(15) }}</div>
+                                    <div class="visitor-meta">
+                                        <span><i class="fas fa-id-card"></i> {{ visitor.visitor_id[-4:] }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -887,6 +1068,26 @@
                             </div>
                         </td>
                         <td>
+                            {% set visit_type = visitor.visit_type|lower %}
+                            {% if visit_type == 'admission' %}
+                                <span class="visit-badge visit-admission">
+                                    <i class="fas fa-graduation-cap"></i> Admission
+                                </span>
+                            {% elif visit_type == 'parent' %}
+                                <span class="visit-badge visit-parent">
+                                    <i class="fas fa-users"></i> Parent
+                                </span>
+                            {% elif visit_type == 'official' %}
+                                <span class="visit-badge visit-official">
+                                    <i class="fas fa-briefcase"></i> Official
+                                </span>
+                            {% else %}
+                                <span class="visit-badge visit-general">
+                                    <i class="fas fa-user"></i> General
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <div class="meeting-info">
                                 <span class="meeting-person">{{ visitor.person_to_meet|truncate(12) or '—' }}</span>
                                 <span class="meeting-meta">{{ visitor.purpose|truncate(10) or '—' }}</span>
@@ -894,9 +1095,9 @@
                         </td>
                         <td><span class="meeting-meta">{{ visitor.department|truncate(10) or '—' }}</span></td>
                         <td>
-                            <div class="time-badge">
+                            <div>
                                 <span class="time-main">{{ visitor.checkin_time.strftime('%I:%M %p') }}</span>
-                                <span class="time-sub">{{ visitor.checkin_time.strftime('%d/%m') }}</span>
+                                <div class="time-sub">{{ visitor.checkin_time.strftime('%d/%m') }}</div>
                             </div>
                         </td>
                         <td>
@@ -908,12 +1109,18 @@
                         <td>
                             {% if visitor.status == 'checked_in' %}
                                 {% if visitor.is_overdue_flag %}
-                                <span class="status-badge status-overdue">Overdue</span>
+                                <span class="status-badge status-overdue">
+                                    <i class="fas fa-exclamation-triangle"></i> Overdue
+                                </span>
                                 {% else %}
-                                <span class="status-badge status-active">Active</span>
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-circle"></i> Active
+                                </span>
                                 {% endif %}
                             {% else %}
-                                <span class="status-badge status-completed">Done</span>
+                                <span class="status-badge status-completed">
+                                    <i class="fas fa-check"></i> Done
+                                </span>
                             {% endif %}
                         </td>
                         <td>
@@ -925,20 +1132,14 @@
                         </td>
                         <td onclick="event.stopPropagation()">
                             <div class="action-group">
-                                <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="btn-view" title="View Details">
+                                <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="btn-action btn-view" title="View">
                                     <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ url_for('admin_edit_visitor', visitor_id=visitor.visitor_id) }}" class="btn-edit" title="Edit Visitor">
-                                    <i class="fas fa-edit"></i>
                                 </a>
                                 {% if visitor.status == 'checked_in' %}
                                 <a href="{{ url_for('checkout_page') }}?visitor_id={{ visitor.visitor_id }}" class="btn-checkout" title="Checkout">
                                     <i class="fas fa-sign-out-alt"></i>
                                 </a>
                                 {% endif %}
-                                <button class="btn-delete" onclick="showDeleteModal('{{ visitor.visitor_id }}', '{{ visitor.full_name|escapejs }}')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -952,19 +1153,19 @@
     {% if total_pages > 1 %}
     <ul class="pagination">
         <li class="page-item {% if page == 1 %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('admin_visitors', page=page-1, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, department=department_filter, has_card=has_card_filter) }}">
+            <a class="page-link" href="{{ url_for('security_visitors', page=page-1, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, visit_type=visit_type_filter, department=department_filter, has_card=has_card_filter, date=date_filter) }}">
                 <i class="fas fa-chevron-left"></i>
             </a>
         </li>
         {% for p in range(1, total_pages + 1) %}
             {% if p >= page - 2 and p <= page + 2 %}
             <li class="page-item {% if p == page %}active{% endif %}">
-                <a class="page-link" href="{{ url_for('admin_visitors', page=p, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, department=department_filter, has_card=has_card_filter) }}">{{ p }}</a>
+                <a class="page-link" href="{{ url_for('security_visitors', page=p, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, visit_type=visit_type_filter, department=department_filter, has_card=has_card_filter, date=date_filter) }}">{{ p }}</a>
             </li>
             {% endif %}
         {% endfor %}
         <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('admin_visitors', page=page+1, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, department=department_filter, has_card=has_card_filter) }}">
+            <a class="page-link" href="{{ url_for('security_visitors', page=page+1, status=status_filter, search=search_query, start_date=start_date, end_date=end_date, visit_type=visit_type_filter, department=department_filter, has_card=has_card_filter, date=date_filter) }}">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </li>
@@ -974,9 +1175,11 @@
     {% else %}
     <div class="empty-state">
         <i class="fas fa-users-slash"></i>
-        <h5 class="fw-semibold">No Visitors Found</h5>
-        <p class="text-muted small">Try adjusting your filters</p>
-        <a href="{{ url_for('admin_visitors') }}" class="btn-sm btn-primary-sm mt-2">Clear Filters</a>
+        <h5>No Visitors Found</h5>
+        <p>Try adjusting your filters to see more results</p>
+        <a href="{{ url_for('security_visitors') }}" class="btn btn-primary mt-2">
+            <i class="fas fa-redo"></i> Clear Filters
+        </a>
     </div>
     {% endif %}
 </div>
@@ -992,8 +1195,8 @@
             Are you sure you want to delete <strong id="visitorName"></strong>? This action cannot be undone.
         </div>
         <div class="modal-footer">
-            <button class="btn-sm btn-outline-sm" onclick="closeDeleteModal()">Cancel</button>
-            <button class="btn-sm btn-danger-sm" onclick="confirmDelete()">Delete</button>
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-danger" onclick="confirmDelete()">Delete</button>
         </div>
     </div>
 </div>
@@ -1009,8 +1212,8 @@
             Are you sure you want to delete <strong id="bulkDeleteCount"></strong> visitors? This action cannot be undone.
         </div>
         <div class="modal-footer">
-            <button class="btn-sm btn-outline-sm" onclick="closeBulkDeleteModal()">Cancel</button>
-            <button class="btn-sm btn-danger-sm" onclick="confirmBulkDelete()">Delete All</button>
+            <button class="btn btn-secondary" onclick="closeBulkDeleteModal()">Cancel</button>
+            <button class="btn-danger" onclick="confirmBulkDelete()">Delete All</button>
         </div>
     </div>
 </div>
@@ -1173,16 +1376,18 @@
     
     function applyFilters() {
         const status = document.querySelector('select[name="status"]').value;
+        const visitType = document.getElementById('visitType').value;
         const search = document.getElementById('searchInput').value;
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
         const department = document.getElementById('department').value;
         const hasCard = document.getElementById('hasCard').value;
         
-        let url = `{{ url_for('admin_visitors') }}?`;
+        let url = `{{ url_for('security_visitors') }}?`;
         let params = [];
         
         if (status && status !== 'all') params.push(`status=${status}`);
+        if (visitType && visitType !== 'all') params.push(`visit_type=${visitType}`);
         if (search) params.push(`search=${encodeURIComponent(search)}`);
         if (startDate) params.push(`start_date=${startDate}`);
         if (endDate) params.push(`end_date=${endDate}`);
@@ -1192,6 +1397,7 @@
         window.location.href = url + params.join('&');
     }
     
+    // Enter key search
     document.getElementById('searchInput').addEventListener('keypress', e => {
         if (e.key === 'Enter') applyFilters();
     });
