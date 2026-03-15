@@ -26,6 +26,14 @@
         --primary-light: #e7f1ff;
         --primary-soft: #cfe2ff;
         --success: #198754;
+        --admission: #9c27b0;
+        --admission-light: #f3e5f5;
+        --parent: #1976d2;
+        --parent-light: #e3f2fd;
+        --official: #f57c00;
+        --official-light: #fff3e0;
+        --general: #2e7d32;
+        --general-light: #e8f5e9;
         --gray-100: #f8f9fa;
         --gray-200: #e9ecef;
         --gray-300: #dee2e6;
@@ -51,6 +59,41 @@
         padding: 20px;
     }
 
+    /* Visit Type Badge */
+    .type-badge {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .type-badge .badge {
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .badge-admission {
+        background: var(--admission-light);
+        color: var(--admission);
+        border: 1px solid var(--admission);
+    }
+    .badge-parent {
+        background: var(--parent-light);
+        color: var(--parent);
+        border: 1px solid var(--parent);
+    }
+    .badge-official {
+        background: var(--official-light);
+        color: var(--official);
+        border: 1px solid var(--official);
+    }
+    .badge-general {
+        background: var(--general-light);
+        color: var(--general);
+        border: 1px solid var(--general);
+    }
+
     /* Visitor Receipt */
     .receipt {
         background: white;
@@ -65,6 +108,44 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         font-size: 0.8rem;
     }
+    
+    /* Receipt Type Header */
+    .receipt-type-header {
+        text-align: center;
+        margin: 8px 0 10px;
+        padding: 6px;
+        border-radius: 4px;
+    }
+    .receipt-type-header.admission {
+        background: var(--admission-light);
+        color: var(--admission);
+        border-left: 4px solid var(--admission);
+    }
+    .receipt-type-header.parent {
+        background: var(--parent-light);
+        color: var(--parent);
+        border-left: 4px solid var(--parent);
+    }
+    .receipt-type-header.official {
+        background: var(--official-light);
+        color: var(--official);
+        border-left: 4px solid var(--official);
+    }
+    .receipt-type-header.general {
+        background: var(--general-light);
+        color: var(--general);
+        border-left: 4px solid var(--general);
+    }
+    .receipt-type-header h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
     .receipt-header {
         text-align: center;
         border-bottom: 1px dashed var(--gray-600);
@@ -90,14 +171,6 @@
         color: var(--gray-700);
         margin: 4px 0;
         font-weight: bold;
-    }
-    .receipt-header h4 {
-        font-size: 0.85rem;
-        font-weight: bold;
-        color: var(--primary);
-        margin: 4px 0 0;
-        border-top: 1px solid var(--gray-300);
-        padding-top: 3px;
     }
     .receipt-body {
         margin-bottom: 8px;
@@ -324,13 +397,22 @@
             border-top: 2px solid #000;
             padding-top: 4px;
         }
-        .receipt-header h4 {
+        
+        /* Print styles for receipt type header */
+        .receipt-type-header {
+            text-align: center !important;
+            margin: 8px 0 10px !important;
+            padding: 4px !important;
+            border: 2px solid #000 !important;
+            background: #fff !important;
+        }
+        .receipt-type-header h4 {
+            margin: 0 !important;
             font-size: 11pt !important;
             font-weight: bold !important;
             color: #000 !important;
-            margin: 5px 0 0 0 !important;
-            text-decoration: underline;
         }
+        
         .receipt-body {
             margin-bottom: 10px !important;
         }
@@ -489,6 +571,19 @@
 </style>
 
 <div class="success-wrapper">
+    <!-- Visit Type Badge -->
+    <div class="type-badge">
+        {% if visitor.visit_type == 'admission' %}
+        <span class="badge badge-admission"><i class="fas fa-graduation-cap"></i> Admission Visit</span>
+        {% elif visitor.visit_type == 'parent' %}
+        <span class="badge badge-parent"><i class="fas fa-users"></i> Parent Meeting</span>
+        {% elif visitor.visit_type == 'official' %}
+        <span class="badge badge-official"><i class="fas fa-briefcase"></i> Official Visit</span>
+        {% else %}
+        <span class="badge badge-general"><i class="fas fa-user"></i> General Visit</span>
+        {% endif %}
+    </div>
+
     <!-- ID Card Badge (if issued) -->
     {% if card %}
     <div class="card-badge">
@@ -499,16 +594,26 @@
     <!-- Visitor Receipt -->
     <div class="receipt">
         <div class="receipt-header">
-            <h3>KPR COLLEGE</h3>
-            <p>Arts, Science & Research • Coimbatore</p>
+            <img src="{{ url_for('static', filename='image.png') }}" alt="KPRCAS Logo" style="height:36px; margin-bottom:2px;">
+            <h3 style="font-family:'Inter',sans-serif; font-weight:900; color:#23395d; margin-bottom:0; font-size:1rem;">KPR College of Arts Science and Research</h3>
+            <p style="font-size:0.65rem; color:#23395d; font-weight:500; margin:0;">(Affiliated To Bharathiar University, Coimbatore)</p>
             <div class="receipt-datetime">
                 <span>Date: {{ visitor.checkin_time.strftime('%d/%m/%Y') }}</span>
                 <span>Time: {{ visitor.checkin_time.strftime('%I:%M %p') }}</span>
             </div>
+        </div>
+
+        <!-- Visit Type Specific Header -->
+        <div class="receipt-type-header 
+        <div style="text-align:center; margin:8px 0 10px; font-weight:700; font-size:0.9rem;">
             {% if visitor.visit_type == 'admission' %}
-            <h4>ADMISSION RECEIPT</h4>
+                <span style="color:#0d6efd; font-weight:900; font-size:1.2rem; letter-spacing:1px;">ADMISSION RECEIPT</span>
+            {% elif visitor.visit_type == 'parent' %}
+                <span style="color:#0d6efd; font-weight:900; font-size:1.2rem; letter-spacing:1px;">P/T MEETING RECEIPT</span>
+            {% elif visitor.visit_type == 'official' %}
+                <span style="color:#0d6efd; font-weight:900; font-size:1.2rem; letter-spacing:1px;">OFFICIAL VISIT RECEIPT</span>
             {% else %}
-            <h4>VISITOR RECEIPT</h4>
+                <span style="color:#0d6efd; font-weight:900; font-size:1.2rem; letter-spacing:1px;">VISITOR RECEIPT</span>
             {% endif %}
         </div>
 
@@ -521,18 +626,66 @@
                 <span class="receipt-label">Visitor Name:</span>
                 <span class="receipt-value">{{ visitor.full_name }}</span>
             </div>
+            
+            <!-- Student/Parent Info based on visit type -->
+            {% if visitor.visit_type == 'admission' and visitor.student_name %}
+            <div class="receipt-row">
+                <span class="receipt-label">Student Name:</span>
+                <span class="receipt-value">{{ visitor.student_name }}</span>
+            </div>
+            {% endif %}
+            
+            {% if visitor.visit_type == 'parent' %}
+                {% if visitor.parent_name %}
+                <div class="receipt-row">
+                    <span class="receipt-label">Parent Name:</span>
+                    <span class="receipt-value">{{ visitor.parent_name }}</span>
+                </div>
+                {% endif %}
+                {% if visitor.student_name %}
+                <div class="receipt-row">
+                    <span class="receipt-label">Student Name:</span>
+                    <span class="receipt-value">{{ visitor.student_name }}</span>
+                </div>
+                {% endif %}
+            {% endif %}
+            
+            {% if visitor.student_roll %}
+            <div class="receipt-row">
+                <span class="receipt-label">Roll No:</span>
+                <span class="receipt-value">{{ visitor.student_roll }}</span>
+            </div>
+            {% endif %}
+            
             {% if visitor.phone %}
             <div class="receipt-row">
                 <span class="receipt-label">Phone:</span>
                 <span class="receipt-value">{{ visitor.phone }}</span>
             </div>
             {% endif %}
+            
             <div class="receipt-row">
                 <span class="receipt-label">No. of Persons:</span>
-                <span class="receipt-value">{{ visitor.accompanied_count or 1 }}</span>
+                <span class="receipt-value">{{ visitor.accompanied_count if visitor.accompanied_count and visitor.accompanied_count > 0 else 1 }}</span>
             </div>
+            
+            <!-- Vehicle Information -->
+            {% if visitor.vehicle_number or visitor.vehicle_type %}
             <div class="receipt-row">
-                <span class="receipt-label">Type:</span>
+                <span class="receipt-label">Vehicle:</span>
+                <span class="receipt-value">
+                    {% if visitor.vehicle_number and visitor.vehicle_number.strip() %}
+                        {{ visitor.vehicle_number }}{% if visitor.vehicle_type and visitor.vehicle_type.strip() %} ({{ visitor.vehicle_type }}){% endif %}
+                    {% elif visitor.vehicle_type and visitor.vehicle_type.strip() %}
+                        {{ visitor.vehicle_type }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+
+            <!-- Visit Type Display -->
+            <div class="receipt-row">
+                <span class="receipt-label">Visit Type:</span>
                 <span class="receipt-value">
                     {% if visitor.visit_type == 'admission' %}
                         Admission
@@ -549,62 +702,63 @@
             <div class="receipt-row">
                 <span class="receipt-label">Purpose:</span>
                 <span class="receipt-value">
-                    {% if visitor.visit_type == 'admission' %}
-                        {% if visitor.purpose %}
-                            {{ visitor.purpose }}
-                        {% else %}
-                            Admission
-                        {% endif %}
+                    {% if visitor.purpose %}
+                        {{ visitor.purpose }}
+                    {% elif visitor.visit_type == 'admission' %}
+                        Admission Inquiry
                     {% elif visitor.visit_type == 'parent' %}
-                        {{ visitor.purpose or 'Parent Meeting' }}
+                        Parent-Teacher Meeting
                     {% elif visitor.visit_type == 'official' %}
-                        {{ visitor.purpose or 'Official Visit' }}
+                        Official Work
                     {% else %}
-                        {{ visitor.purpose or 'Visit' }}
+                        General Visit
                     {% endif %}
                 </span>
             </div>
-            {% if visitor.person_to_meet %}
-            <div class="receipt-row">
-                <span class="receipt-label">To see:</span>
-                <span class="receipt-value">{{ visitor.person_to_meet }}</span>
-            </div>
-            {% endif %}
-            {% if visitor.department %}
-            <div class="receipt-row">
-                <span class="receipt-label">Department:</span>
-                <span class="receipt-value">{{ visitor.department }}</span>
-            </div>
-            {% endif %}
+            
             {% if visitor.company %}
             <div class="receipt-row">
                 <span class="receipt-label">Organization:</span>
                 <span class="receipt-value">{{ visitor.company }}</span>
             </div>
             {% endif %}
+            
+            <div class="receipt-row">
+                <span class="receipt-label">Person to Meet:</span>
+                <span class="receipt-value">{{ visitor.person_to_meet if visitor.person_to_meet else 'None' }}</span>
+            </div>
+
+            {% if visitor.department %}
+            <div class="receipt-row">
+                <span class="receipt-label">Department:</span>
+                <span class="receipt-value">{{ visitor.department }}</span>
+            </div>
+            {% endif %}
+            
             {% if card %}
             <div class="receipt-row">
                 <span class="receipt-label">ID Card Issued:</span>
                 <span class="receipt-value">{{ card.card_number }}</span>
             </div>
             {% endif %}
-            {% if visitor.vehicle_number %}
-            <div class="receipt-row">
-                <span class="receipt-label">Vehicle No:</span>
-                <span class="receipt-value">{{ visitor.vehicle_number }}{% if visitor.vehicle_type %} ({{ visitor.vehicle_type }}){% endif %}</span>
-            </div>
-            {% endif %}
-            {% if visitor.address %}
+            
+            <!-- Address Information -->
+            {% if visitor.address or visitor.city or visitor.district %}
             <div class="receipt-row">
                 <span class="receipt-label">Address:</span>
-                <span class="receipt-value">{{ visitor.address }}{% if visitor.city %}, {{ visitor.city }}{% endif %}</span>
+                <span class="receipt-value">
+                    {%- if visitor.address %}{{ visitor.address }}{% endif %}
+                    {%- if visitor.city %}, {{ visitor.city }}{% endif %}
+                    {%- if visitor.state %}, {{ visitor.state }}{% endif %}
+                    {%- if visitor.pincode %} {{ visitor.pincode }}{% endif %}
+                </span>
             </div>
-            {% endif %}
             {% if visitor.district %}
             <div class="receipt-row">
                 <span class="receipt-label">District:</span>
                 <span class="receipt-value">{{ visitor.district }}</span>
             </div>
+            {% endif %}
             {% endif %}
         </div>
 
@@ -639,6 +793,13 @@
             <div class="receipt-note">
                 <p>Thank you for visiting KPR College.</p>
                 <p>Valid for check-out within 12 hours.</p>
+                {% if visitor.visit_type == 'admission' %}
+                <p><strong>Admission Office:</strong> Block A, Ground Floor</p>
+                {% elif visitor.visit_type == 'parent' %}
+                <p><strong>Please meet the respective class teacher</strong></p>
+                {% elif visitor.visit_type == 'official' %}
+                <p><strong>Please report to the administrative office</strong></p>
+                {% endif %}
             </div>
         </div>
     </div>
