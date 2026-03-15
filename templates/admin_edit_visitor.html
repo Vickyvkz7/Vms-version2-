@@ -1,10 +1,11 @@
+{# templates/admin_edit_visitor.html #}
 {% extends "base.html" %}
 
 {% block title %}Edit Visitor · KPR College{% endblock %}
 
 {% block page_title %}
 <div class="d-flex align-items-center">
-    <i class="fas fa-user-edit fs-2 me-2" style="color: #2e7d32;"></i>
+    <i class="fas fa-user-edit fs-2 me-2" style="color: #1a237e;"></i>
     <span class="fw-bold" style="font-size: 1.6rem;">Edit Visitor</span>
 </div>
 {% endblock %}
@@ -12,625 +13,1255 @@
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
 <li class="breadcrumb-item"><a href="{{ url_for('admin_visitors') }}">Visitor Management</a></li>
-<li class="breadcrumb-item"><a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}">Details</a></li>
-<li class="breadcrumb-item active">Edit</li>
+<li class="breadcrumb-item active">Edit Visitor</li>
 {% endblock %}
 
 {% block content %}
 <style>
-    .form-container {
+    /* ===== PROFESSIONAL EDIT VISITOR STYLES – MATCHING USER MANAGEMENT FLOW ===== */
+    :root {
+        /* refined color palette */
+        --primary: #1a237e;
+        --primary-light: #e0e7ff;
+        --primary-dark: #0d1458;
+        --success: #0d9488;
+        --success-light: #ccfbf1;
+        --warning: #b45309;
+        --warning-light: #ffedd5;
+        --danger: #b91c1c;
+        --danger-light: #fee2e2;
+        --info: #2563eb;
+        --info-light: #dbeafe;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+
+        /* typography scale */
+        --font-xs: 0.75rem;
+        --font-sm: 0.875rem;
+        --font-base: 1rem;
+        --font-lg: 1.125rem;
+        --font-xl: 1.25rem;
+        --font-2xl: 1.5rem;
+
+        /* spacing */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+
+        /* shadows */
+        --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.02);
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.03), 0 1px 2px -1px rgb(0 0 0 / 0.02);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.03), 0 2px 4px -2px rgb(0 0 0 / 0.02);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.03), 0 4px 6px -4px rgb(0 0 0 / 0.02);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.03), 0 8px 10px -6px rgb(0 0 0 / 0.02);
+        --shadow-hover: 0 20px 30px -10px rgba(26,35,126,0.15);
+
+        /* radius */
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+    }
+
+    body {
+        background: var(--gray-50);
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* smooth transitions */
+    * {
+        transition: background-color 0.1s ease, border-color 0.15s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    }
+
+    /* typography helpers */
+    .text-muted { color: var(--gray-500) !important; }
+    .text-small { font-size: var(--font-xs); }
+    .text-body { font-size: var(--font-sm); }
+    .fw-semibold { font-weight: 600; letter-spacing: -0.01em; }
+
+    /* header section */
+    .page-header {
         background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        border: 1px solid #e2e8f0;
-        max-width: 900px;
-        margin: 0 auto;
+        border-radius: var(--radius-xl);
+        padding: var(--space-5) var(--space-6);
+        margin-bottom: var(--space-6);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-4);
     }
 
-    .form-section {
-        margin-bottom: 24px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e2e8f0;
+    .page-header h4 {
+        color: var(--gray-900);
+        font-weight: 700;
+        margin: 0;
+        font-size: var(--font-xl);
+        letter-spacing: -0.02em;
     }
 
-    .form-section:last-child {
-        border-bottom: none;
+    .page-header p {
+        color: var(--gray-500);
+        margin: var(--space-1) 0 0;
+        font-size: var(--font-sm);
     }
 
-    .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 16px;
+    /* visitor info card */
+    .info-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        margin-bottom: var(--space-6);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--gray-300);
+    }
+
+    .info-header {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--gray-200);
     }
 
-    .section-title i {
-        color: #2e7d32;
+    .info-header i {
+        font-size: var(--font-xl);
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: var(--space-3);
+        border-radius: var(--radius-lg);
     }
 
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
+    .info-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: var(--font-lg);
     }
 
-    .form-group {
-        margin-bottom: 16px;
+    .info-header p {
+        margin: var(--space-1) 0 0;
+        color: var(--gray-500);
+        font-size: var(--font-sm);
     }
 
-    .form-group.full-width {
-        grid-column: span 2;
+    /* form styles */
+    .form-section {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        margin-bottom: var(--space-6);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+        padding-bottom: var(--space-3);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .form-section-title i {
+        color: var(--primary);
+        font-size: var(--font-lg);
+        background: var(--primary-light);
+        padding: var(--space-2);
+        border-radius: var(--radius-md);
+    }
+
+    .form-section-title h6 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: var(--font-base);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
 
     .form-label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #475569;
-        margin-bottom: 4px;
+        font-size: var(--font-xs);
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
     }
 
-    .form-control {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        font-size: 0.9rem;
+    .form-label i {
+        color: var(--primary);
+        width: 16px;
+        font-size: var(--font-xs);
+    }
+
+    .form-control, .form-select {
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-lg);
+        padding: 0.65rem 1rem;
+        font-size: var(--font-sm);
+        background: white;
         transition: all 0.2s;
     }
 
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(26,35,126,0.08);
         outline: none;
-        border-color: #2e7d32;
-        box-shadow: 0 0 0 2px rgba(46,125,50,0.1);
     }
 
-    .form-control.error {
-        border-color: #d32f2f;
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: var(--danger);
+        background-image: none;
     }
 
-    .error-message {
-        color: #d32f2f;
-        font-size: 0.7rem;
-        margin-top: 2px;
+    .form-control.is-invalid:focus, .form-select.is-invalid:focus {
+        box-shadow: 0 0 0 4px rgba(185,28,28,0.08);
     }
 
-    .btn-submit {
-        background: #2e7d32;
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .btn-submit:hover {
-        background: #1b5e20;
-    }
-
-    .btn-cancel {
-        background: white;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
-        padding: 10px 24px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.2s;
-    }
-
-    .btn-cancel:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-    }
-
-    .btn-danger {
-        background: #d32f2f;
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .btn-danger:hover {
-        background: #b71c1c;
-    }
-
-    .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-
-    .card-info {
-        background: #e8f5e9;
-        padding: 12px;
-        border-radius: 6px;
-        margin-bottom: 12px;
-        font-size: 0.85rem;
-        color: #2e7d32;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .card-info i {
-        font-size: 1.1rem;
-    }
-
-    .help-text {
-        font-size: 0.7rem;
-        color: #64748b;
-        margin-top: 4px;
-    }
-
-    .photo-preview {
-        max-width: 150px;
-        max-height: 150px;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        margin-top: 8px;
-    }
-</style>
-
-<div class="container-fluid">
-    <div class="form-container">
-        <form method="POST" action="{{ url_for('admin_edit_visitor', visitor_id=visitor.visitor_id) }}" id="editVisitorForm" enctype="multipart/form-data">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <span class="status-badge">
-                        <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
-                        {{ visitor.status|replace('_', ' ')|title }}
-                    </span>
-                    <small class="text-muted ms-2">ID: {{ visitor.visitor_id }}</small>
-                </div>
-                <div>
-                    <small class="text-muted">Checked in: {{ visitor.checkin_time.strftime('%d/%m/%Y %I:%M %p') }}</small>
-                </div>
-            </div>
-
-            <!-- Personal Information -->
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-user-circle"></i>
-                    Personal Information
-                </div>
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" name="full_name" class="form-control" 
-                               value="{{ visitor.full_name }}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Phone Number *</label>
-                        <input type="tel" name="phone" class="form-control" 
-                               value="{{ visitor.phone }}" required>
-                    </div>
-                    
-                    
-                    <div class="form-group full-width">
-                        <label class="form-label">Address</label>
-                        <textarea name="address" class="form-control" rows="2">{{ visitor.address or '' }}</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">City</label>
-                        <input type="text" name="city" class="form-control" value="{{ visitor.city or '' }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">State</label>
-                        <input type="text" name="state" class="form-control" value="{{ visitor.state or '' }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Pincode</label>
-                        <input type="text" name="pincode" class="form-control" value="{{ visitor.pincode or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">District</label>
-                        <input type="text" name="district" class="form-control" value="{{ visitor.district or '' }}">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ID Information -->
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-id-card"></i>
-                    ID Proof Information
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">ID Type *</label>
-                        <select name="id_type" class="form-control" required>
-                            <option value="">Select ID Type</option>
-                            {% for id_type in id_types %}
-                            <option value="{{ id_type }}" {% if visitor.id_type == id_type %}selected{% endif %}>{{ id_type }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">ID Number *</label>
-                        <input type="text" name="id_number" class="form-control" 
-                               value="{{ visitor.id_number }}" required>
-                    </div>
-                    
-                    {% if visitor.id_photo %}
-                    <div class="form-group full-width">
-                        <label class="form-label">Current ID Photo</label>
-                        <div>
-                            <img src="{{ url_for('static', filename='uploads/' + visitor.id_photo) }}" class="photo-preview">
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="form-group full-width">
-                        <label class="form-label">Upload New ID Photo</label>
-                        <input type="file" name="id_photo" class="form-control" accept="image/*">
-                        <div class="help-text">Leave empty to keep current photo</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Company/Organization -->
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-building"></i>
-                    Organization Details
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Company/Organization</label>
-                        <input type="text" name="company" class="form-control" value="{{ visitor.company or '' }}">
-                    </div>
-                    
-                    <div class="form-group">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Visit Details -->
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-calendar-check"></i>
-                    Visit Details
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Person to Meet *</label>
-                        <input type="text" name="person_to_meet" class="form-control" 
-                               value="{{ visitor.person_to_meet }}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select name="department" class="form-control">
-                            <option value="">Select Department</option>
-                            {% for dept in departments %}
-                            <option value="{{ dept }}" {% if visitor.department == dept %}selected{% endif %}>{{ dept }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label class="form-label">Purpose of Visit *</label>
-                        <select name="purpose" class="form-control" required>
-                            <option value="">Select Purpose</option>
-                            {% for purpose in purposes %}
-                            <option value="{{ purpose }}" {% if visitor.purpose == purpose %}selected{% endif %}>{{ purpose }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Expected Duration (minutes)</label>
-                        <input type="number" name="expected_duration" class="form-control" 
-                               value="{{ visitor.expected_duration or 60 }}" min="5" max="480">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Vehicle Number</label>
-                        <input type="text" name="vehicle_number" class="form-control" 
-                               value="{{ visitor.vehicle_number or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Vehicle Type</label>
-                        <input type="text" name="vehicle_type" class="form-control" 
-                               value="{{ visitor.vehicle_type or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Accompanied Count</label>
-                        <input type="number" min="0" name="accompanied_count" class="form-control" 
-                               value="{{ visitor.accompanied_count or 0 }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Student Name</label>
-                        <input type="text" name="student_name" class="form-control" 
-                               value="{{ visitor.student_name or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Parent/Guardian Name</label>
-                        <input type="text" name="parent_name" class="form-control" 
-                               value="{{ visitor.parent_name or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Student Roll No.</label>
-                        <input type="text" name="student_roll" class="form-control" 
-                               value="{{ visitor.student_roll or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Interested Course</label>
-                        <input type="text" name="interested_course" class="form-control" 
-                               value="{{ visitor.interested_course or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Current Education</label>
-                        <input type="text" name="current_education" class="form-control" 
-                               value="{{ visitor.current_education or '' }}">
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label class="form-label">Visit Notes</label>
-                        <textarea name="visit_notes" class="form-control" rows="2">{{ visitor.visit_notes or '' }}</textarea>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- ID Card Information (Read-only) -->
-            {% if card %}
-            <div class="form-section">
-                <div class="section-title">
-                    <i class="fas fa-id-card-alt"></i>
-                    ID Card Information
-                </div>
-                <div class="card-info">
-                    <i class="fas fa-id-card"></i>
-                    <div>
-                        <strong>Card Number:</strong> {{ card.card_number }}<br>
-                        <strong>Status:</strong> {{ card.status|title }}<br>
-                        <strong>Issued:</strong> {{ visitor.card_issued_date.strftime('%d/%m/%Y %I:%M %p') if visitor.card_issued_date else 'N/A' }}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="btn-danger" onclick="showDeleteModal('{{ visitor.visitor_id }}', '{{ visitor.full_name|escapejs }}')">
-                    <i class="fas fa-trash me-1"></i> Delete
-                </button>
-                <div style="flex: 1;"></div>
-                <a href="{{ url_for('visitor_details', visitor_id=visitor.visitor_id) }}" class="btn-cancel">
-                    <i class="fas fa-times me-1"></i> Cancel
-                </a>
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-save me-1"></i> Update Visitor
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Delete Visitor</h3>
-        </div>
-        <div class="modal-body" id="deleteModalBody">
-            Are you sure you want to delete <strong id="visitorName"></strong>? This action cannot be undone.
-        </div>
-        <div class="modal-footer">
-            <button class="btn-sm btn-outline-sm" onclick="closeDeleteModal()">Cancel</button>
-            <button class="btn-sm btn-danger-sm" onclick="confirmDelete()">Delete</button>
-        </div>
-    </div>
-</div>
-
-<!-- Toast Notification -->
-<div class="toast" id="toast">
-    <i class="fas" id="toastIcon"></i>
-    <span id="toastMessage"></span>
-</div>
-
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal.show {
-        display: flex;
-    }
-
-    .modal-content {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        max-width: 400px;
-        width: 90%;
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-
-    .modal-header i {
-        font-size: 2rem;
+    .invalid-feedback {
+        font-size: var(--font-xs);
         color: var(--danger);
+        margin-top: var(--space-2);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
     }
 
-    .modal-header h3 {
-        margin: 0;
+    .text-danger-star {
+        color: var(--danger);
+        margin-left: 2px;
+    }
+
+    /* read-only field */
+    .readonly-field {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 0.65rem 1rem;
+        font-size: var(--font-sm);
+        color: var(--gray-700);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .readonly-field i {
+        color: var(--gray-400);
+        width: 16px;
+    }
+
+    /* badge styles */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-1) var(--space-3);
+        border-radius: 30px;
+        font-size: var(--font-xs);
+        font-weight: 500;
+        background: white;
+        border: 1px solid var(--gray-200);
+    }
+
+    .status-badge.active {
+        background: var(--success-light);
+        color: var(--success);
+        border-color: rgba(13,148,136,0.2);
+    }
+
+    .status-badge.inactive {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border-color: var(--gray-200);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-dot.active { background: var(--success); box-shadow: 0 0 0 2px var(--success-light); }
+    .status-dot.inactive { background: var(--gray-400); }
+
+    .purpose-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        border-radius: 30px;
+        font-size: var(--font-xs);
+        font-weight: 600;
+        background: var(--info-light);
+        color: var(--info);
+        border: 1px solid rgba(37,99,235,0.2);
+    }
+
+    /* timeline */
+    .timeline {
+        position: relative;
+        padding-left: var(--space-6);
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--gray-200);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: var(--space-4);
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -22px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid var(--primary);
+        z-index: 1;
+    }
+
+    .timeline-item.completed::before {
+        background: var(--success);
+        border-color: var(--success);
+    }
+
+    .timeline-item.cancelled::before {
+        background: var(--danger);
+        border-color: var(--danger);
+    }
+
+    .timeline-time {
+        font-size: var(--font-xs);
+        color: var(--gray-500);
+        margin-bottom: var(--space-1);
+    }
+
+    .timeline-title {
+        font-weight: 600;
         color: var(--gray-800);
+        font-size: var(--font-sm);
+        margin-bottom: var(--space-1);
     }
 
-    .modal-body {
-        margin-bottom: 24px;
+    .timeline-desc {
+        font-size: var(--font-xs);
         color: var(--gray-600);
     }
 
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
+    /* action buttons */
+    .action-btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: var(--radius-lg);
+        font-size: var(--font-sm);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        transition: all 0.15s;
+        border: 1px solid transparent;
     }
 
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline-primary {
         background: white;
-        border-radius: 8px;
-        padding: 12px 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-light);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-light {
+        background: white;
+        color: var(--gray-700);
+        border-color: var(--gray-200);
+    }
+
+    .btn-light:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-300);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: #991b1b;
+        border-color: #991b1b;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* divider */
+    .divider {
         display: flex;
         align-items: center;
-        gap: 12px;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
-        z-index: 1100;
+        color: var(--gray-400);
+        font-size: var(--font-xs);
+        margin: var(--space-4) 0;
     }
 
-    .toast.show {
-        transform: translateX(0);
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--gray-200);
     }
 
-    .toast.success {
-        border-left: 4px solid var(--success);
+    .divider::before {
+        margin-right: var(--space-4);
     }
 
-    .toast.error {
-        border-left: 4px solid var(--danger);
+    .divider::after {
+        margin-left: var(--space-4);
     }
 
-    .toast.info {
-        border-left: 4px solid var(--info);
+    /* alert */
+    .alert {
+        border-radius: var(--radius-lg);
+        padding: var(--space-4) var(--space-5);
+        font-size: var(--font-sm);
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
     }
 
-    .toast i {
-        font-size: 1.2rem;
+    .alert-warning {
+        background: var(--warning-light);
+        color: var(--warning);
+        border-color: rgba(180,83,9,0.2);
     }
 
-    .toast.success i { color: var(--success); }
-    .toast.error i { color: var(--danger); }
-    .toast.info i { color: var(--info); }
+    .alert-info {
+        background: var(--info-light);
+        color: var(--info);
+        border-color: rgba(37,99,235,0.2);
+    }
+
+    /* responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .form-section {
+            padding: var(--space-4);
+        }
+        
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .button-group {
+            flex-direction: column;
+        }
+    }
 </style>
 
-<script>
-    let currentDeleteId = '{{ visitor.visitor_id }}';
-    let currentDeleteName = '{{ visitor.full_name|escapejs }}';
-    
-    function showDeleteModal(visitorId, visitorName) {
-        currentDeleteId = visitorId;
-        document.getElementById('visitorName').textContent = visitorName;
-        document.getElementById('deleteModal').classList.add('show');
-    }
-    
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('show');
-    }
-    
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const icon = document.getElementById('toastIcon');
-        const messageEl = document.getElementById('toastMessage');
-        
-        toast.className = 'toast ' + type;
-        icon.className = 'fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
-        messageEl.textContent = message;
-        
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-    
-    function confirmDelete() {
-        if (!currentDeleteId) return;
-        
-        fetch(`/security/visitors/${currentDeleteId}/delete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast(data.message, 'success');
-                setTimeout(() => {
-                    window.location.href = "{{ url_for('admin_visitors') }}";
-                }, 1000);
-            } else {
-                showToast(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            showToast('Error deleting visitor', 'error');
-        })
-        .finally(() => {
-            closeDeleteModal();
-        });
-    }
-    
-    // Form validation
-    document.getElementById('editVisitorForm').addEventListener('submit', function(e) {
-        const phone = document.querySelector('input[name="phone"]').value;
-        const phoneRegex = /^[0-9+\-\s]{10,15}$/;
-        
-        if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
-            e.preventDefault();
-            showToast('Please enter a valid phone number', 'error');
-        }
-    });
+<div class="container-fluid px-0">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h4 class="fw-bold">Edit Visitor Information</h4>
+            <p class="text-muted mb-0">Update visitor details and manage visit information</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_visitors') }}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-2"></i>Back to Visitors
+            </a>
+        </div>
+    </div>
 
-    // Close modals when clicking outside
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.classList.remove('show');
-        }
+    <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+            <!-- Visitor Information Form -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-user"></i>
+                    <h6>Personal Information</h6>
+                </div>
+                
+                <form id="editVisitorForm" method="POST" action="{{ url_for('admin_update_visitor', visitor_id=visitor.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>Full Name <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="text" class="form-control {% if errors and errors.name %}is-invalid{% endif %}" 
+                                   id="name" name="name" value="{{ visitor.name or '' }}" required
+                                   placeholder="Enter full name">
+                            {% if errors and errors.name %}
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ errors.name }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-id-card"></i>ID Type
+                            </label>
+                            <select class="form-select" id="id_type" name="id_type">
+                                <option value="Aadhar" {% if visitor.id_type == 'Aadhar' %}selected{% endif %}>Aadhar Card</option>
+                                <option value="PAN" {% if visitor.id_type == 'PAN' %}selected{% endif %}>PAN Card</option>
+                                <option value="Driving License" {% if visitor.id_type == 'Driving License' %}selected{% endif %}>Driving License</option>
+                                <option value="Passport" {% if visitor.id_type == 'Passport' %}selected{% endif %}>Passport</option>
+                                <option value="Voter ID" {% if visitor.id_type == 'Voter ID' %}selected{% endif %}>Voter ID</option>
+                                <option value="Other" {% if visitor.id_type == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-passport"></i>ID Number
+                            </label>
+                            <input type="text" class="form-control" id="id_number" name="id_number" 
+                                   value="{{ visitor.id_number or '' }}" placeholder="Enter ID number">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i>Phone Number <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="tel" class="form-control {% if errors and errors.phone %}is-invalid{% endif %}" 
+                                   id="phone" name="phone" value="{{ visitor.phone or '' }}" required
+                                   placeholder="+91 98765 43210">
+                            {% if errors and errors.phone %}
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ errors.phone }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ visitor.email or '' }}" placeholder="visitor@example.com">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-address-card"></i>Address
+                            </label>
+                            <input type="text" class="form-control" id="address" name="address" 
+                                   value="{{ visitor.address or '' }}" placeholder="Full address">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Visit Details Form -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h6>Visit Information</h6>
+                </div>
+                
+                <form id="visitDetailsForm" method="POST" action="{{ url_for('admin_update_visit', visitor_id=visitor.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-user-tie"></i>Person to Meet <span class="text-danger-star">*</span>
+                            </label>
+                            <select class="form-select {% if errors and errors.contact_person %}is-invalid{% endif %}" 
+                                    id="contact_person" name="contact_person" required>
+                                <option value="">Select person to meet</option>
+                                {% for staff in staff_members %}
+                                <option value="{{ staff.id }}" {% if visitor.contact_person_id == staff.id %}selected{% endif %}>
+                                    {{ staff.full_name }} ({{ staff.department }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors and errors.contact_person %}
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ errors.contact_person }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Purpose of Visit <span class="text-danger-star">*</span>
+                            </label>
+                            <select class="form-select {% if errors and errors.purpose %}is-invalid{% endif %}" 
+                                    id="purpose" name="purpose" required>
+                                <option value="">Select purpose</option>
+                                <option value="Meeting" {% if visitor.purpose == 'Meeting' %}selected{% endif %}>Meeting</option>
+                                <option value="Interview" {% if visitor.purpose == 'Interview' %}selected{% endif %}>Interview</option>
+                                <option value="Delivery" {% if visitor.purpose == 'Delivery' %}selected{% endif %}>Delivery</option>
+                                <option value="Guest Lecture" {% if visitor.purpose == 'Guest Lecture' %}selected{% endif %}>Guest Lecture</option>
+                                <option value="Parent Visit" {% if visitor.purpose == 'Parent Visit' %}selected{% endif %}>Parent Visit</option>
+                                <option value="Maintenance" {% if visitor.purpose == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                                <option value="Other" {% if visitor.purpose == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                            {% if errors and errors.purpose %}
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ errors.purpose }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-calendar"></i>Visit Date <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="date" class="form-control {% if errors and errors.visit_date %}is-invalid{% endif %}" 
+                                   id="visit_date" name="visit_date" value="{{ visitor.visit_date.strftime('%Y-%m-%d') if visitor.visit_date else '' }}" required>
+                            {% if errors and errors.visit_date %}
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ errors.visit_date }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>Expected Time
+                            </label>
+                            <input type="time" class="form-control" id="expected_time" name="expected_time" 
+                                   value="{{ visitor.expected_time.strftime('%H:%M') if visitor.expected_time else '' }}">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">
+                                <i class="fas fa-sticky-note"></i>Additional Notes
+                            </label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Any additional information about this visit">{{ visitor.notes or '' }}</textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle"></i>Visit Status
+                            </label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="statusPending" 
+                                           value="pending" {% if visitor.status == 'pending' %}checked{% endif %}>
+                                    <label class="form-check-label" for="statusPending">
+                                        <span class="status-badge">
+                                            <span class="status-dot inactive"></span>
+                                            Pending
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="statusApproved" 
+                                           value="approved" {% if visitor.status == 'approved' %}checked{% endif %}>
+                                    <label class="form-check-label" for="statusApproved">
+                                        <span class="status-badge active">
+                                            <span class="status-dot active"></span>
+                                            Approved
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="statusCheckedIn" 
+                                           value="checked_in" {% if visitor.status == 'checked_in' %}checked{% endif %}>
+                                    <label class="form-check-label" for="statusCheckedIn">
+                                        <span class="status-badge" style="background: var(--info-light); color: var(--info);">
+                                            <span class="status-dot" style="background: var(--info);"></span>
+                                            Checked In
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="statusCheckedOut" 
+                                           value="checked_out" {% if visitor.status == 'checked_out' %}checked{% endif %}>
+                                    <label class="form-check-label" for="statusCheckedOut">
+                                        <span class="status-badge" style="background: var(--gray-100); color: var(--gray-600);">
+                                            <span class="status-dot" style="background: var(--gray-500);"></span>
+                                            Checked Out
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="statusCancelled" 
+                                           value="cancelled" {% if visitor.status == 'cancelled' %}checked{% endif %}>
+                                    <label class="form-check-label" for="statusCancelled">
+                                        <span class="status-badge" style="background: var(--danger-light); color: var(--danger);">
+                                            <span class="status-dot" style="background: var(--danger);"></span>
+                                            Cancelled
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3 justify-content-end mb-4 button-group">
+                <button type="button" class="btn btn-light action-btn" onclick="window.history.back()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="submit" form="editVisitorForm" class="btn btn-primary action-btn">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+                <button type="submit" form="visitDetailsForm" class="btn btn-outline-primary action-btn">
+                    <i class="fas fa-calendar-check"></i>
+                    Update Visit
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <!-- Visitor Summary Card -->
+            <div class="info-card">
+                <div class="info-header">
+                    <i class="fas fa-id-badge"></i>
+                    <div>
+                        <h5>Visitor Summary</h5>
+                        <p>Quick overview and actions</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <div class="user-avatar {{ 'admin' if visitor.is_vip else 'security' }}" 
+                         style="width: 64px; height: 64px; font-size: var(--font-xl);">
+                        {{ visitor.name[0]|upper }}
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-1 fw-bold">{{ visitor.name }}</h5>
+                        <p class="text-muted mb-1 small">
+                            <i class="fas fa-phone-alt me-1"></i>{{ visitor.phone }}
+                        </p>
+                        <span class="purpose-badge">
+                            <i class="fas fa-tag"></i>
+                            {{ visitor.purpose }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="divider">VISIT INFORMATION</div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Status</span>
+                        <span class="status-badge {{ 'active' if visitor.status == 'approved' or visitor.status == 'checked_in' else 'inactive' }}">
+                            <span class="status-dot {{ 'active' if visitor.status == 'approved' or visitor.status == 'checked_in' else 'inactive' }}"></span>
+                            {{ visitor.status|replace('_', ' ')|title }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Meeting with</span>
+                        <span class="fw-semibold small">{{ visitor.contact_person_name or 'Not assigned' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Visit Date</span>
+                        <span class="fw-semibold small">{{ visitor.visit_date.strftime('%d %b %Y') if visitor.visit_date else 'Not set' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Check In</span>
+                        <span class="fw-semibold small">{{ visitor.check_in_time.strftime('%I:%M %p') if visitor.check_in_time else '—' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Check Out</span>
+                        <span class="fw-semibold small">{{ visitor.check_out_time.strftime('%I:%M %p') if visitor.check_out_time else '—' }}</span>
+                    </div>
+                </div>
+                
+                {% if visitor.status == 'pending' %}
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-clock"></i>
+                    <span>This visit is pending approval. <a href="#" onclick="approveVisit({{ visitor.id }})" class="text-dark fw-semibold">Approve now</a></span>
+                </div>
+                {% endif %}
+                
+                {% if visitor.is_vip %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-star"></i>
+                    <span>VIP Visitor - Special handling required</span>
+                </div>
+                {% endif %}
+                
+                <div class="divider">QUICK ACTIONS</div>
+                
+                <div class="d-grid gap-2">
+                    {% if visitor.status != 'checked_in' and visitor.status != 'checked_out' and visitor.status != 'cancelled' %}
+                    <button class="btn btn-success action-btn" onclick="checkInVisitor({{ visitor.id }})">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Check In Visitor
+                    </button>
+                    {% endif %}
+                    
+                    {% if visitor.status == 'checked_in' %}
+                    <button class="btn btn-warning action-btn" onclick="checkOutVisitor({{ visitor.id }})">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Check Out Visitor
+                    </button>
+                    {% endif %}
+                    
+                    {% if visitor.status != 'cancelled' and visitor.status != 'checked_out' %}
+                    <button class="btn btn-outline-danger action-btn" onclick="cancelVisit({{ visitor.id }})">
+                        <i class="fas fa-ban"></i>
+                        Cancel Visit
+                    </button>
+                    {% endif %}
+                    
+                    <button class="btn btn-outline-secondary action-btn" onclick="printPass({{ visitor.id }})">
+                        <i class="fas fa-print"></i>
+                        Print Visitor Pass
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Visit Timeline Card -->
+            <div class="info-card">
+                <div class="info-header">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <h5>Visit Timeline</h5>
+                        <p>Activity history</p>
+                    </div>
+                </div>
+                
+                <div class="timeline">
+                    {% if visitor.check_out_time %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-time">{{ visitor.check_out_time.strftime('%d %b %Y, %I:%M %p') }}</div>
+                        <div class="timeline-title">Checked Out</div>
+                        <div class="timeline-desc">Visitor left the campus</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if visitor.check_in_time %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-time">{{ visitor.check_in_time.strftime('%d %b %Y, %I:%M %p') }}</div>
+                        <div class="timeline-title">Checked In</div>
+                        <div class="timeline-desc">Visitor entered the campus</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if visitor.approval_time %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-time">{{ visitor.approval_time.strftime('%d %b %Y, %I:%M %p') }}</div>
+                        <div class="timeline-title">Visit Approved</div>
+                        <div class="timeline-desc">Approved by {{ visitor.approved_by_name or 'System' }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="timeline-item {% if visitor.status == 'cancelled' %}cancelled{% else %}completed{% endif %}">
+                        <div class="timeline-time">{{ visitor.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+                        <div class="timeline-title">Visit Created</div>
+                        <div class="timeline-desc">Initial registration completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Check In Modal -->
+<div class="modal fade" id="checkInModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--success);">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-sign-in-alt me-2"></i>Check In Visitor
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="checkInForm">
+                <input type="hidden" id="checkInVisitorId">
+                <div class="modal-body">
+                    <p class="mb-3">Confirm check-in for <span class="fw-semibold" id="checkInVisitorName"></span></p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">ID Verification</label>
+                        <select class="form-select" id="idVerified" required>
+                            <option value="">Select verification status</option>
+                            <option value="yes">ID Verified</option>
+                            <option value="no">ID Not Verified</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Vehicle Number (if any)</label>
+                        <input type="text" class="form-control" id="vehicleNumber" placeholder="KA 01 AB 1234">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Remarks</label>
+                        <textarea class="form-control" id="checkInRemarks" rows="2" placeholder="Any remarks"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn" id="confirmCheckInBtn" style="background: var(--success); color: white; border: none;">
+                        <span class="spinner-border spinner-border-sm d-none" id="checkInSpinner"></span>
+                        Confirm Check In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Check Out Modal -->
+<div class="modal fade" id="checkOutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--warning);">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-sign-out-alt me-2"></i>Check Out Visitor
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="checkOutForm">
+                <input type="hidden" id="checkOutVisitorId">
+                <div class="modal-body">
+                    <p class="mb-3">Confirm check-out for <span class="fw-semibold" id="checkOutVisitorName"></span></p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Visit Summary</label>
+                        <textarea class="form-control" id="visitSummary" rows="3" placeholder="Brief summary of the visit"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Feedback (if any)</label>
+                        <textarea class="form-control" id="feedback" rows="2" placeholder="Visitor feedback"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn" id="confirmCheckOutBtn" style="background: var(--warning); color: white; border: none;">
+                        <span class="spinner-border spinner-border-sm d-none" id="checkOutSpinner"></span>
+                        Confirm Check Out
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Visit Modal -->
+<div class="modal fade" id="cancelVisitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--danger);">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-ban me-2"></i>Cancel Visit
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="cancelVisitForm">
+                <input type="hidden" id="cancelVisitorId">
+                <div class="modal-body">
+                    <p class="mb-3">Are you sure you want to cancel the visit for <span class="fw-semibold" id="cancelVisitorName"></span>?</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Cancellation Reason <span class="text-danger-star">*</span></label>
+                        <select class="form-select" id="cancelReason" required>
+                            <option value="">Select reason</option>
+                            <option value="visitor_unavailable">Visitor Unavailable</option>
+                            <option value="host_unavailable">Host Unavailable</option>
+                            <option value="schedule_change">Schedule Change</option>
+                            <option value="duplicate_entry">Duplicate Entry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Additional Comments</label>
+                        <textarea class="form-control" id="cancelComments" rows="2" placeholder="Additional details"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">No, Keep Visit</button>
+                    <button type="submit" class="btn" id="confirmCancelBtn" style="background: var(--danger); color: white; border: none;">
+                        <span class="spinner-border spinner-border-sm d-none" id="cancelSpinner"></span>
+                        Yes, Cancel Visit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<script>
+let currentVisitorId = {{ visitor.id }};
+
+// Check In function
+function checkInVisitor(visitorId) {
+    document.getElementById('checkInVisitorId').value = visitorId;
+    document.getElementById('checkInVisitorName').textContent = '{{ visitor.name }}';
+    document.getElementById('checkInForm').reset();
+    new bootstrap.Modal(document.getElementById('checkInModal')).show();
+}
+
+document.getElementById('checkInForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const visitorId = document.getElementById('checkInVisitorId').value;
+    const formData = {
+        id_verified: document.getElementById('idVerified').value === 'yes',
+        vehicle_number: document.getElementById('vehicleNumber').value,
+        remarks: document.getElementById('checkInRemarks').value
     };
+    
+    try {
+        showButtonLoading('confirmCheckInBtn', true);
+        
+        const response = await fetch(`/admin/visitors/${visitorId}/check-in`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Visitor checked in successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('checkInModal')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error checking in visitor', 'error');
+        }
+    } catch (error) {
+        showToast('Error checking in visitor', 'error');
+    } finally {
+        showButtonLoading('confirmCheckInBtn', false);
+    }
+});
+
+// Check Out function
+function checkOutVisitor(visitorId) {
+    document.getElementById('checkOutVisitorId').value = visitorId;
+    document.getElementById('checkOutVisitorName').textContent = '{{ visitor.name }}';
+    document.getElementById('checkOutForm').reset();
+    new bootstrap.Modal(document.getElementById('checkOutModal')).show();
+}
+
+document.getElementById('checkOutForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const visitorId = document.getElementById('checkOutVisitorId').value;
+    const formData = {
+        summary: document.getElementById('visitSummary').value,
+        feedback: document.getElementById('feedback').value
+    };
+    
+    try {
+        showButtonLoading('confirmCheckOutBtn', true);
+        
+        const response = await fetch(`/admin/visitors/${visitorId}/check-out`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Visitor checked out successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('checkOutModal')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error checking out visitor', 'error');
+        }
+    } catch (error) {
+        showToast('Error checking out visitor', 'error');
+    } finally {
+        showButtonLoading('confirmCheckOutBtn', false);
+    }
+});
+
+// Cancel Visit function
+function cancelVisit(visitorId) {
+    document.getElementById('cancelVisitorId').value = visitorId;
+    document.getElementById('cancelVisitorName').textContent = '{{ visitor.name }}';
+    document.getElementById('cancelVisitForm').reset();
+    new bootstrap.Modal(document.getElementById('cancelVisitModal')).show();
+}
+
+document.getElementById('cancelVisitForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const visitorId = document.getElementById('cancelVisitorId').value;
+    const formData = {
+        reason: document.getElementById('cancelReason').value,
+        comments: document.getElementById('cancelComments').value
+    };
+    
+    if (!formData.reason) {
+        showToast('Please select a cancellation reason', 'error');
+        return;
+    }
+    
+    try {
+        showButtonLoading('confirmCancelBtn', true);
+        
+        const response = await fetch(`/admin/visitors/${visitorId}/cancel`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Visit cancelled successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('cancelVisitModal')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error cancelling visit', 'error');
+        }
+    } catch (error) {
+        showToast('Error cancelling visit', 'error');
+    } finally {
+        showButtonLoading('confirmCancelBtn', false);
+    }
+});
+
+// Approve Visit
+async function approveVisit(visitorId) {
+    if (!confirm('Approve this visit?')) return;
+    
+    try {
+        const response = await fetch(`/admin/visitors/${visitorId}/approve`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Visit approved successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error approving visit', 'error');
+        }
+    } catch (error) {
+        showToast('Error approving visit', 'error');
+    }
+}
+
+// Print Visitor Pass
+function printPass(visitorId) {
+    window.open(`/admin/visitors/${visitorId}/pass`, '_blank');
+}
+
+// Utility Functions
+function showButtonLoading(buttonId, isLoading) {
+    const btn = document.getElementById(buttonId);
+    const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
+    
+    if (isLoading) {
+        btn.disabled = true;
+        if (spinner) spinner.classList.remove('d-none');
+    } else {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add('d-none');
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toastContainer = document.querySelector('.toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
 </script>
 {% endblock %}
