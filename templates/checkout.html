@@ -1,22 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}QR Check-out System · KPR College{% endblock %}
+{% block title %}QR Check-out · KPR College{% endblock %}
 
 {% block page_title %}
-<div class="d-flex align-items-center flex-wrap gap-2">
-    <div class="d-flex align-items-center">
-        <i class="fas fa-qrcode fs-2 me-2" style="color: #2e7d32;"></i>
-        <span class="fw-bold" style="font-size: 1.6rem;">QR Check-out</span>
-    </div>
-    <div class="d-flex align-items-center gap-2 ms-auto">
-        <span class="badge bg-white text-success px-3 py-1 rounded-pill border border-success">
-            <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i> 
-            {{ active_visitors|length }} Active
-        </span>
-        <span class="badge bg-white text-dark px-3 py-1 rounded-pill border border-secondary">
-            <i class="fas fa-clock me-1"></i> {{ now.strftime('%H:%M') }}
-        </span>
-    </div>
+<div class="d-flex align-items-center">
+    <i class="fas fa-qrcode me-2" style="font-size: 1.8rem; color: var(--primary);"></i>
+    <span class="fw-bold" style="font-size: 1.6rem;">QR Check-out</span>
 </div>
 {% endblock %}
 
@@ -27,17 +16,17 @@
 
 {% block content %}
 <style>
-    /* ===== RESTRUCTURED QR CHECKOUT - CLEAN & EFFICIENT ===== */
+    /* ===== PROFESSIONAL QR CHECKOUT - OPTIMIZED ===== */
     :root {
-        --primary: #2e7d32;
-        --primary-dark: #1b5e20;
-        --primary-light: #e8f5e9;
-        --primary-soft: #c8e6c9;
-        --danger: #d32f2f;
-        --danger-light: #ffebee;
+        --primary: #1a237e;
+        --primary-dark: #0d1458;
+        --primary-light: #e8eaf6;
+        --primary-soft: #c5cae9;
         --success: #2e7d32;
         --success-light: #e8f5e9;
-        --warning: #ed6c02;
+        --danger: #c62828;
+        --danger-light: #ffebee;
+        --warning: #f57c00;
         --warning-light: #fff3e0;
         --gray-50: #f8fafc;
         --gray-100: #f1f5f9;
@@ -48,17 +37,16 @@
         --gray-600: #475569;
         --gray-700: #334155;
         --gray-800: #1e293b;
-        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-        --radius: 12px;
-        --radius-sm: 8px;
-        --transition: all 0.2s ease;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+        --radius: 10px;
+        --radius-sm: 6px;
+        --radius-pill: 30px;
     }
 
     body {
-        background: #f1f5f9;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: #f5f7fb;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     .checkout-wrapper {
@@ -67,168 +55,225 @@
         padding: 16px;
     }
 
-    /* ===== GLOBAL SCANNER BADGE ===== */
-    .scanner-badge-global {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background: var(--primary);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-weight: 600;
-        box-shadow: var(--shadow-lg);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border: 2px solid white;
-        animation: pulse-subtle 2s infinite;
-    }
-
-    @keyframes pulse-subtle {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-    }
-
-    /* ===== HEADER SECTION ===== */
-    .header-panel {
+    /* ===== HEADER ===== */
+    .header-bar {
         background: white;
         border-radius: var(--radius);
-        padding: 20px 24px;
-        margin-bottom: 24px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        border: 1px solid var(--gray-200);
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 16px;
         box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-200);
     }
 
-    .header-title h1 {
-        font-size: 1.75rem;
+    .header-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-icon {
+        width: 42px;
+        height: 42px;
+        background: var(--primary-light);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.3rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.3rem;
         font-weight: 700;
         color: var(--gray-800);
+        margin: 0 0 2px;
+    }
+
+    .header-text p {
+        font-size: 0.8rem;
+        color: var(--gray-500);
         margin: 0;
-    }
-
-    .header-title p {
-        color: var(--gray-500);
-        font-size: 0.875rem;
-        margin: 4px 0 0;
-    }
-
-    .stats-group {
         display: flex;
-        gap: 16px;
+        align-items: center;
+        gap: 12px;
     }
 
-    .stat-item {
-        background: var(--gray-50);
-        border-radius: 40px;
-        padding: 8px 20px;
-        border: 1px solid var(--gray-200);
-        text-align: center;
-    }
-
-    .stat-number {
-        font-size: 1.5rem;
-        font-weight: 700;
+    .header-text p i {
         color: var(--primary);
-        line-height: 1.2;
+        width: 14px;
     }
 
-    .stat-label {
-        font-size: 0.7rem;
-        color: var(--gray-500);
-        text-transform: uppercase;
+    .header-stats {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
-    .live-indicator {
-        background: var(--success-light);
-        color: var(--success);
-        padding: 8px 20px;
-        border-radius: 40px;
-        font-weight: 600;
+    .stat-pill {
+        background: var(--gray-100);
+        padding: 6px 16px;
+        border-radius: var(--radius-pill);
         display: flex;
         align-items: center;
         gap: 8px;
-        border: 1px solid var(--success);
+        border: 1px solid var(--gray-200);
+    }
+
+    .stat-pill i {
+        color: var(--primary);
+        font-size: 0.8rem;
+    }
+
+    .stat-pill span {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .stat-pill .number {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-right: 4px;
+    }
+
+    .gate-indicator {
+        background: var(--success-light);
+        padding: 6px 16px;
+        border-radius: var(--radius-pill);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #a7f3d0;
+    }
+
+    .gate-indicator .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--success);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .gate-indicator span {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--success);
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .officer-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 12px 4px 4px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--gray-200);
+        background: white;
+    }
+
+    .officer-avatar {
+        width: 28px;
+        height: 28px;
+        background: var(--primary);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .officer-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-800);
     }
 
     /* ===== SCANNER GRID ===== */
-    .scanner-layout {
+    .scanner-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        margin-bottom: 24px;
+        gap: 16px;
+        margin-bottom: 20px;
     }
 
-    /* Scanner Card */
     .scanner-card {
         background: white;
         border-radius: var(--radius);
-        padding: 24px;
-        box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-200);
+        padding: 18px;
+        box-shadow: var(--shadow-sm);
     }
 
     .card-header {
         display: flex;
         align-items: center;
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 10px;
+        margin-bottom: 14px;
     }
 
     .card-icon {
-        width: 48px;
-        height: 48px;
+        width: 36px;
+        height: 36px;
         background: var(--primary-light);
-        border-radius: var(--radius-sm);
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--primary);
-        font-size: 1.5rem;
+        font-size: 1.1rem;
     }
 
     .card-header h3 {
-        font-size: 1.25rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--gray-800);
-        margin: 0 0 4px;
-    }
-
-    .card-header p {
-        color: var(--gray-500);
-        font-size: 0.875rem;
         margin: 0;
     }
 
-    /* Input Fields */
-    .input-group {
-        position: relative;
-        margin-bottom: 16px;
+    .card-header p {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        margin: 2px 0 0;
     }
 
-    .input-group i {
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .input-wrapper i {
         position: absolute;
-        left: 16px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--gray-400);
+        font-size: 0.9rem;
     }
 
     .scanner-input,
     .search-input {
         width: 100%;
-        padding: 14px 14px 14px 44px;
-        border: 2px solid var(--gray-200);
-        border-radius: 40px;
-        font-size: 1rem;
+        height: 42px;
+        padding: 0 12px 0 38px;
+        border: 1px solid var(--gray-200);
+        border-radius: 30px;
+        font-size: 0.85rem;
         background: var(--gray-50);
-        transition: var(--transition);
+        transition: all 0.15s;
     }
 
     .scanner-input:focus,
@@ -239,47 +284,43 @@
         box-shadow: 0 0 0 3px var(--primary-light);
     }
 
-    .hint-text {
-        background: var(--gray-50);
-        border-radius: var(--radius-sm);
-        padding: 12px 16px;
-        border: 1px solid var(--gray-200);
-        color: var(--gray-600);
-        font-size: 0.875rem;
+    .hint-row {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 16px;
+        font-size: 0.7rem;
+        color: var(--gray-500);
     }
 
-    .key-hint {
-        background: white;
+    .key-badge {
+        background: var(--gray-100);
         border: 1px solid var(--gray-300);
         border-radius: 4px;
-        padding: 2px 8px;
-        font-family: monospace;
+        padding: 2px 6px;
+        font-size: 0.6rem;
         font-weight: 600;
-        font-size: 0.75rem;
+        color: var(--gray-700);
     }
 
     /* Search Results */
     .search-results {
-        max-height: 300px;
+        max-height: 240px;
         overflow-y: auto;
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-sm);
         background: white;
-        margin-top: 16px;
+        margin-top: 12px;
         display: none;
     }
 
     .result-row {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
+        gap: 10px;
+        padding: 10px 12px;
         border-bottom: 1px solid var(--gray-200);
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.15s;
     }
 
     .result-row:last-child {
@@ -292,19 +333,20 @@
 
     .result-row.selected {
         background: var(--primary-light);
-        border-left: 4px solid var(--primary);
+        border-left: 3px solid var(--primary);
     }
 
     .result-avatar {
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         background: var(--primary-light);
-        border-radius: 10px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--primary);
         font-weight: 600;
+        font-size: 0.8rem;
     }
 
     .result-info {
@@ -312,81 +354,97 @@
     }
 
     .result-info h6 {
+        font-size: 0.85rem;
         font-weight: 600;
+        margin: 0 0 2px;
         color: var(--gray-800);
-        margin: 0 0 4px;
     }
 
     .result-info small {
+        font-size: 0.65rem;
         color: var(--gray-500);
-        font-size: 0.75rem;
     }
 
-    .overdue-badge {
+    .overdue-tag {
         background: var(--danger-light);
         color: var(--danger);
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 0.55rem;
         font-weight: 600;
-        margin-left: 6px;
+        margin-left: 4px;
     }
 
-    /* ===== ACTIVE VISITORS PANEL ===== */
-    .visitors-panel {
+    /* ===== VISITORS TABLE ===== */
+    .table-card {
         background: white;
         border-radius: var(--radius);
-        padding: 24px;
-        box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-200);
-        margin-top: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
     }
 
-    .panel-header {
+    .table-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--gray-200);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 20px;
         flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .panel-title {
-        display: flex;
-        align-items: center;
         gap: 12px;
     }
 
-    .panel-title h3 {
-        font-size: 1.25rem;
+    .table-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-title i {
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    .table-title h3 {
+        font-size: 1rem;
         font-weight: 600;
         color: var(--gray-800);
         margin: 0;
     }
 
-    .bulk-actions {
+    .table-actions {
         display: flex;
         align-items: center;
         gap: 12px;
+    }
+
+    .count-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
     }
 
     .btn-bulk {
         background: var(--primary);
         color: white;
         border: none;
-        border-radius: 40px;
-        padding: 8px 20px;
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 0.75rem;
         font-weight: 600;
-        font-size: 0.9rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.15s;
     }
 
-    .btn-bulk:hover {
+    .btn-bulk:hover:not(:disabled) {
         background: var(--primary-dark);
+        transform: translateY(-1px);
     }
 
     .btn-bulk:disabled {
@@ -394,246 +452,285 @@
         cursor: not-allowed;
     }
 
-    .count-badge {
-        background: var(--primary-light);
-        color: var(--primary);
-        padding: 4px 12px;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-
-    /* Visitors Table */
-    .visitors-table-container {
+    .table-responsive {
         overflow-x: auto;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--gray-200);
     }
 
     .visitors-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.9rem;
+        min-width: 900px;
+        font-size: 0.85rem;
     }
 
     .visitors-table th {
-        background: var(--gray-100);
-        padding: 12px 16px;
         text-align: left;
+        padding: 12px 16px;
+        background: var(--gray-50);
+        color: var(--gray-600);
         font-weight: 600;
-        color: var(--gray-700);
-        border-bottom: 2px solid var(--gray-200);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--gray-200);
     }
 
     .visitors-table td {
         padding: 12px 16px;
         border-bottom: 1px solid var(--gray-200);
-        vertical-align: middle;
+        color: var(--gray-700);
     }
 
-    .visitors-table tr:hover {
+    .visitors-table tr:hover td {
         background: var(--gray-50);
     }
 
     .visitors-table input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: pointer;
         accent-color: var(--primary);
+    }
+
+    .visitor-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .visitor-avatar {
+        width: 32px;
+        height: 32px;
+        background: var(--primary-light);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .visitor-details {
+        line-height: 1.3;
     }
 
     .visitor-name {
         font-weight: 600;
         color: var(--gray-800);
+        font-size: 0.85rem;
     }
 
     .visitor-id {
+        font-size: 0.65rem;
+        color: var(--gray-500);
         font-family: monospace;
-        background: var(--gray-100);
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.85rem;
+    }
+
+    .phone-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--gray-600);
+        font-size: 0.8rem;
+    }
+
+    .phone-cell i {
+        color: var(--primary);
+        font-size: 0.7rem;
+        width: 14px;
     }
 
     .time-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         color: var(--gray-600);
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+    }
+
+    .time-cell i {
+        color: var(--primary);
+        font-size: 0.7rem;
+        width: 14px;
+    }
+
+    .duration-badge {
+        background: var(--gray-100);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .duration-badge.overdue {
+        background: var(--danger-light);
+        color: var(--danger);
+        border-color: #fecaca;
     }
 
     .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-badge.active {
         background: var(--success-light);
         color: var(--success);
-        padding: 4px 10px;
-        border-radius: 30px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        border: 1px solid #a7f3d0;
     }
 
     .status-badge.overdue {
         background: var(--danger-light);
         color: var(--danger);
+        border: 1px solid #fecaca;
     }
 
-    .action-checkout {
-        background: var(--primary-light);
-        color: var(--primary);
-        border: none;
-        border-radius: 30px;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .action-checkout:hover {
+    .btn-checkout {
         background: var(--primary);
         color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 48px 20px;
-        background: var(--gray-50);
-        border-radius: var(--radius);
-        border: 2px dashed var(--gray-300);
+    .btn-checkout:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
     }
 
-    .empty-state i {
-        font-size: 3rem;
-        color: var(--gray-400);
-        margin-bottom: 16px;
-    }
-
-    .empty-state h4 {
-        color: var(--gray-700);
-        margin-bottom: 8px;
-    }
-
-    .empty-state p {
-        color: var(--gray-500);
-    }
-
-    /* ===== VISITOR DETAIL CARD ===== */
+    /* ===== DETAIL CARD ===== */
     .detail-card {
         background: white;
         border-radius: var(--radius);
-        padding: 24px;
-        margin-top: 24px;
-        box-shadow: var(--shadow-lg);
         border: 1px solid var(--gray-200);
+        padding: 20px;
+        margin-top: 16px;
+        box-shadow: var(--shadow-md);
         display: none;
     }
 
     .detail-card.show {
         display: block;
-        animation: slideIn 0.3s ease;
+        animation: slideIn 0.2s ease;
     }
 
     @keyframes slideIn {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     .detail-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 2px dashed var(--gray-200);
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gray-200);
     }
 
     .detail-title {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
     }
 
     .detail-title i {
-        font-size: 2rem;
         color: var(--success);
+        font-size: 1.3rem;
     }
 
     .detail-title h2 {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: var(--gray-800);
         margin: 0;
     }
 
-    .scan-tag {
+    .scan-badge {
         background: var(--success-light);
         color: var(--success);
-        padding: 6px 16px;
-        border-radius: 40px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
-        border: 1px solid var(--success);
+        border: 1px solid #a7f3d0;
     }
 
-    .profile-section {
+    .profile-row {
         display: flex;
-        gap: 24px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 16px;
     }
 
     .avatar-large {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         background: var(--primary-light);
-        border-radius: var(--radius);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--primary);
         font-weight: 700;
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
-    .info-large {
+    .profile-info {
         flex: 1;
     }
 
-    .info-large h2 {
-        font-size: 1.8rem;
+    .profile-info h3 {
+        font-size: 1.2rem;
         font-weight: 700;
         color: var(--gray-800);
-        margin: 0 0 8px;
+        margin: 0 0 4px;
     }
 
-    .meta-list {
+    .profile-meta {
         display: flex;
-        gap: 24px;
+        gap: 16px;
         color: var(--gray-500);
+        font-size: 0.8rem;
         flex-wrap: wrap;
     }
 
-    .meta-list i {
+    .profile-meta i {
         color: var(--primary);
-        margin-right: 6px;
+        margin-right: 4px;
+        width: 14px;
     }
 
-    .details-grid {
+    .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
     }
 
-    .detail-item {
+    .info-item {
         background: var(--gray-50);
         border-radius: var(--radius-sm);
-        padding: 16px;
+        padding: 12px;
         border: 1px solid var(--gray-200);
     }
 
-    .detail-label {
-        font-size: 0.7rem;
+    .info-label {
+        font-size: 0.65rem;
         color: var(--gray-500);
         text-transform: uppercase;
         margin-bottom: 4px;
@@ -642,90 +739,90 @@
         gap: 4px;
     }
 
-    .detail-value {
-        font-weight: 700;
-        color: var(--gray-800);
-        font-size: 1.1rem;
+    .info-label i {
+        color: var(--primary);
+        font-size: 0.6rem;
     }
 
-    .detail-sub {
+    .info-value {
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 0.9rem;
+    }
+
+    .info-sub {
+        font-size: 0.65rem;
         color: var(--gray-500);
-        font-size: 0.75rem;
-        margin-top: 4px;
+        margin-top: 2px;
     }
 
     .time-panel {
         background: var(--gray-50);
         border-radius: var(--radius-sm);
-        padding: 16px 20px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 16px;
         border: 1px solid var(--gray-200);
     }
 
-    .duration-indicator {
-        background: white;
-        border: 1px solid var(--gray-300);
-        padding: 8px 20px;
-        border-radius: 40px;
+    .duration-stat {
+        font-size: 0.9rem;
         font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        color: var(--gray-800);
     }
 
-    .duration-indicator.overdue {
+    .duration-stat i {
+        color: var(--primary);
+        margin-right: 6px;
+    }
+
+    .overdue-tag-large {
         background: var(--danger-light);
         color: var(--danger);
-        border-color: var(--danger);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid #fecaca;
     }
 
     .action-group {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         justify-content: flex-end;
     }
 
-    .btn-primary {
-        padding: 12px 28px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 40px;
+    .btn {
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 0.8rem;
         font-weight: 600;
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.15s;
+        border: none;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
     }
 
-    .btn-primary:hover:not(:disabled) {
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
         background: var(--primary-dark);
-        transform: translateY(-2px);
-    }
-
-    .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+        transform: translateY(-1px);
     }
 
     .btn-secondary {
-        padding: 12px 28px;
         background: white;
         color: var(--gray-700);
-        border: 2px solid var(--gray-200);
-        border-radius: 40px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        border: 1px solid var(--gray-300);
     }
 
     .btn-secondary:hover {
@@ -733,31 +830,45 @@
         color: var(--primary);
     }
 
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: var(--radius);
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: var(--gray-400);
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        margin: 0;
+    }
+
     /* Responsive */
-    @media (max-width: 1024px) {
-        .scanner-layout {
+    @media (max-width: 992px) {
+        .scanner-grid {
             grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 768px) {
-        .header-panel {
+        .header-bar {
             flex-direction: column;
             align-items: flex-start;
         }
         
-        .stats-group {
-            width: 100%;
-            justify-content: space-between;
-        }
-        
-        .profile-section {
+        .profile-row {
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
         
-        .meta-list {
+        .profile-meta {
             justify-content: center;
         }
         
@@ -765,53 +876,58 @@
             flex-direction: column;
         }
         
-        .btn-primary, .btn-secondary {
+        .btn {
             width: 100%;
             justify-content: center;
         }
     }
 </style>
 
-<!-- Global Scanner Input (Hidden) -->
-<input type="hidden" id="globalScannerInput">
-
-<!-- Global Scanner Badge -->
-<div class="scanner-badge-global" id="globalScannerBadge">
-    <i class="fas fa-qrcode"></i>
-    <span>Scanner Ready</span>
-    <span class="badge bg-white text-success ms-2">F8</span>
-</div>
-
 <div class="checkout-wrapper">
-    <!-- Header Section -->
-    <div class="header-panel">
-        <div class="header-title">
-            <h1><i class="fas fa-qrcode me-2" style="color: var(--primary);"></i>QR Check-out</h1>
-            <p><i class="far fa-clock me-1"></i> {{ now.strftime('%A, %d %B %Y • %I:%M %p') }}</p>
-        </div>
-        <div class="stats-group">
-            <div class="stat-item">
-                <div class="stat-number" id="activeCount">{{ active_visitors|length }}</div>
-                <div class="stat-label">Active</div>
+    <!-- Header -->
+    <div class="header-bar">
+        <div class="header-info">
+            <div class="header-icon">
+                <i class="fas fa-qrcode"></i>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="overdueCount">{{ overdue_count|default(0) }}</div>
-                <div class="stat-label">Overdue</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="cardsIssued">{{ cards_issued|default(0) }}</div>
-                <div class="stat-label">Cards</div>
+            <div class="header-text">
+                <h1>QR Check-out</h1>
+                <p>
+                    <i class="fas fa-calendar-alt"></i> {{ now.strftime('%d %b %Y') }}
+                    <i class="fas fa-clock"></i> {{ now.strftime('%I:%M %p') }}
+                </p>
             </div>
         </div>
-        <div class="live-indicator">
-            <i class="fas fa-circle"></i>
-            <span>GLOBAL SCANNER</span>
+        <div class="header-stats">
+            <div class="stat-pill">
+                <i class="fas fa-users"></i>
+                <span class="number">{{ active_visitors|length }}</span>
+                <span>Active</span>
+            </div>
+            <div class="stat-pill">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="number">{{ overdue_count|default(0) }}</span>
+                <span>Overdue</span>
+            </div>
+            <div class="stat-pill">
+                <i class="fas fa-id-card"></i>
+                <span class="number">{{ available_cards|default(0) }}</span>
+                <span>Cards</span>
+            </div>
+            <div class="gate-indicator">
+                <div class="dot"></div>
+                <span>Gate 1</span>
+            </div>
+            <div class="officer-chip">
+                <div class="officer-avatar">{{ current_user.full_name[:1] if current_user.full_name else 'S' }}</div>
+                <span class="officer-name">{{ current_user.full_name or current_user.username }}</span>
+            </div>
         </div>
     </div>
 
     <!-- Scanner Grid -->
-    <div class="scanner-layout">
-        <!-- Hardware Scanner Card -->
+    <div class="scanner-grid">
+        <!-- Hardware Scanner -->
         <div class="scanner-card">
             <div class="card-header">
                 <div class="card-icon">
@@ -819,32 +935,21 @@
                 </div>
                 <div>
                     <h3>Hardware Scanner</h3>
-                    <p>Works on all pages - Press F8 to focus</p>
+                    <p>Works globally - Press F8</p>
                 </div>
             </div>
-
-            <div class="input-group">
+            <div class="input-wrapper">
                 <i class="fas fa-qrcode"></i>
-                <input type="text" 
-                       id="hardwareScannerInput" 
-                       class="scanner-input"
-                       placeholder="Scan QR code..."
-                       autocomplete="off"
-                       autofocus>
+                <input type="text" id="hardwareScanner" class="scanner-input" placeholder="Scan QR code..." autocomplete="off" autofocus>
             </div>
-
-            <div class="hint-text">
-                <i class="fas fa-info-circle"></i>
-                <span>Auto-detects QR codes - <span class="key-hint">Enter</span> works</span>
-            </div>
-
-            <div class="hint-text mt-2">
-                <i class="fas fa-keyboard"></i>
-                <span><span class="key-hint">F8</span> focus • <span class="key-hint">Esc</span> clear</span>
+            <div class="hint-row">
+                <span><span class="key-badge">F8</span> Focus</span>
+                <span><span class="key-badge">ESC</span> Clear</span>
+                <span><span class="key-badge">↵</span> Process</span>
             </div>
         </div>
 
-        <!-- Manual Search Card -->
+        <!-- Manual Search -->
         <div class="scanner-card">
             <div class="card-header">
                 <div class="card-icon" style="background: #fff3e0; color: #f97316;">
@@ -852,106 +957,80 @@
                 </div>
                 <div>
                     <h3>Manual Search</h3>
-                    <p>Find by name, ID, phone or card</p>
+                    <p>By name, ID, phone or card</p>
                 </div>
             </div>
-
-            <div class="input-group">
+            <div class="input-wrapper">
                 <i class="fas fa-search"></i>
-                <input type="text" 
-                       id="manualSearch" 
-                       class="search-input"
-                       placeholder="Type to search..."
-                       autocomplete="off">
+                <input type="text" id="manualSearch" class="search-input" placeholder="Type to search..." autocomplete="off">
             </div>
-
-            <div class="hint-text">
-                <i class="fas fa-lightbulb"></i>
-                <span><span class="key-hint">↑</span> <span class="key-hint">↓</span> navigate • <span class="key-hint">Enter</span> select</span>
+            <div class="hint-row">
+                <span><span class="key-badge">↑↓</span> Navigate</span>
+                <span><span class="key-badge">↵</span> Select</span>
+                <span><span class="key-badge">ESC</span> Close</span>
             </div>
-
-            <!-- Search Results -->
             <div class="search-results" id="searchResults"></div>
         </div>
     </div>
 
-    <!-- Active Visitors Panel (with integrated bulk checkout) -->
-    <div class="visitors-panel">
-        <div class="panel-header">
-            <div class="panel-title">
-                <i class="fas fa-users" style="color: var(--primary); font-size: 1.5rem;"></i>
+    <!-- Active Visitors Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">
+                <i class="fas fa-users"></i>
                 <h3>Active Visitors</h3>
-                <span class="count-badge" id="activeCountBadge">{{ active_visitors|length }}</span>
+                <span class="count-badge">{{ active_visitors|length }} on campus</span>
             </div>
-            
-            <!-- Bulk Actions Integrated -->
-            <div class="bulk-actions">
+            <div class="table-actions">
                 <button class="btn-bulk" id="bulkCheckoutBtn" onclick="bulkCheckout()" disabled>
-                    <i class="fas fa-sign-out-alt"></i>
-                    Check-out Selected (<span id="selectedCount">0</span>)
+                    <i class="fas fa-sign-out-alt"></i> Check-out (<span id="selectedCount">0</span>)
                 </button>
             </div>
         </div>
 
         {% if active_visitors %}
-        <div class="visitors-table-container">
+        <div class="table-responsive">
             <table class="visitors-table">
                 <thead>
                     <tr>
-                        <th width="40">
-                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
-                        </th>
-                        <th>Name & ID</th>
+                        <th width="30"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+                        <th>Visitor</th>
+                        <th>ID</th>
                         <th>Contact</th>
-                        <th>Check-in Time</th>
+                        <th>Check-in</th>
                         <th>Duration</th>
                         <th>Status</th>
-                        <th width="100">Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for visitor in active_visitors %}
                     <tr>
+                        <td><input type="checkbox" class="visitor-checkbox" value="{{ visitor.visitor_id }}" onchange="updateSelection()"></td>
                         <td>
-                            <input type="checkbox" 
-                                   class="visitor-checkbox" 
-                                   value="{{ visitor.visitor_id }}" 
-                                   onchange="updateSelection()"
-                                   data-id="{{ visitor.visitor_id }}">
+                            <div class="visitor-cell">
+                                <div class="visitor-avatar">{{ visitor.full_name[:1] }}</div>
+                                <span class="visitor-name">{{ visitor.full_name }}</span>
+                            </div>
                         </td>
+                        <td><span class="visitor-id">{{ visitor.visitor_id[-6:] }}</span></td>
+                        <td><span class="phone-cell"><i class="fas fa-phone-alt"></i> {{ visitor.phone }}</span></td>
+                        <td><span class="time-cell"><i class="far fa-clock"></i> {{ visitor.checkin_time.strftime('%I:%M %p') }}</span></td>
                         <td>
-                            <div class="visitor-name">{{ visitor.full_name }}</div>
-                            <span class="visitor-id">{{ visitor.visitor_id }}</span>
-                            {% if visitor.card_id %}
-                            <span class="badge bg-light text-dark ms-1"><i class="fas fa-id-card"></i></span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div><i class="fas fa-phone me-1" style="font-size: 0.7rem;"></i> {{ visitor.phone }}</div>
-                            {% if visitor.email %}
-                            <small class="text-muted">{{ visitor.email }}</small>
-                            {% endif %}
-                        </td>
-                        <td class="time-cell">
-                            {{ visitor.checkin_time.strftime('%I:%M %p') }}
-                            <br>
-                            <small>{{ visitor.checkin_time.strftime('%d/%m/%Y') }}</small>
-                        </td>
-                        <td>
-                            {% set duration = (now - visitor.checkin_time) %}
-                            {% set hours = (duration.total_seconds() / 3600)|int %}
-                            {% set minutes = ((duration.total_seconds() % 3600) / 60)|int %}
-                            {{ hours }}h {{ minutes }}m
+                            <span class="duration-badge {% if visitor.is_overdue %}overdue{% endif %}">
+                                <i class="fas {% if visitor.is_overdue %}fa-exclamation-circle{% else %}fa-hourglass-half{% endif %}"></i>
+                                {{ visitor.duration_display }}
+                            </span>
                         </td>
                         <td>
                             {% if visitor.is_overdue %}
                             <span class="status-badge overdue">Overdue</span>
                             {% else %}
-                            <span class="status-badge">Active</span>
+                            <span class="status-badge active">Active</span>
                             {% endif %}
                         </td>
                         <td>
-                            <button class="action-checkout" onclick="processCheckout('{{ visitor.visitor_id }}')">
+                            <button class="btn-checkout" onclick="processCheckout('{{ visitor.visitor_id }}')">
                                 <i class="fas fa-sign-out-alt"></i> Check-out
                             </button>
                         </td>
@@ -963,66 +1042,45 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-door-open"></i>
-            <h4>No Active Visitors</h4>
-            <p>All visitors have checked out</p>
+            <p>No active visitors</p>
         </div>
         {% endif %}
     </div>
 
-    <!-- Visitor Detail Card (shown when scanning/searching) -->
-    <div class="detail-card" id="resultCard"></div>
+    <!-- Visitor Detail Card -->
+    <div class="detail-card" id="detailCard"></div>
 </div>
 
-<!-- Hidden audio feedback -->
-<audio id="beepSound" src="data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWAIkWAAAAIAWFuAAA" style="display: none;"></audio>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
 <script>
-    // ===== VISITOR DATA =====
+    // ===== DATA =====
     let activeVisitors = {{ active_visitors_json|tojson|safe }};
+    let selectedVisitors = new Set();
     let currentVisitor = null;
     let searchResults = [];
     let selectedIndex = -1;
     let scannerBuffer = '';
     let scannerTimer = null;
-    let selectedVisitors = new Set();
-    const SCANNER_DELAY = 100;
 
-    // ===== GLOBAL SCANNER =====
+    // ===== SCANNER HANDLING =====
+    const hardwareInput = document.getElementById('hardwareScanner');
+
+    // Global keyboard listener
     document.addEventListener('keydown', function(e) {
         // F8 to focus scanner
         if (e.key === 'F8') {
             e.preventDefault();
-            document.getElementById('hardwareScannerInput').focus();
-            showToast('Scanner focused', 'info');
+            hardwareInput.focus();
+            hardwareInput.select();
             return;
         }
 
         // Ignore if typing in other inputs
-        if (e.target.tagName === 'INPUT' && e.target.id !== 'hardwareScannerInput') {
-            return;
-        }
-
-        // Enter key - process buffer
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (scannerBuffer.length > 0) {
-                processScannedCode(scannerBuffer);
-                scannerBuffer = '';
-            }
-            return;
-        }
-
-        // Escape - clear buffer
-        if (e.key === 'Escape') {
-            scannerBuffer = '';
-            clearResult();
+        if (e.target.tagName === 'INPUT' && e.target.id !== 'hardwareScanner') {
             return;
         }
 
         // Build scanner buffer
-        if (e.key.length === 1 || e.key.match(/[A-Z0-9]/i)) {
+        if (e.key.length === 1 && e.key.match(/[A-Z0-9]/i)) {
             scannerBuffer += e.key;
             
             if (scannerTimer) clearTimeout(scannerTimer);
@@ -1031,260 +1089,95 @@
                     processScannedCode(scannerBuffer);
                     scannerBuffer = '';
                 }
-            }, SCANNER_DELAY);
+            }, 100);
+        }
+
+        // Enter key
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (scannerBuffer.length > 0) {
+                processScannedCode(scannerBuffer);
+                scannerBuffer = '';
+            }
+        }
+
+        // Escape
+        if (e.key === 'Escape') {
+            scannerBuffer = '';
+            hideDetail();
         }
     });
 
-    // Hardware scanner input
-    const hardwareInput = document.getElementById('hardwareScannerInput');
-    
-    hardwareInput.addEventListener('input', function(e) {
-        const value = e.target.value.trim();
-        if (scannerTimer) clearTimeout(scannerTimer);
-        
+    // Hardware input
+    hardwareInput.addEventListener('input', function() {
+        const value = this.value.trim();
         if (value.length >= 8) {
-            scannerTimer = setTimeout(() => {
-                processScannedCode(value);
-                hardwareInput.value = '';
-            }, SCANNER_DELAY);
+            processScannedCode(value);
+            this.value = '';
         }
     });
 
     hardwareInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const value = hardwareInput.value.trim();
+            const value = this.value.trim();
             if (value) {
                 processScannedCode(value);
-                hardwareInput.value = '';
+                this.value = '';
             }
-        }
-        if (e.key === 'Escape') {
-            hardwareInput.value = '';
-            clearResult();
         }
     });
 
-    // ===== PROCESS SCAN - IMMEDIATE CHECKOUT =====
     function processScannedCode(data) {
         console.log('Scanned:', data);
-        playBeep();
         
+        // Extract visitor ID
         let visitorId = null;
-        
-        // Parse various formats
-        const matches = data.match(/Visitor ID: ([A-Z0-9]+)/i);
-        if (matches && matches[1]) {
-            visitorId = matches[1];
-        } else if (/^KPR\d+$/.test(data)) {
+        if (data.includes('KPR')) {
+            const match = data.match(/KPR\d+/i);
+            if (match) visitorId = match[0];
+        } else if (data.length >= 8) {
             visitorId = data;
-        } else {
-            const kprMatch = data.match(/(KPR\d+)/i);
-            if (kprMatch) visitorId = kprMatch[1];
         }
-        
+
         if (visitorId) {
             const visitor = activeVisitors.find(v => v.visitor_id === visitorId);
-            
             if (visitor) {
-                // Show quick preview then checkout
-                displayVisitorDetails(visitor);
-                showToast(`Processing checkout for ${visitor.full_name}`, 'success');
-                
-                // Immediate checkout (next second)
+                showVisitorDetails(visitor);
                 setTimeout(() => {
-                    processCheckout(visitor.visitor_id, true);
-                }, 1000);
+                    if (confirm(`Check out ${visitor.full_name}?`)) {
+                        processCheckout(visitor.visitor_id);
+                    }
+                }, 500);
             } else {
-                showToast('Visitor not found or already checked out', 'warning');
+                alert('Visitor not found');
             }
-        } else {
-            showToast('Invalid QR code', 'warning');
         }
     }
 
-    function playBeep() {
-        document.getElementById('beepSound').play().catch(() => {});
-    }
-
-    // ===== DISPLAY VISITOR DETAILS =====
-    function displayVisitorDetails(visitor) {
-        currentVisitor = visitor;
-        
-        const checkinTime = new Date(visitor.checkin_time);
-        const now = new Date();
-        const durationMs = now - checkinTime;
-        const hours = Math.floor(durationMs / (1000 * 60 * 60));
-        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-        const isOverdue = visitor.is_overdue || false;
-        
-        const resultCard = document.getElementById('resultCard');
-        
-        resultCard.innerHTML = `
-            <div class="detail-header">
-                <div class="detail-title">
-                    <i class="fas fa-check-circle"></i>
-                    <h2>Visitor Found</h2>
-                </div>
-                <div class="scan-tag">
-                    <i class="fas fa-qrcode me-1"></i> SCANNED
-                </div>
-            </div>
-            
-            <div class="profile-section">
-                <div class="avatar-large">${visitor.full_name[0].toUpperCase()}</div>
-                <div class="info-large">
-                    <h2>${visitor.full_name}</h2>
-                    <div class="meta-list">
-                        <span><i class="fas fa-id-card"></i> ${visitor.visitor_id}</span>
-                        <span><i class="fas fa-phone"></i> ${visitor.phone}</span>
-                        ${visitor.email ? `<span><i class="fas fa-envelope"></i> ${visitor.email}</span>` : ''}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="details-grid">
-                <div class="detail-item">
-                    <div class="detail-label"><i class="fas fa-building"></i> Department</div>
-                    <div class="detail-value">${visitor.department}</div>
-                    <div class="detail-sub"><i class="fas fa-user-tie"></i> ${visitor.person_to_meet}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label"><i class="fas fa-tag"></i> Purpose</div>
-                    <div class="detail-value">${visitor.purpose || 'Not specified'}</div>
-                </div>
-                ${visitor.card_number ? `
-                <div class="detail-item">
-                    <div class="detail-label"><i class="fas fa-id-card"></i> ID Card</div>
-                    <div class="detail-value">${visitor.card_number}</div>
-                </div>
-                ` : ''}
-                <div class="detail-item">
-                    <div class="detail-label"><i class="fas fa-clock"></i> Check-in</div>
-                    <div class="detail-value">${checkinTime.toLocaleTimeString()}</div>
-                    <div class="detail-sub">${checkinTime.toLocaleDateString()}</div>
-                </div>
-            </div>
-            
-            <div class="time-panel">
-                <div class="time-stat">
-                    <div class="detail-label">Duration</div>
-                    <div class="detail-value">${hours}h ${minutes}m</div>
-                </div>
-                <div class="duration-indicator ${isOverdue ? 'overdue' : ''}">
-                    <i class="fas ${isOverdue ? 'fa-exclamation-triangle' : 'fa-hourglass-half'}"></i>
-                    ${isOverdue ? 'OVERDUE' : 'On time'}
-                </div>
-            </div>
-            
-            <div class="action-group">
-                <button class="btn-secondary" onclick="clearResult()">
-                    <i class="fas fa-times"></i> Close
-                </button>
-                <button class="btn-primary" onclick="processCheckout('${visitor.visitor_id}')" id="checkoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Check-out Now
-                </button>
-            </div>
-            
-            <div class="mt-3 text-center text-muted small">
-                <i class="fas fa-spinner fa-pulse me-1"></i> Auto checkout in 1 second...
-            </div>
-        `;
-        
-        resultCard.classList.add('show');
-        resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    function clearResult() {
-        document.getElementById('resultCard').classList.remove('show');
-        currentVisitor = null;
-    }
-
-    // ===== PROCESS CHECKOUT WITH REDIRECT =====
-    function processCheckout(visitorId, auto = false) {
-        const btn = document.getElementById('checkoutBtn');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
-        }
-        
-        fetch(`/api/checkout/${visitorId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                checkout_notes: auto ? 'Auto checked out via hardware scanner' : 'Checked out via QR scanner',
-                rating: 5
-            })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                showToast('Checkout successful', 'success');
-                
-                // Remove from active list
-                activeVisitors = activeVisitors.filter(v => v.visitor_id !== visitorId);
-                updateActiveCount();
-                
-                // Redirect to success page
-                window.location.href = `{{ url_for('checkout_success') }}?visitor_id=${visitorId}`;
-            } else {
-                throw new Error(data.message);
-            }
-        })
-        .catch(error => {
-            showToast(error.message, 'danger');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Check-out Now';
-            }
-        });
-    }
-
-    // ===== SEARCH FUNCTIONALITY =====
-    const manualSearch = document.getElementById('manualSearch');
+    // ===== SEARCH =====
+    const searchInput = document.getElementById('manualSearch');
     
-    manualSearch.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase().trim();
+    searchInput.addEventListener('input', function() {
+        const term = this.value.toLowerCase().trim();
         
         if (term.length < 2) {
             document.getElementById('searchResults').style.display = 'none';
             return;
         }
-        
+
         const results = activeVisitors.filter(v => 
             v.full_name.toLowerCase().includes(term) ||
             v.visitor_id.toLowerCase().includes(term) ||
-            v.phone.includes(term) ||
-            (v.card_number && v.card_number.toLowerCase().includes(term))
+            v.phone.includes(term)
         );
-        
+
         searchResults = results;
         selectedIndex = -1;
-        
-        const resultsDiv = document.getElementById('searchResults');
-        if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="result-row"><i class="fas fa-search me-2"></i>No visitors found</div>';
-        } else {
-            resultsDiv.innerHTML = results.map((v, i) => `
-                <div class="result-row ${i === selectedIndex ? 'selected' : ''}" onclick="selectVisitor('${v.id}')">
-                    <div class="result-avatar">${v.full_name[0].toUpperCase()}</div>
-                    <div class="result-info">
-                        <h6>${v.full_name}</h6>
-                        <small><i class="fas fa-id-card"></i> ${v.visitor_id}${v.is_overdue ? ' <span class="overdue-badge">OVERDUE</span>' : ''}</small>
-                    </div>
-                    <small class="text-muted">${new Date(v.checkin_time).toLocaleTimeString()}</small>
-                </div>
-            `).join('');
-        }
-        resultsDiv.style.display = 'block';
+        displaySearchResults(results);
     });
 
-    manualSearch.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && searchResults.length > 0) {
-            e.preventDefault();
-            if (selectedIndex >= 0) selectVisitor(searchResults[selectedIndex].id);
-            else selectVisitor(searchResults[0].id);
-        }
+    searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             selectedIndex = Math.min(selectedIndex + 1, searchResults.length - 1);
@@ -1295,30 +1188,137 @@
             selectedIndex = Math.max(selectedIndex - 1, -1);
             highlightSelected();
         }
+        if (e.key === 'Enter' && searchResults.length > 0) {
+            e.preventDefault();
+            if (selectedIndex >= 0) {
+                showVisitorDetails(searchResults[selectedIndex]);
+            } else {
+                showVisitorDetails(searchResults[0]);
+            }
+            searchInput.value = '';
+            document.getElementById('searchResults').style.display = 'none';
+        }
         if (e.key === 'Escape') {
-            manualSearch.value = '';
+            searchInput.value = '';
             document.getElementById('searchResults').style.display = 'none';
         }
     });
 
+    function displaySearchResults(results) {
+        const container = document.getElementById('searchResults');
+        if (results.length === 0) {
+            container.innerHTML = '<div class="result-row"><i class="fas fa-search ms-2 me-2"></i>No results</div>';
+        } else {
+            container.innerHTML = results.map((v, i) => `
+                <div class="result-row ${i === selectedIndex ? 'selected' : ''}" onclick="showVisitorDetails(${JSON.stringify(v).replace(/"/g, '&quot;')})">
+                    <div class="result-avatar">${v.full_name[0]}</div>
+                    <div class="result-info">
+                        <h6>${v.full_name} ${v.is_overdue ? '<span class="overdue-tag">OVERDUE</span>' : ''}</h6>
+                        <small><i class="fas fa-id-card"></i> ${v.visitor_id}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+        container.style.display = 'block';
+    }
+
     function highlightSelected() {
-        document.querySelectorAll('#searchResults .result-row').forEach((item, i) => {
+        document.querySelectorAll('.result-row').forEach((el, i) => {
             if (i === selectedIndex) {
-                item.classList.add('selected');
-                item.scrollIntoView({ block: 'nearest' });
+                el.classList.add('selected');
+                el.scrollIntoView({ block: 'nearest' });
             } else {
-                item.classList.remove('selected');
+                el.classList.remove('selected');
             }
         });
     }
 
-    function selectVisitor(id) {
-        const visitor = activeVisitors.find(v => v.id == id);
-        if (visitor) {
-            displayVisitorDetails(visitor);
-            document.getElementById('searchResults').style.display = 'none';
-            manualSearch.value = '';
-        }
+    // ===== VISITOR DETAILS =====
+    function showVisitorDetails(visitor) {
+        currentVisitor = visitor;
+        
+        const checkin = new Date(visitor.checkin_time);
+        const now = new Date();
+        const hours = Math.floor((now - checkin) / (1000 * 60 * 60));
+        const minutes = Math.floor(((now - checkin) % (1000 * 60 * 60)) / (1000 * 60));
+
+        const card = document.getElementById('detailCard');
+        card.innerHTML = `
+            <div class="detail-header">
+                <div class="detail-title">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Visitor Found</h2>
+                </div>
+                <span class="scan-badge"><i class="fas fa-qrcode me-1"></i> Scanned</span>
+            </div>
+            <div class="profile-row">
+                <div class="avatar-large">${visitor.full_name[0].toUpperCase()}</div>
+                <div class="profile-info">
+                    <h3>${visitor.full_name}</h3>
+                    <div class="profile-meta">
+                        <span><i class="fas fa-id-card"></i> ${visitor.visitor_id}</span>
+                        <span><i class="fas fa-phone"></i> ${visitor.phone}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-building"></i> Department</div>
+                    <div class="info-value">${visitor.department || '—'}</div>
+                    <div class="info-sub"><i class="fas fa-user-tie"></i> ${visitor.person_to_meet || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-tag"></i> Purpose</div>
+                    <div class="info-value">${visitor.purpose || 'Not specified'}</div>
+                </div>
+                ${visitor.card_number ? `
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-id-card"></i> ID Card</div>
+                    <div class="info-value">${visitor.card_number}</div>
+                </div>
+                ` : ''}
+                <div class="info-item">
+                    <div class="info-label"><i class="fas fa-clock"></i> Check-in</div>
+                    <div class="info-value">${checkin.toLocaleTimeString()}</div>
+                    <div class="info-sub">${checkin.toLocaleDateString()}</div>
+                </div>
+            </div>
+            <div class="time-panel">
+                <span class="duration-stat"><i class="fas fa-hourglass-half"></i> Duration: ${hours}h ${minutes}m</span>
+                ${visitor.is_overdue ? '<span class="overdue-tag-large"><i class="fas fa-exclamation-triangle"></i> OVERDUE</span>' : ''}
+            </div>
+            <div class="action-group">
+                <button class="btn btn-secondary" onclick="hideDetail()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-primary" onclick="processCheckout('${visitor.visitor_id}')">
+                    <i class="fas fa-sign-out-alt"></i> Check-out Now
+                </button>
+            </div>
+        `;
+        card.classList.add('show');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideDetail() {
+        document.getElementById('detailCard').classList.remove('show');
+        currentVisitor = null;
+    }
+
+    // ===== CHECKOUT =====
+    function processCheckout(visitorId) {
+        fetch(`/api/checkout/${visitorId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/checkout_success?visitor_id=${visitorId}`;
+            } else {
+                alert('Checkout failed');
+            }
+        });
     }
 
     // ===== BULK CHECKOUT =====
@@ -1326,83 +1326,50 @@
         const checkboxes = document.querySelectorAll('.visitor-checkbox:checked');
         selectedVisitors = new Set(Array.from(checkboxes).map(cb => cb.value));
         
-        const selectedCount = selectedVisitors.size;
-        document.getElementById('selectedCount').textContent = selectedCount;
+        const count = selectedVisitors.size;
+        document.getElementById('selectedCount').textContent = count;
+        document.getElementById('bulkCheckoutBtn').disabled = count === 0;
         
-        const bulkBtn = document.getElementById('bulkCheckoutBtn');
-        bulkBtn.disabled = selectedCount === 0;
-        
-        // Update select all checkbox
-        const totalCheckboxes = document.querySelectorAll('.visitor-checkbox').length;
-        const selectAll = document.getElementById('selectAllCheckbox');
+        const selectAll = document.getElementById('selectAll');
         if (selectAll) {
-            selectAll.checked = selectedCount === totalCheckboxes && totalCheckboxes > 0;
-            selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCheckboxes;
+            selectAll.checked = count === document.querySelectorAll('.visitor-checkbox').length;
         }
     }
 
     function toggleSelectAll(source) {
-        document.querySelectorAll('.visitor-checkbox').forEach(cb => {
-            cb.checked = source.checked;
-        });
+        document.querySelectorAll('.visitor-checkbox').forEach(cb => cb.checked = source.checked);
         updateSelection();
     }
 
     function bulkCheckout() {
-        const visitorIds = Array.from(selectedVisitors);
-        if (visitorIds.length === 0) return;
+        const ids = Array.from(selectedVisitors);
+        if (ids.length === 0) return;
         
-        if (!confirm(`Check out ${visitorIds.length} selected visitors?`)) return;
-        
-        const bulkBtn = document.getElementById('bulkCheckoutBtn');
-        bulkBtn.disabled = true;
-        bulkBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        if (!confirm(`Check out ${ids.length} visitors?`)) return;
         
         fetch('/api/visitors/bulk-checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ visitor_ids: visitorIds })
+            body: JSON.stringify({ visitor_ids: ids })
         })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                showToast(`${data.checked_out} visitors checked out`, 'success');
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                throw new Error(data.message || 'Bulk checkout failed');
+                // Redirect to checkout_success for the first visitor
+                window.location.href = `/checkout_success?visitor_id=${ids[0]}`;
             }
-        })
-        .catch(error => {
-            showToast(error.message, 'danger');
-            bulkBtn.disabled = false;
-            bulkBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Check-out Selected (<span id="selectedCount">' + visitorIds.length + '</span>)';
         });
-    }
-
-    // ===== UTILITIES =====
-    function updateActiveCount() {
-        document.getElementById('activeCount').textContent = activeVisitors.length;
-        document.getElementById('activeCountBadge').textContent = activeVisitors.length;
-    }
-
-    function showToast(message, type = 'info') {
-        if (window.VMS?.showAlert) {
-            window.VMS.showAlert(message, type);
-        } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
     }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-        showToast('Global scanner active on all pages', 'success');
-        document.getElementById('hardwareScannerInput').focus();
-        updateSelection(); // Initialize selection counts
+        hardwareInput.focus();
+        updateSelection();
     });
 
     // Click outside to refocus scanner
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('input, button, .result-row, .visitors-table')) {
+        if (!e.target.closest('input, button, .result-row')) {
             hardwareInput.focus();
         }
     });
