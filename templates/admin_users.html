@@ -1,0 +1,1243 @@
+{# templates/admin_users.html #}
+{% extends "base.html" %}
+
+{% block title %}User Management · KPR College{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center">
+    <i class="fas fa-users-cog fs-2 me-2" style="color: #1a237e;"></i>
+    <span class="fw-bold" style="font-size: 1.6rem;">User Management</span>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active">User Management</li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== PROFESSIONAL USER MANAGEMENT STYLES ===== */
+    :root {
+        --primary: #1a237e;
+        --primary-light: #e8eaf6;
+        --primary-dark: #0d1458;
+        --success: #00c853;
+        --success-light: #e8f5e9;
+        --warning: #ffab00;
+        --warning-light: #fff3e0;
+        --danger: #d50000;
+        --danger-light: #ffebee;
+        --info: #0091ea;
+        --info-light: #e1f5fe;
+        --purple: #aa00ff;
+        --purple-light: #f3e5f5;
+        --gray-50: #f8f9fa;
+        --gray-100: #f1f3f5;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+        --gray-600: #6c757d;
+        --gray-700: #495057;
+        --gray-800: #343a40;
+        --gray-900: #212529;
+        
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
+        --shadow-hover: 0 10px 20px -5px rgba(26,35,126,0.15);
+        
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+    }
+
+    body {
+        background: var(--gray-50);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Header Section */
+    .page-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h4 {
+        color: var(--gray-900);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header p {
+        color: var(--gray-600);
+        margin: 0.2rem 0 0;
+        font-size: 0.9rem;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 1.2rem;
+        transition: all 0.2s ease;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .stats-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stats-icon.primary { background: var(--primary-light); color: var(--primary); }
+    .stats-icon.success { background: var(--success-light); color: var(--success); }
+    .stats-icon.info { background: var(--info-light); color: var(--info); }
+    .stats-icon.warning { background: var(--warning-light); color: var(--warning); }
+
+    .stats-content h6 {
+        color: var(--gray-600);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.2rem;
+    }
+
+    .stats-content h4 {
+        color: var(--gray-900);
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.6rem;
+    }
+
+    /* Filter Card */
+    .filter-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .filter-label i {
+        color: var(--primary);
+        width: 16px;
+    }
+
+    .filter-input {
+        background: var(--gray-50) !important;
+        border: 1px solid var(--gray-200) !important;
+        border-radius: var(--radius-md) !important;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.9rem !important;
+        transition: all 0.2s !important;
+    }
+
+    .filter-input:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(26,35,126,0.1) !important;
+        background: white !important;
+    }
+
+    .input-group-text {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-right: none;
+        color: var(--gray-600);
+    }
+
+    /* Table Card */
+    .table-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table-header {
+        background: var(--gray-50);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .table-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .table-header h5 i {
+        color: var(--primary);
+    }
+
+    .table-header .badge-count {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* Avatar */
+    .user-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .user-avatar.admin {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .user-avatar.security {
+        background: var(--info-light);
+        color: var(--info);
+    }
+
+    /* Role Badges */
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+
+    .role-badge.admin {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .role-badge.security {
+        background: var(--info-light);
+        color: var(--info);
+        border-color: var(--info);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .status-badge.inactive {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-dot.active { background: var(--success); }
+    .status-dot.inactive { background: var(--gray-500); }
+
+    /* Table Styles */
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .user-table th {
+        background: var(--gray-50);
+        padding: 1rem 1.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .user-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+        color: var(--gray-800);
+        font-size: 0.9rem;
+    }
+
+    .user-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .user-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-600);
+        background: white;
+        border: 1px solid var(--gray-200);
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .action-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .action-btn.delete:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+    }
+
+    /* Dropdown */
+    .dropdown-toggle {
+        background: white;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-700);
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        border-radius: var(--radius-md);
+    }
+
+    .dropdown-toggle:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-300);
+    }
+
+    .dropdown-menu {
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        padding: 0.5rem;
+    }
+
+    .dropdown-item {
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dropdown-item:hover {
+        background: var(--gray-50);
+    }
+
+    .dropdown-item i {
+        width: 16px;
+    }
+
+    /* Pagination */
+    .pagination-custom {
+        display: flex;
+        gap: 0.3rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .page-item-custom {
+        margin: 0;
+    }
+
+    .page-link-custom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 0.5rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        background: white;
+        color: var(--gray-700);
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .page-link-custom:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-item-custom.active .page-link-custom {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-item-custom.disabled .page-link-custom {
+        background: var(--gray-50);
+        color: var(--gray-400);
+        border-color: var(--gray-200);
+        pointer-events: none;
+    }
+
+    /* Modals */
+    .modal-content {
+        border: none;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: var(--primary);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border-bottom: none;
+    }
+
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1.2rem 1.5rem;
+        border-top: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .modal-footer .btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26,35,126,0.1);
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.3rem;
+    }
+
+    .text-danger-star {
+        color: var(--danger);
+        margin-left: 2px;
+    }
+
+    /* Toast */
+    .toast-container {
+        z-index: 9999;
+    }
+
+    .toast {
+        border: none;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .toast.bg-success { background: var(--success) !important; }
+    .toast.bg-error { background: var(--danger) !important; }
+    .toast.bg-warning { background: var(--warning) !important; }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: var(--gray-500);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h6 {
+        color: var(--gray-700);
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+
+    .empty-state p {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Loading Spinner */
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 2px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .user-table th, 
+        .user-table td {
+            white-space: nowrap;
+            padding: 1rem;
+        }
+        
+        .table-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-row {
+            margin-top: 1rem;
+        }
+        
+        .pagination-custom {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+</style>
+
+<div class="container-fluid px-0">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h4 class="fw-bold">System Users</h4>
+            <p class="text-muted mb-0">Manage administrators and security staff accounts</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddUserModal()">
+            <i class="fas fa-user-plus me-2"></i>Add New User
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card d-flex align-items-center">
+                <div class="stats-icon primary me-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-content">
+                    <h6>Total Users</h6>
+                    <h4>{{ total_users }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card d-flex align-items-center">
+                <div class="stats-icon success me-3">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="stats-content">
+                    <h6>Administrators</h6>
+                    <h4>{{ users|selectattr('is_admin', 'equalto', true)|list|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card d-flex align-items-center">
+                <div class="stats-icon info me-3">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="stats-content">
+                    <h6>Security Staff</h6>
+                    <h4>{{ users|rejectattr('is_admin', 'equalto', true)|list|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card d-flex align-items-center">
+                <div class="stats-icon warning me-3">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-content">
+                    <h6>Last Login</h6>
+                    <h4>{{ last_login }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="GET" class="row g-3">
+            <div class="col-lg-5">
+                <div class="filter-label">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" class="form-control filter-input" name="search" 
+                           placeholder="Search by username, name, email..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="filter-label">
+                    <i class="fas fa-tag"></i>
+                    <span>Role</span>
+                </div>
+                <select class="form-select filter-input" name="role">
+                    <option value="all" {% if role_filter == 'all' %}selected{% endif %}>All Roles</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Administrators</option>
+                    <option value="security" {% if role_filter == 'security' %}selected{% endif %}>Security Staff</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <div class="filter-label">
+                    <i class="fas fa-circle"></i>
+                    <span>Status</span>
+                </div>
+                <select class="form-select filter-input" name="status">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-lg-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <h5>
+                <i class="fas fa-users"></i>
+                User Accounts
+                <span class="badge-count">{{ total_users }} Total</span>
+            </h5>
+            <div class="d-flex gap-2">
+                <span class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    {{ users|selectattr('is_active', 'equalto', true)|list|length }} active, 
+                    {{ users|selectattr('is_active', 'equalto', false)|list|length }} inactive
+                </span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Contact</th>
+                        <th>Department</th>
+                        <th>Last Login</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar {{ 'admin' if user.is_admin else 'security' }} me-3">
+                                    {{ (user.full_name or user.username)[0]|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ user.full_name or user.username }}</div>
+                                    <small class="text-muted">@{{ user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge {{ 'admin' if user.is_admin else 'security' }}">
+                                <i class="fas fa-{{ 'crown' if user.is_admin else 'shield-alt' }}"></i>
+                                {{ 'Administrator' if user.is_admin else 'Security Staff' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div><i class="fas fa-envelope text-muted me-2 small"></i>{{ user.email }}</div>
+                            {% if user.phone %}
+                            <div class="mt-1"><i class="fas fa-phone text-muted me-2 small"></i>{{ user.phone }}</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.department or '—' }}</td>
+                        <td>
+                            {% if user.last_login %}
+                            <span title="{{ user.last_login.strftime('%d %b %Y, %I:%M %p') }}">
+                                <i class="far fa-clock text-muted me-1"></i>
+                                {{ user.last_login.strftime('%d %b %Y') }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">
+                                <i class="far fa-clock me-1"></i>Never
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge {{ 'active' if user.is_active else 'inactive' }}">
+                                <span class="status-dot {{ 'active' if user.is_active else 'inactive' }}"></span>
+                                {{ 'Active' if user.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-sm dropdown-toggle" type="button" 
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="editUser({{ user.id }})">
+                                            <i class="fas fa-edit text-primary"></i>
+                                            Edit User
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="resetPassword({{ user.id }})">
+                                            <i class="fas fa-key text-warning"></i>
+                                            Reset Password
+                                        </a>
+                                    </li>
+                                    {% if user.id != current_user.id %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" 
+                                           onclick="toggleStatus({{ user.id }}, {{ 'true' if user.is_active else 'false' }})">
+                                            <i class="fas fa-{{ 'ban' if user.is_active else 'check-circle' }} 
+                                               text-{{ 'danger' if user.is_active else 'success' }}"></i>
+                                            {{ 'Deactivate' if user.is_active else 'Activate' }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" 
+                                           onclick="deleteUser({{ user.id }})">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete User
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h6>No Users Found</h6>
+                            <p>Click "Add New User" to create your first user account</p>
+                            <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">
+                                <i class="fas fa-user-plus me-2"></i>Add User
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="card-footer bg-white border-0 py-3 px-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing {{ ((page-1) * per_page) + 1 }} to 
+                    {{ min(page * per_page, total_users) }} of {{ total_users }} entries
+                </div>
+                <ul class="pagination-custom">
+                    <li class="page-item-custom {{ 'disabled' if page == 1 }}">
+                        <a class="page-link-custom" href="{{ url_for('admin_users', page=page-1, search=search_query, role=role_filter, status=status_filter) }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p >= page - 2 and p <= page + 2 %}
+                        <li class="page-item-custom {{ 'active' if p == page }}">
+                            <a class="page-link-custom" href="{{ url_for('admin_users', page=p, search=search_query, role=role_filter, status=status_filter) }}">{{ p }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item-custom {{ 'disabled' if page == total_pages }}">
+                        <a class="page-link-custom" href="{{ url_for('admin_users', page=page+1, search=search_query, role=role_filter, status=status_filter) }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="fas fa-user-plus me-2"></i>Add New User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId" name="userId">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Username <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" required 
+                                   placeholder="User Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName" 
+                                   placeholder="Full Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Email <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" required 
+                                   placeholder="Email">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   placeholder="+91 98765 43210">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" id="department" name="department">
+                                <option value="">Select Department</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept }}">{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" id="isAdmin" name="isAdmin">
+                                <option value="false">Security Staff</option>
+                                <option value="true">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="passwordField">
+                            <label class="form-label">
+                                Password <span class="text-danger-star">*</span>
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter password" minlength="3">
+                            <small class="text-muted">Minimum 3 characters</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <span class="spinner-border spinner-border-sm d-none" id="saveSpinner"></span>
+                        <span id="saveText">Save User</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--warning);">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>Reset Password
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="resetPasswordForm">
+                <input type="hidden" id="resetUserId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            New Password <span class="text-danger-star">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="newPassword" required minlength="3">
+                        <small class="text-muted">Minimum 3 characters</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Confirm Password <span class="text-danger-star">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="confirmPassword" required minlength="3">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn" id="resetBtn" style="background: var(--warning); color: white; border: none;">
+                        <span class="spinner-border spinner-border-sm d-none" id="resetSpinner"></span>
+                        Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--danger);">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" id="deleteMessage">Are you sure you want to delete this user? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn" id="confirmDeleteBtn" style="background: var(--danger); color: white; border: none;">
+                    <span class="spinner-border spinner-border-sm d-none" id="deleteSpinner"></span>
+                    Delete User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<script>
+let currentUserId = null;
+
+// Add User
+function openAddUserModal() {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus me-2"></i>Add New User';
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('passwordField').style.display = 'block';
+    document.getElementById('password').required = true;
+    new bootstrap.Modal(document.getElementById('userModal')).show();
+}
+
+// Edit User
+async function editUser(userId) {
+    try {
+        const response = await fetch(`/admin/users/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const user = data.user;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit User';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('fullName').value = user.full_name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('department').value = user.department;
+            document.getElementById('isAdmin').value = user.is_admin.toString();
+            document.getElementById('passwordField').style.display = 'none';
+            document.getElementById('password').required = false;
+            
+            new bootstrap.Modal(document.getElementById('userModal')).show();
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error loading user details', 'error');
+    }
+}
+
+// Save User
+document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const userId = document.getElementById('userId').value;
+    const isEdit = !!userId;
+    
+    const formData = {
+        username: document.getElementById('username').value,
+        full_name: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        department: document.getElementById('department').value,
+        is_admin: document.getElementById('isAdmin').value === 'true'
+    };
+    
+    if (!isEdit) {
+        formData.password = document.getElementById('password').value;
+    }
+    
+    // Validate
+    if (!formData.username || !formData.email) {
+        showToast('Username and email are required', 'error');
+        return;
+    }
+    
+    if (!isEdit && (!formData.password || formData.password.length < 3)) {
+        showToast('Password must be at least 3 characters', 'error');
+        return;
+    }
+    
+    try {
+        showButtonLoading('saveBtn', true);
+        
+        const url = isEdit ? `/admin/users/${userId}/edit` : '/admin/users/add';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error saving user', 'error');
+    } finally {
+        showButtonLoading('saveBtn', false);
+    }
+});
+
+// Reset Password
+function resetPassword(userId) {
+    document.getElementById('resetUserId').value = userId;
+    document.getElementById('resetPasswordForm').reset();
+    new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+}
+
+document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const userId = document.getElementById('resetUserId').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (newPassword !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+    }
+    
+    if (newPassword.length < 3) {
+        showToast('Password must be at least 3 characters', 'error');
+        return;
+    }
+    
+    try {
+        showButtonLoading('resetBtn', true);
+        
+        const response = await fetch(`/admin/users/${userId}/reset-password`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({password: newPassword})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error resetting password', 'error');
+    } finally {
+        showButtonLoading('resetBtn', false);
+    }
+});
+
+// Toggle Status
+async function toggleStatus(userId, isActive) {
+    if (!confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this user?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error toggling user status', 'error');
+    }
+}
+
+// Delete User
+function deleteUser(userId) {
+    document.getElementById('deleteMessage').textContent = 
+        'Are you sure you want to delete this user? This action cannot be undone.';
+    currentUserId = userId;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (!currentUserId) return;
+    
+    try {
+        showButtonLoading('confirmDeleteBtn', true);
+        
+        const response = await fetch(`/admin/users/${currentUserId}/delete`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error deleting user', 'error');
+    } finally {
+        showButtonLoading('confirmDeleteBtn', false);
+        currentUserId = null;
+    }
+});
+
+// Utility Functions
+function showButtonLoading(buttonId, isLoading) {
+    const btn = document.getElementById(buttonId);
+    const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
+    const text = document.getElementById(buttonId.replace('Btn', 'Text'));
+    
+    if (isLoading) {
+        btn.disabled = true;
+        if (spinner) spinner.classList.remove('d-none');
+        if (text) text.textContent = 'Processing...';
+    } else {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add('d-none');
+        if (text) text.textContent = buttonId.includes('save') ? 'Save User' : 
+                                      (buttonId.includes('reset') ? 'Reset Password' : 'Delete User');
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toastContainer = document.querySelector('.toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}
