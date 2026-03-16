@@ -633,74 +633,89 @@
         
         /* User Profile */
         .user-profile {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 4px 12px 4px 4px;
-            border-radius: 30px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
+            gap: 8px;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 5px 8px 5px 5px;
+            min-height: 38px;
             cursor: pointer;
             transition: var(--transition);
         }
-        
+
         .user-profile:hover {
-            background: white;
-            border-color: var(--primary);
+            background: #f8fafc;
+            border-color: #cbd5e1;
         }
-        
+
         .user-avatar {
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
             border-radius: 8px;
-            background: var(--primary-gradient);
-            color: white;
+            background: #084298;
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.78rem;
             flex-shrink: 0;
         }
-        
+
         .user-info {
+            display: flex;
+            flex-direction: column;
             min-width: 0;
+            margin-right: 4px;
+            line-height: 1;
         }
-        
+
         .user-info h6 {
             margin: 0;
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: 0.9rem;
+            font-weight: 700;
+            color: #111827;
+            font-size: 0.8rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 120px;
+            max-width: 140px;
+            line-height: 1.1;
+            text-transform: none;
         }
-        
+
         .user-info p {
-            margin: 0;
+            margin: 2px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 1;
+        }
+
+        .badge-admin, .badge-security {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 18px;
+            border-radius: 999px;
+            padding: 0 8px;
             font-size: 0.65rem;
-            color: var(--gray-500);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: none;
+            color: #ffffff;
             white-space: nowrap;
         }
-        
-        .badge-admin, .badge-security {
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            color: white;
-        }
-        
+
         .badge-admin {
-            background: var(--primary-gradient);
+            background: #1d4ed8;
         }
-        
+
         .badge-security {
-            background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+            background: #334155;
         }
-        
+
         .dropdown-menu {
             border: none;
             border-radius: 12px;
@@ -1321,7 +1336,7 @@
                                     {% endif %}
                                 </p>
                             </div>
-                            <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--gray-500);"></i>
+                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
